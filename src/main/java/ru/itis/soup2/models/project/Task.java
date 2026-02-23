@@ -1,4 +1,5 @@
-package ru.itis.soup2.models;
+package ru.itis.soup2.models.project;
+
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -6,9 +7,9 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import ru.itis.soup2.models.enums.TaskPriority;
 import ru.itis.soup2.models.enums.TaskStatus;
-
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Builder
 @AllArgsConstructor
@@ -50,5 +51,8 @@ public class Task {
     @ManyToOne
     @JoinColumn(name = "sprint_id")
     private Sprint sprint;
+
+    @OneToMany(mappedBy = "task")
+    private List<Attachment> attachments;
 }
 

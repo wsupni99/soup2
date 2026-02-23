@@ -1,4 +1,4 @@
-package ru.itis.soup2.models;
+package ru.itis.soup2.models.core;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;

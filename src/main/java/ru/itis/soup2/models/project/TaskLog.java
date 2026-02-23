@@ -1,9 +1,12 @@
-package ru.itis.soup2.models;
+package ru.itis.soup2.models.project;
+
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import ru.itis.soup2.models.core.User;
+
 import java.time.LocalDateTime;
 
 @Builder
@@ -11,11 +14,11 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @Data
 @Entity
-@Table(name = "comments", schema = "project")
-public class Comment {
+@Table(name = "task_log", schema = "project")
+public class TaskLog {
     @Id
-    @Column(name = "comment_id")
-    private Integer commentId;
+    @Column(name = "log_id")
+    private Integer logId;
 
     @ManyToOne
     @JoinColumn(name = "task_id")
@@ -25,9 +28,9 @@ public class Comment {
     @JoinColumn(name = "user_id")
     private User user;
 
-    private String text;
+    private String action;
 
-    @Column(name = "created_at")
-    private LocalDateTime createdAt;
+    @Column(name = "changed_at")
+    private LocalDateTime changedAt;
 }
 

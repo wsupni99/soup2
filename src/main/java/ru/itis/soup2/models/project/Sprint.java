@@ -1,26 +1,29 @@
-package ru.itis.soup2.models;
+package ru.itis.soup2.models.project;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import ru.itis.soup2.models.enums.ProjectStatus;
-
 import java.time.LocalDate;
+import java.util.List;
 
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
 @Entity
-@Table(name = "projects", schema = "project")
-public class Project {
+@Table(name = "sprints", schema = "project")
+public class Sprint {
     @Id
-    @Column(name = "project_id")
-    private Integer projectId;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "sprint_id")
+    private Integer sprintId;
+
+    @ManyToOne
+    @JoinColumn(name = "project_id")
+    private Project project;
 
     private String name;
-    private String description;
 
     @Column(name = "start_date")
     private LocalDate startDate;
@@ -28,10 +31,7 @@ public class Project {
     @Column(name = "end_date")
     private LocalDate endDate;
 
-    @Enumerated(EnumType.STRING)
-    private ProjectStatus status;
-
-    @ManyToOne
-    @JoinColumn(name = "manager_id")
-    private User manager;
+    @OneToMany(mappedBy = "sprint")
+    private List<Task> tasks;
 }
+
