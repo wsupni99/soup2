@@ -17,6 +17,7 @@ import java.time.LocalDateTime;
 @Table(name = "task_log", schema = "project")
 public class TaskLog {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "log_id")
     private Integer logId;
 

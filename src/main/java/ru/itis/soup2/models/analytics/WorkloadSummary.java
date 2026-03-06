@@ -17,6 +17,7 @@ import ru.itis.soup2.models.project.Sprint;
 @Table(name = "workload_summary", schema = "analytics")
 public class WorkloadSummary {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "summary_id")
     private Integer summaryId;
 
