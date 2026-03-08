@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import ru.itis.soup2.models.project.Task;
 
 import java.util.Set;
 
@@ -37,4 +38,7 @@ public class User {
             inverseJoinColumns = @JoinColumn(name = "role_id")
     )
     private Set<Role> roles;
+
+    @ManyToMany(mappedBy = "assignees")
+    private Set<Task> tasks;
 }

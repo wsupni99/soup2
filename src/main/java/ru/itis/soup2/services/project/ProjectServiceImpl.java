@@ -1,5 +1,6 @@
 package ru.itis.soup2.services.project;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -11,13 +12,9 @@ import java.util.Optional;
 
 @Service
 @Transactional(readOnly = true)
+@RequiredArgsConstructor
 public class ProjectServiceImpl implements ProjectService {
-
     private final ProjectRepository projectsRepository;
-
-    public ProjectServiceImpl(ProjectRepository projectsRepository) {
-        this.projectsRepository = projectsRepository;
-    }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     @Override

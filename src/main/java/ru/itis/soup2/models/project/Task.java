@@ -5,11 +5,13 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import ru.itis.soup2.models.core.User;
 import ru.itis.soup2.models.enums.TaskPriority;
 import ru.itis.soup2.models.enums.TaskStatus;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
 
 @Builder
 @AllArgsConstructor
@@ -55,5 +57,14 @@ public class Task {
 
     @OneToMany(mappedBy = "task")
     private List<Attachment> attachments;
+
+    @ManyToMany
+    @JoinTable(
+            name = "task_assignments",
+            schema = "project",
+            joinColumns = @JoinColumn(name = "task_id"),
+            inverseJoinColumns = @JoinColumn(name = "user_id")
+    )
+    private Set<User> assignees;
 }
 
