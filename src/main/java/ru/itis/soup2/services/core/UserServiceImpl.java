@@ -4,9 +4,13 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.itis.soup2.dto.UserDto;
+import ru.itis.soup2.models.core.Role;
 import ru.itis.soup2.models.core.User;
 import ru.itis.soup2.repositories.core.UserRepository;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -63,5 +67,17 @@ public class UserServiceImpl implements UserService {
     @Override
     public List<User> getAllManagers() {
         return userRepository.findByRolesId(2);
+    }
+
+    @Override
+    public List<UserDto> getUsersDto() {
+        return userRepository.findUsersWithSingleRole().stream()
+                .map(row -> new UserDto(
+                        (Integer) row[0],
+                        (String) row[1],
+                        (String) row[2],
+                        row[3] != null ? List.of((String) row[3]) : List.of()
+                ))
+                .toList();
     }
 }

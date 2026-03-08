@@ -18,4 +18,12 @@ public interface UserRepository extends JpaRepository<User, Integer> {
     );
 
     List<User> findByRolesId(Integer roleId);
+
+    @Query(value = """
+    SELECT u.user_id, u.name, u.email, r.role_name 
+    FROM core.users u 
+    LEFT JOIN core.user_roles ur ON u.user_id = ur.user_id 
+    LEFT JOIN core.roles r ON ur.role_id = r.role_id
+    """, nativeQuery = true)
+    List<Object[]> findUsersWithSingleRole();
 }
