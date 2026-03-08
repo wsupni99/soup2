@@ -1,5 +1,6 @@
 package ru.itis.soup2.services.core;
 
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -9,8 +10,6 @@ import ru.itis.soup2.models.core.Role;
 import ru.itis.soup2.models.core.User;
 import ru.itis.soup2.repositories.core.UserRepository;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -20,6 +19,8 @@ import java.util.Optional;
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final RoleService roleService;
+    private static final String MANAGER_ROLE_NAME = "MANAGER";
 
     @Override
     public void register(String email, String name, String rawPassword) {
@@ -66,7 +67,9 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public List<User> getAllManagers() {
-        return userRepository.findByRolesId(2);
+        Role managerRole = roleService.findByName(MANAGER_ROLE_NAME)
+                .orElseThrow(()-> new EntityNotFoundException("Role MANAGER not found"));
+        return userRepository.findByRolesId(managerRole.getId());
     }
 
     @Override

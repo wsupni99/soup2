@@ -21,6 +21,7 @@ public class CommentServiceImpl implements CommentService {
         return commentRepository.save(comment);
     }
 
+    @Override
     public List<Comment> findByTaskId(Integer taskId) {
         return commentRepository.findByTaskId(taskId);
     }

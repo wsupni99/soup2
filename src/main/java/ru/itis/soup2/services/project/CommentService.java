@@ -9,4 +9,6 @@ public interface CommentService {
 
     @Transactional
     Comment createComment(Comment comment);
+
+    List<Comment> findByTaskId(Integer taskId);
 }

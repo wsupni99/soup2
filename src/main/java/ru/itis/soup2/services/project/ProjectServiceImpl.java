@@ -1,5 +1,6 @@
 package ru.itis.soup2.services.project;
 
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -40,6 +41,14 @@ public class ProjectServiceImpl implements ProjectService {
     @Transactional
     @Override
     public void delete(Integer id) {
-        projectRepository.deleteById(id);
+        Project project = projectRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Project not found"));
+        if (!project.getSprints().isEmpty()) {
+            throw new IllegalStateException("Cannot delete project with existing sprints");
+        }
+        if (!project.getTasks().isEmpty()) {
+            throw new IllegalStateException("Cannot delete project with existing tasks");
+        }
+        projectRepository.delete(project);
     }
 }

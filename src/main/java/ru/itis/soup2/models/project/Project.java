@@ -8,6 +8,8 @@ import ru.itis.soup2.models.core.User;
 import ru.itis.soup2.models.enums.ProjectStatus;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 @Builder
 @AllArgsConstructor
@@ -32,6 +34,12 @@ public class Project {
 
     @Enumerated(EnumType.STRING)
     private ProjectStatus status;
+
+    @OneToMany(mappedBy = "project")
+    private List<Sprint> sprints = new ArrayList<>();
+
+    @OneToMany(mappedBy = "project")
+    private List<Task> tasks = new ArrayList<>();
 
     @ManyToOne
     @JoinColumn(name = "manager_id")
