@@ -9,25 +9,25 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-@Transactional(readOnly = true)
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class AttachmentServiceImpl implements AttachmentService {
-    private final AttachmentRepository attachmentsRepository;
+    private final AttachmentRepository attachmentRepository;
 
     @Transactional
     @Override
     public Attachment create(Attachment attachment) {
-        return attachmentsRepository.save(attachment);
+        return attachmentRepository.save(attachment);
     }
 
     @Override
     public Optional<Attachment> findById(Integer id) {
-        return attachmentsRepository.findById(id);
+        return attachmentRepository.findById(id);
     }
 
     @Override
     public List<Attachment> findByTaskId(Integer taskId) {
-        return attachmentsRepository.findByTaskId(taskId);
+        return attachmentRepository.findByTaskId(taskId);
     }
 }
 

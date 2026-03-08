@@ -17,7 +17,7 @@ public class Sprint {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "sprint_id")
-    private Integer sprintId;
+    private Integer id;
 
     @ManyToOne
     @JoinColumn(name = "project_id")

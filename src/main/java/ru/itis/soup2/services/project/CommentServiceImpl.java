@@ -9,20 +9,19 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
-@Transactional(readOnly = true)
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class CommentServiceImpl implements CommentService {
-    CommentRepository commentRepository;
-
-    @Override
-    public List<Comment> getCommentsByTaskId(Integer taskId) {
-        return commentRepository.findByTaskIdOrderByCreatedAtDesc(taskId);
-    }
+    private final CommentRepository commentRepository;
 
     @Transactional
     @Override
     public Comment createComment(Comment comment) {
         comment.setCreatedAt(LocalDateTime.now());
         return commentRepository.save(comment);
+    }
+
+    public List<Comment> findByTaskId(Integer taskId) {
+        return commentRepository.findByTaskId(taskId);
     }
 }

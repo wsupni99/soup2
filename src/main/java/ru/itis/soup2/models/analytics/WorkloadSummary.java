@@ -19,7 +19,7 @@ public class WorkloadSummary {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "summary_id")
-    private Integer summaryId;
+    private Integer id;
 
     @ManyToOne
     @JoinColumn(name = "user_id")

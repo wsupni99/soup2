@@ -16,7 +16,7 @@ public class Attachment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "attachment_id")
-    private Integer attachmentId;
+    private Integer id;
 
     @ManyToOne
     @JoinColumn(name = "task_id")

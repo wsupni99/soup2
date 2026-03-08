@@ -19,7 +19,7 @@ public class TaskLog {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "log_id")
-    private Integer logId;
+    private Integer id;
 
     @ManyToOne
     @JoinColumn(name = "task_id")

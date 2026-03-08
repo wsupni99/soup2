@@ -9,18 +9,14 @@ import ru.itis.soup2.models.project.Task;
 import java.util.List;
 
 public interface TaskRepository extends JpaRepository<Task, Integer> {
-    List<Task> findByProjectId(Integer projectId);
-    List<Task> findBySprintId(Integer sprintId);
-    List<Task> findByParentTaskId(Integer parentTaskId);
-    List<Task> findByStatus(TaskStatus status);
-
-    @Query("SELECT COUNT(t) FROM Task t WHERE t.project.projectId = :projectId")
-    long countByProjectId(@Param("projectId") Integer projectId);
+    @Query("SELECT t FROM Task t JOIN t.assignees u WHERE u.id = :userId")
+    List<Task> findByUserId(@Param("userId") Integer userId);
 
     @Query("SELECT t FROM Task t WHERE " +
-            "(:projectId IS NULL OR t.project.projectId = :projectId) AND " +
-            "(:sprintId IS NULL OR t.sprint.sprintId = :sprintId) AND " +
-            "(:status IS NULL OR t.status = :status)")
+            "(:projectId IS NULL OR t.project.id = :projectId) AND " +
+            "(:sprintId IS NULL OR t.sprint.id = :sprintId) AND " +
+            "(:status IS NULL OR t.status = :status) AND " +
+            "(:userId IS NULL OR EXISTS (SELECT 1 FROM t.assignees u WHERE u.id = :userId))")
     List<Task> findWithFilters(
             @Param("projectId") Integer projectId,
             @Param("sprintId") Integer sprintId,
