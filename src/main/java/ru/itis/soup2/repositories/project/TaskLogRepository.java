@@ -7,7 +7,7 @@ import ru.itis.soup2.models.project.TaskLog;
 
 import java.util.List;
 
-public interface TaskLogRepository extends JpaRepository<TaskLog, Long> {
-    @Query("SELECT tl FROM TaskLog tl WHERE tl.task.id = :taskId")
-    List<TaskLog> findByTaskId(@Param("taskId") Integer taskId);
+public interface TaskLogRepository extends JpaRepository<TaskLog, Integer> {   // ← Integer!
+    @Query("SELECT tl FROM TaskLog tl WHERE tl.task.id = :taskId ORDER BY tl.changedAt DESC")
+    List<TaskLog> findByTaskIdOrderByChangedAtDesc(@Param("taskId") Integer taskId);
 }

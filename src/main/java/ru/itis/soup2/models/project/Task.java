@@ -10,6 +10,7 @@ import ru.itis.soup2.models.enums.TaskPriority;
 import ru.itis.soup2.models.enums.TaskStatus;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -57,6 +58,9 @@ public class Task {
 
     @OneToMany(mappedBy = "task")
     private List<Attachment> attachments;
+
+    @OneToMany(mappedBy = "task")
+    private List<Comment> comments = new ArrayList<>();
 
     @ManyToMany
     @JoinTable(

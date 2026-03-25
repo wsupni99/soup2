@@ -4,8 +4,8 @@ import java.util.List;
 
 public record UserDto(
         Integer id,
-        String name,
         String email,
+        String name,
+        String contactInfo,
         List<String> roles
 ) {}
-

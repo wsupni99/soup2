@@ -10,7 +10,13 @@ import java.util.List;
 
 public interface TaskRepository extends JpaRepository<Task, Integer> {
     @Query("SELECT t FROM Task t JOIN t.assignees u WHERE u.id = :userId")
-    List<Task> findByUserId(@Param("userId") Integer userId);
+    List<Task> findByAssigneeId(@Param("userId") Integer userId);
+
+    List<Task> findByProjectId(Integer projectId);
+
+    List<Task> findBySprintId(Integer sprintId);
+
+    List<Task> findByStatus(TaskStatus status);
 
     @Query("SELECT t FROM Task t WHERE " +
             "(:projectId IS NULL OR t.project.id = :projectId) AND " +
@@ -23,4 +29,3 @@ public interface TaskRepository extends JpaRepository<Task, Integer> {
             @Param("status") TaskStatus status,
             @Param("userId") Integer userId);
 }
-

@@ -9,8 +9,11 @@ import ru.itis.soup2.models.project.Project;
 import java.util.List;
 
 public interface ProjectRepository extends JpaRepository<Project, Integer> {
+
     @Query("SELECT p FROM Project p WHERE p.manager.id = :managerId")
     List<Project> findByManagerId(@Param("managerId") Integer managerId);
 
     List<Project> findByStatus(ProjectStatus status);
+
+    boolean existsByName(String name);
 }

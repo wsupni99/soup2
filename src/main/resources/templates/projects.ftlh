@@ -1,17 +1,10 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <meta charset="UTF-8">
-    <title>Projects</title>
-</head>
-<body>
 <h1>Projects</h1>
-
-<ul>
-    <#list projects as project>
-        <li>${project.name} - ${project.description}</li>
+<a href="/projects/new">+ New Project</a>
+<table>
+    <#list projects as p>
+        <tr>
+            <td>${p.name}</td>
+            <td><a href="/projects/${p.id}/edit">Edit</a></td>
+        </tr>
     </#list>
-</ul>
-
-</body>
-</html>
+</table>

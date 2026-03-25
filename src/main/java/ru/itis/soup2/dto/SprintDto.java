@@ -2,13 +2,11 @@ package ru.itis.soup2.dto;
 
 import java.time.LocalDate;
 
-public record ProjectDto(
+public record SprintDto(
         Integer id,
         String name,
-        String description,
         LocalDate startDate,
         LocalDate endDate,
-        String status,
-        Integer managerId,
-        String managerName
+        Integer projectId,
+        String projectName
 ) {}

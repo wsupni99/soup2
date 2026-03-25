@@ -5,7 +5,13 @@ import ru.itis.soup2.models.analytics.WorkloadSummary;
 
 import java.util.List;
 
-public interface WorkloadSummaryRepository extends JpaRepository<WorkloadSummary, Long> {
+public interface WorkloadSummaryRepository extends JpaRepository<WorkloadSummary, Integer> {  // ← Integer!
+
     List<WorkloadSummary> findByUserId(Integer userId);
+
     List<WorkloadSummary> findByProjectId(Integer projectId);
+
+    List<WorkloadSummary> findBySprintId(Integer sprintId);
+
+    List<WorkloadSummary> findByUserIdAndProjectId(Integer userId, Integer projectId);
 }

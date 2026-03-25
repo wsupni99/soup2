@@ -5,6 +5,7 @@ import ru.itis.soup2.models.core.Role;
 
 import java.util.Optional;
 
-public interface RoleRepository extends JpaRepository<Role, Long> {
+public interface RoleRepository extends JpaRepository<Role, Integer> {
+
     Optional<Role> findByRoleName(String roleName);
 }
