@@ -12,8 +12,6 @@ public interface UserRepository extends JpaRepository<User, Integer> {
 
     Optional<User> findByEmail(String email);
 
-    List<User> findByRolesId(Integer roleId);
-
     @Query("""
         SELECT new ru.itis.soup2.dto.UserWithRoleDto(
             u.id,
@@ -22,7 +20,13 @@ public interface UserRepository extends JpaRepository<User, Integer> {
             r.roleName
         )
         FROM User u
-        LEFT JOIN u.roles r
+        LEFT JOIN u.role r
         """)
     List<UserWithRoleDto> findUsersWithRoles();
+
+    @Query("SELECT u FROM User u WHERE u.role.roleName = :roleName")
+    List<User> findByRoleName(String roleName);
+
+    @Query("SELECT u FROM User u WHERE u.role.roleName = 'ROLE_MANAGER'")
+    List<User> findManagers();
 }

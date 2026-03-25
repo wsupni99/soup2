@@ -12,7 +12,7 @@ import java.util.List;
 
 @Controller
 @RequestMapping("/admin")
-@PreAuthorize("hasRole('ADMIN')")   // весь контроллер только для админа
+@PreAuthorize("hasRole('ROLE_ADMIN')")   // весь контроллер только для админа
 @RequiredArgsConstructor
 public class AdminController {
 

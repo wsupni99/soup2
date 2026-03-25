@@ -11,9 +11,6 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.itis.soup2.models.core.User;
 import ru.itis.soup2.repositories.core.UserRepository;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -22,28 +19,27 @@ public class CustomUserDetailsService implements UserDetailsService {
     private final UserRepository userRepository;
 
     @Override
-    @Transactional(readOnly = true)   // ← Важно! Открываем транзакцию
+    @Transactional(readOnly = true)
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        log.info("CustomUserDetailsService: Получен email для поиска: '{}'", email);
+        log.info("CustomUserDetailsService: Загрузка пользователя по email: '{}'", email);
 
         User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> {
-                    log.warn("Пользователь с email {} не найден", email);
-                    return new UsernameNotFoundException("User not found: " + email);
-                });
+                .orElseThrow(() -> new UsernameNotFoundException("User not found with email: " + email));
 
-        // Загружаем роли внутри транзакции
-        List<SimpleGrantedAuthority> authorities = user.getRoles().stream()
-                .map(role -> new SimpleGrantedAuthority("ROLE_" + role.getRoleName()))
-                .collect(Collectors.toList());
+        // НОВАЯ связь — одна роль
+        SimpleGrantedAuthority authority = new SimpleGrantedAuthority("ROLE_" + user.getRole().getRoleName());
 
-        log.info("Пользователь успешно загружен: id={}, email={}, roles={}",
-                user.getId(), user.getEmail(), authorities);
+        log.info("Пользователь успешно загружен → email={}, role={}",
+                user.getEmail(), user.getRole().getRoleName());
 
         return org.springframework.security.core.userdetails.User
                 .withUsername(user.getEmail())
                 .password(user.getPassword())
-                .authorities(authorities)
+                .authorities(authority)
+                .accountExpired(false)
+                .accountLocked(false)
+                .credentialsExpired(false)
+                .disabled(false)
                 .build();
     }
 }

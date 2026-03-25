@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.itis.soup2.dto.RegisterRequestDto;
 import ru.itis.soup2.dto.UserWithRoleDto;
 import ru.itis.soup2.models.core.Role;
 import ru.itis.soup2.models.core.User;
@@ -27,21 +28,32 @@ public class UserServiceImpl implements UserService {
 
     @Transactional
     @Override
-    public void register(String email, String name, String rawPassword) {
-        log.info("=== РЕГИСТРАЦИЯ === Попытка регистрации пользователя: {}", email);
+    public void register(RegisterRequestDto dto) {
+        log.info("Регистрация пользователя: email={}, роль={}", dto.email(), dto.roleName());
 
         User user = new User();
-        user.setEmail(email.trim());
-        user.setName(name.trim());
+        user.setEmail(dto.email().trim());
+        user.setName(dto.name().trim());
+        user.setPassword(passwordEncoder.encode(dto.password().trim()));
         user.setContactInfo("");
 
-        String encodedPassword = passwordEncoder.encode(rawPassword.trim());
-        user.setPassword(encodedPassword);
+        User savedUser = userRepository.save(user);
 
-        log.info("Пароль зашифрован. Хэш начинается с: {}", encodedPassword.substring(0, 20) + "...");
+        // Определяем роль
+        String roleName = dto.roleName() != null ? dto.roleName().trim().toUpperCase() : "ROLE_DEVELOPER";
 
-        userRepository.save(user);
-        log.info("Пользователь успешно сохранён в БД с id = {}", user.getId());
+        if (!roleName.startsWith("ROLE_")) {
+            roleName = "ROLE_" + roleName;
+        }
+
+        Role role = roleService.findByName(roleName)
+                .orElseGet(() -> roleService.findByName("ROLE_DEVELOPER")
+                        .orElseThrow(() -> new EntityNotFoundException("Default role not found")));
+
+        savedUser.setRole(role);           // ← новая связь!
+        userRepository.save(savedUser);
+
+        log.info("Пользователь {} успешно зарегистрирован с ролью {}", dto.email(), roleName);
     }
 
     @Override
@@ -91,10 +103,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public List<User> getAllManagers() {
-        Role managerRole = roleService.findByName(MANAGER_ROLE_NAME)
-                .orElseThrow(() -> new EntityNotFoundException("Role MANAGER not found"));
-
-        return userRepository.findByRolesId(managerRole.getId());
+        return userRepository.findManagers();
     }
 
     @Override

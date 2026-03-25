@@ -30,8 +30,8 @@ public class ProjectController {
         return "tasks";                    // tasks.ftlh
     }
 
-    // ==================== PROJECTS (только MANAGER и ADMIN) ====================
-    @PreAuthorize("hasAnyRole('MANAGER', 'ADMIN')")
+    // ==================== PROJECTS (только ROLE_MANAGER и ROLE_ADMIN) ====================
+    @PreAuthorize("hasAnyRole('ROLE_MANAGER', 'ROLE_ADMIN')")
     @GetMapping("/projects")
     public String projectsPage(Model model) {
         List<Project> projects = projectService.getAllProjects();
@@ -39,21 +39,21 @@ public class ProjectController {
         return "projects";                 // projects.ftlh
     }
 
-    @PreAuthorize("hasAnyRole('MANAGER', 'ADMIN')")
+    @PreAuthorize("hasAnyRole('ROLE_MANAGER', 'ROLE_ADMIN')")
     @GetMapping("/projects/new")
     public String newProjectForm(Model model) {
         model.addAttribute("project", new Project());
         return "project-form";
     }
 
-    @PreAuthorize("hasAnyRole('MANAGER', 'ADMIN')")
+    @PreAuthorize("hasAnyRole('ROLE_MANAGER', 'ROLE_ADMIN')")
     @PostMapping("/projects")
     public String createProject(@ModelAttribute Project project) {
         projectService.create(project);
         return "redirect:/projects";
     }
 
-    @PreAuthorize("hasAnyRole('MANAGER', 'ADMIN')")
+    @PreAuthorize("hasAnyRole('ROLE_MANAGER', 'ROLE_ADMIN')")
     @GetMapping("/projects/{id}/edit")
     public String editProject(@PathVariable Integer id, Model model) {
         Project project = projectService.getProjectById(id)
@@ -62,7 +62,7 @@ public class ProjectController {
         return "project-form";
     }
 
-    @PreAuthorize("hasAnyRole('MANAGER', 'ADMIN')")
+    @PreAuthorize("hasAnyRole('ROLE_MANAGER', 'ROLE_ADMIN')")
     @PostMapping("/projects/{id}/update")
     public String updateProject(@PathVariable Integer id, @ModelAttribute Project project) {
         project.setId(id);   // важно для обновления
@@ -70,8 +70,8 @@ public class ProjectController {
         return "redirect:/projects";
     }
 
-    // ==================== SPRINTS (только MANAGER и ADMIN) ====================
-    @PreAuthorize("hasAnyRole('MANAGER', 'ADMIN')")
+    // ==================== SPRINTS (только ROLE_MANAGER и ROLE_ADMIN) ====================
+    @PreAuthorize("hasAnyRole('ROLE_MANAGER', 'ROLE_ADMIN')")
     @GetMapping("/sprints")
     public String sprintsPage(Model model) {
         List<Sprint> sprints = sprintService.getAllSprints();
@@ -79,14 +79,14 @@ public class ProjectController {
         return "sprints";
     }
 
-    @PreAuthorize("hasAnyRole('MANAGER', 'ADMIN')")
+    @PreAuthorize("hasAnyRole('ROLE_MANAGER', 'ROLE_ADMIN')")
     @GetMapping("/sprints/new")
     public String newSprintForm(Model model) {
         model.addAttribute("sprint", new Sprint());
         return "sprint-form";
     }
 
-    @PreAuthorize("hasAnyRole('MANAGER', 'ADMIN')")
+    @PreAuthorize("hasAnyRole('ROLE_MANAGER', 'ROLE_ADMIN')")
     @PostMapping("/sprints")
     public String createSprint(@ModelAttribute Sprint sprint) {
         sprintService.create(sprint);

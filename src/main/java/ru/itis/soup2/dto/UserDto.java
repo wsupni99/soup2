@@ -1,11 +1,11 @@
 package ru.itis.soup2.dto;
 
-import java.util.List;
+import ru.itis.soup2.models.core.Role;
 
 public record UserDto(
         Integer id,
         String email,
         String name,
         String contactInfo,
-        List<String> roles
+        Role role
 ) {}

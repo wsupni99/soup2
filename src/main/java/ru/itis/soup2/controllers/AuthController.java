@@ -5,8 +5,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import ru.itis.soup2.dto.RegisterRequestDto;
 import ru.itis.soup2.services.core.UserService;
 
 @Slf4j
@@ -40,17 +42,14 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public String register(@RequestParam String name,
-                           @RequestParam String email,
-                           @RequestParam String password) {
-        log.info("Получен запрос на регистрацию: name={}, email={}", name, email);
+    public String register(@ModelAttribute RegisterRequestDto dto) {
+        log.info("Запрос регистрации: {} ({})", dto.email(), dto.roleName());
 
         try {
-            userService.register(email, name, password);
-            log.info("Регистрация успешно завершена для {}", email);
+            userService.register(dto);
             return "redirect:/login?registered=true";
         } catch (Exception e) {
-            log.error("Ошибка при регистрации пользователя {}", email, e);
+            log.error("Ошибка при регистрации {}", dto.email(), e);
             return "redirect:/register?error=true";
         }
     }

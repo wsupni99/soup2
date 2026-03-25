@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import ru.itis.soup2.models.project.Task;
 
+import java.util.HashSet;
 import java.util.Set;
 
 @Builder
@@ -30,14 +31,9 @@ public class User {
     @Column(name = "contact_info")
     private String contactInfo;
 
-    @ManyToMany
-    @JoinTable(
-            name = "user_roles",
-            schema = "core",
-            joinColumns = @JoinColumn(name = "user_id"),
-            inverseJoinColumns = @JoinColumn(name = "role_id")
-    )
-    private Set<Role> roles;
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "role_id")
+    private Role role;
 
     @ManyToMany(mappedBy = "assignees")
     private Set<Task> tasks;
