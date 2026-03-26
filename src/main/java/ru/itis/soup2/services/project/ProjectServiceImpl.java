@@ -42,12 +42,12 @@ public class ProjectServiceImpl implements ProjectService {
     @Override
     public void delete(Integer id) {
         Project project = projectRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Project not found"));
+                .orElseThrow(() -> new EntityNotFoundException("Проект не найден"));
         if (!project.getSprints().isEmpty()) {
-            throw new IllegalStateException("Cannot delete project with existing sprints");
+            throw new IllegalStateException("Нельзя удалить проект с привязанными спринтами");
         }
         if (!project.getTasks().isEmpty()) {
-            throw new IllegalStateException("Cannot delete project with existing tasks");
+            throw new IllegalStateException("Нельзя удалить проект с привязанными задачами");
         }
         projectRepository.delete(project);
     }

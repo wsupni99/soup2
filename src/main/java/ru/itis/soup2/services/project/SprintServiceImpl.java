@@ -23,10 +23,9 @@ public class SprintServiceImpl implements SprintService {
         sprintRepository.save(sprint);
     }
 
-    // Основной метод для списка всех спринтов (с проектом и задачами)
     @Override
     public List<Sprint> getAllSprints() {
-        return sprintRepository.findAll();                    // теперь используем переопределённый findAll()
+        return sprintRepository.findAll();
     }
 
     @Override
@@ -34,10 +33,9 @@ public class SprintServiceImpl implements SprintService {
         return sprintRepository.findByProjectId(projectId);   // с EntityGraph
     }
 
-    // Основной метод для получения одного спринта (используется в edit и update)
     @Override
     public Optional<Sprint> getSprintById(Integer id) {
-        return sprintRepository.findById(id);                 // с EntityGraph
+        return sprintRepository.findById(id);
     }
 
     @Transactional
@@ -49,12 +47,11 @@ public class SprintServiceImpl implements SprintService {
     @Transactional
     @Override
     public void delete(Integer id) {
-        // Используем метод с подгрузкой задач, чтобы проверить наличие задач
         Sprint sprint = sprintRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Sprint not found"));
+                .orElseThrow(() -> new EntityNotFoundException("Спринт не найден"));
 
         if (!sprint.getTasks().isEmpty()) {
-            throw new IllegalStateException("Cannot delete sprint with existing tasks");
+            throw new IllegalStateException("Нельзя удалить спринт, в котором есть задачи");
         }
 
         sprintRepository.delete(sprint);

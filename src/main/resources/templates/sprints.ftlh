@@ -18,10 +18,21 @@
         .btn-primary { background: #4e73df; color: white; }
         .btn-danger { background: #e74c3c; color: white; }
         .btn-edit { background: #f39c12; color: white; }
+        .error {
+            color: red;
+            background: #ffe6e6;
+            padding: 12px;
+            border-radius: 6px;
+            margin: 15px 0;
+        }
     </style>
 </head>
 <body>
 <h1>Спринты</h1>
+
+<#if error??>
+    <div class="error">${error}</div>
+</#if>
 
 <a href="/sprints/new" class="btn btn-primary">+ Новый спринт</a>
 <a href="/projects" class="btn">← К проектам</a>
@@ -33,7 +44,7 @@
         <th>Проект</th>
         <th>Начало</th>
         <th>Окончание</th>
-        <th>Кол-во задач</th>
+        <th>Задачи</th>
         <th>Действия</th>
     </tr>
     <#list sprints as sprint>
@@ -48,7 +59,7 @@
                 <a href="/sprints/${sprint.id()}/edit" class="btn btn-edit">Редактировать</a>
                 <a href="/sprints/${sprint.id()}/delete"
                    class="btn btn-danger"
-                   onclick="return confirm('Удалить этот спринт?')">Удалить</a>
+                   onclick="return confirm('Вы действительно хотите удалить этот спринт?')">Удалить</a>
             </td>
         </tr>
     </#list>

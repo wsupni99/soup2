@@ -166,6 +166,28 @@ public class SprintController {
         return "redirect:/sprints";
     }
 
+    // ====================== УДАЛЕНИЕ СПРИНТА ======================
+    @PreAuthorize("hasAnyRole('ROLE_MANAGER', 'ROLE_ADMIN')")
+    @GetMapping("/sprints/{id}/delete")
+    public String deleteSprint(@PathVariable Integer id, Model model) {
+        try {
+            sprintService.delete(id);
+            return "redirect:/sprints";
+        } catch (IllegalStateException e) {
+            // Перехватываем бизнес-ошибку (есть задачи)
+            model.addAttribute("error", e.getMessage());
+            // Возвращаем обратно на список спринтов с ошибкой
+            List<Sprint> sprints = sprintService.getAllSprints();
+            model.addAttribute("sprints", sprintMapper.toDtoList(sprints));
+            return "sprints";
+        } catch (Exception e) {
+            model.addAttribute("error", "Произошла ошибка при удалении спринта");
+            List<Sprint> sprints = sprintService.getAllSprints();
+            model.addAttribute("sprints", sprintMapper.toDtoList(sprints));
+            return "sprints";
+        }
+    }
+
     // ====================== ВАЛИДАЦИЯ ======================
     private String validateSprint(SprintDto dto) {
         if (dto.name() == null || dto.name().trim().isEmpty()) {

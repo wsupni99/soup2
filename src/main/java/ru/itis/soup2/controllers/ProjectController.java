@@ -107,6 +107,26 @@ public class ProjectController {
         return "redirect:/projects";
     }
 
+    // ====================== УДАЛЕНИЕ ПРОЕКТА ======================
+    @PreAuthorize("hasAnyRole('ROLE_MANAGER', 'ROLE_ADMIN')")
+    @GetMapping("/projects/{id}/delete")
+    public String deleteProject(@PathVariable Integer id, Model model) {
+        try {
+            projectService.delete(id);
+            return "redirect:/projects";
+        } catch (IllegalStateException e) {
+            // Бизнес-ошибка: есть спринты или задачи
+            model.addAttribute("error", e.getMessage());
+        } catch (Exception e) {
+            model.addAttribute("error", "Произошла ошибка при удалении проекта");
+        }
+
+        // Возвращаем список проектов с ошибкой
+        List<Project> projects = projectService.getAllProjects();
+        model.addAttribute("projects", projectMapper.toDtoList(projects));
+        return "projects";
+    }
+
     // ====================== ВАЛИДАЦИЯ ======================
     private String validateProject(ProjectDto dto) {
         if (dto.name() == null || dto.name().trim().isEmpty()) {
