@@ -2,51 +2,98 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>${sprint.id?? ? 'Редактирование спринта' : 'Новый спринт'}</title>
-
-    <#-- Настройка форматирования дат -->
-    <#assign dateFormat = "yyyy-MM-dd">
-
+    <title><#if sprint.id()??>Редактирование спринта<#else>Новый спринт</#if></title>
     <style>
-        body { font-family: Arial, sans-serif; max-width: 600px; margin: 40px auto; padding: 20px; }
-        form { display: flex; flex-direction: column; gap: 15px; }
-        label { font-weight: bold; margin-top: 10px; }
-        input, select { padding: 10px; border: 1px solid #ccc; border-radius: 6px; font-size: 16px; }
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 700px;
+            margin: 40px auto;
+            padding: 20px;
+        }
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        label {
+            font-weight: bold;
+            margin-top: 8px;
+        }
+        input, select {
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            font-size: 16px;
+        }
         button {
             padding: 12px;
             background: #4e73df;
             color: white;
             border: none;
             border-radius: 6px;
-            font-size: 16px;
             cursor: pointer;
-            margin-top: 20px;
+            font-size: 16px;
+        }
+        .error {
+            color: red;
+            background: #ffe6e6;
+            padding: 12px;
+            border-radius: 6px;
+            margin: 10px 0;
         }
     </style>
 </head>
 <body>
-<h1>${sprint.id?? ? 'Редактирование спринта' : 'Новый спринт'}</h1>
+
+<h1>
+    <#if sprint.id()??>
+        Редактирование спринта
+    <#else>
+        Новый спринт
+    </#if>
+</h1>
+<#if error??>
+    <div class="error">${error}</div>
+</#if>
 
 <form method="post"
-      action="${sprint.id?? ? '/sprints/' + sprint.id + '/update' : '/sprints'}">
+      action="<#if sprint.id()??>/sprints/${sprint.id()}/update<#else>/sprints</#if>">
+
+    <#if sprint.id()??>
+        <input type="hidden" name="id" value="${sprint.id()}">
+    </#if>
 
     <label>Название спринта *</label>
-    <input type="text" name="name" value="${(sprint.name)!}" required>
+    <input type="text" name="name" value="${sprint.name()!''}" required>
 
-    <label>ID Проекта *</label>
-    <input type="number" name="projectId" value="${(sprint.projectId)!}" required>
+    <label>Проект *</label>
+    <select name="projectId" required>
+        <option value="">-- Выберите проект --</option>
+        <#list projects as project>
+            <option value="${project.id}"
+                    <#if sprint.projectId()?? && sprint.projectId() == project.id>selected</#if>>
+                ${project.name!''}
+            </option>
+        </#list>
+    </select>
 
-    <label>Дата начала</label>
-    <input type="date" name="startDate"
-           value="${(sprint.startDate?string(dateFormat))!''}" required>
+    <label>Дата начала *</label>
+    <input type="date" name="startDate" value="${(startDateStr)!''}" required>
 
-    <label>Дата окончания</label>
-    <input type="date" name="endDate"
-           value="${(sprint.endDate?string(dateFormat))!''}" required>
+    <label>Дата окончания *</label>
+    <input type="date" name="endDate" value="${(endDateStr)!''}" required>
 
-    <button type="submit">Сохранить спринт</button>
+    <button type="submit">
+        <#if sprint.id()??>
+            Сохранить изменения
+        <#else>
+            Создать спринт
+        </#if>
+    </button>
 </form>
 
-<a href="/sprints" style="margin-top:20px; display:inline-block;">← Назад к спринтам</a>
+<br>
+<a href="/sprints">← Назад к списку спринтов</a>
+
 </body>
 </html>
