@@ -5,13 +5,14 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import ru.itis.soup2.dto.ProjectDto;
+import ru.itis.soup2.mappers.ProjectMapper;
 import ru.itis.soup2.models.project.Project;
-import ru.itis.soup2.models.project.Sprint;
-import ru.itis.soup2.models.project.Task;
+import ru.itis.soup2.repositories.core.UserRepository;
 import ru.itis.soup2.services.project.ProjectService;
-import ru.itis.soup2.services.project.SprintService;
-import ru.itis.soup2.services.project.TaskService;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @Controller
@@ -19,77 +20,111 @@ import java.util.List;
 public class ProjectController {
 
     private final ProjectService projectService;
-    private final SprintService sprintService;
-    private final TaskService taskService;
+    private final ProjectMapper projectMapper;
+    private final UserRepository userRepository;
 
-    // ==================== TASKS (доступно всем авторизованным) ====================
-    @GetMapping("/tasks")
-    public String tasksDashboard(Model model) {
-        List<Task> tasks = taskService.getAllTasks();
-        model.addAttribute("tasks", tasks);
-        return "tasks";                    // tasks.ftlh
-    }
-
-    // ==================== PROJECTS (только ROLE_MANAGER и ROLE_ADMIN) ====================
     @PreAuthorize("hasAnyRole('ROLE_MANAGER', 'ROLE_ADMIN')")
     @GetMapping("/projects")
     public String projectsPage(Model model) {
         List<Project> projects = projectService.getAllProjects();
-        model.addAttribute("projects", projects);
-        return "projects";                 // projects.ftlh
+        model.addAttribute("projects", projectMapper.toDtoList(projects));
+        return "projects";
     }
 
+    // Форма создания
     @PreAuthorize("hasAnyRole('ROLE_MANAGER', 'ROLE_ADMIN')")
     @GetMapping("/projects/new")
     public String newProjectForm(Model model) {
-        model.addAttribute("project", new Project());
+        model.addAttribute("project", new ProjectDto(null, "", "", null, null, null, null, null));
+        model.addAttribute("managers", userRepository.findAll());
+        model.addAttribute("startDateStr", "");
+        model.addAttribute("endDateStr", "");
+        model.addAttribute("error", null);
         return "project-form";
     }
 
+    // Создание проекта
     @PreAuthorize("hasAnyRole('ROLE_MANAGER', 'ROLE_ADMIN')")
     @PostMapping("/projects")
-    public String createProject(@ModelAttribute Project project) {
+    public String createProject(@ModelAttribute ProjectDto projectDto, Model model) {
+
+        String error = validateProject(projectDto);
+
+        if (error != null) {
+            model.addAttribute("project", projectDto);
+            model.addAttribute("managers", userRepository.findAll());
+            model.addAttribute("startDateStr", getDateStr(projectDto.startDate()));
+            model.addAttribute("endDateStr", getDateStr(projectDto.endDate()));
+            model.addAttribute("error", error);
+            return "project-form";
+        }
+
+        Project project = projectMapper.toEntity(projectDto);
         projectService.create(project);
         return "redirect:/projects";
     }
 
+    // Форма редактирования
     @PreAuthorize("hasAnyRole('ROLE_MANAGER', 'ROLE_ADMIN')")
     @GetMapping("/projects/{id}/edit")
     public String editProject(@PathVariable Integer id, Model model) {
         Project project = projectService.getProjectById(id)
                 .orElseThrow(() -> new RuntimeException("Project not found"));
-        model.addAttribute("project", project);
+
+        ProjectDto dto = projectMapper.toDto(project);
+
+        model.addAttribute("project", dto);
+        model.addAttribute("managers", userRepository.findAll());
+        model.addAttribute("startDateStr", getDateStr(project.getStartDate()));
+        model.addAttribute("endDateStr", getDateStr(project.getEndDate()));
+        model.addAttribute("error", null);
         return "project-form";
     }
 
+    // Обновление проекта
     @PreAuthorize("hasAnyRole('ROLE_MANAGER', 'ROLE_ADMIN')")
     @PostMapping("/projects/{id}/update")
-    public String updateProject(@PathVariable Integer id, @ModelAttribute Project project) {
-        project.setId(id);   // важно для обновления
+    public String updateProject(@PathVariable Integer id,
+                                @ModelAttribute ProjectDto projectDto,
+                                Model model) {
+
+        String error = validateProject(projectDto);
+
+        if (error != null) {
+            model.addAttribute("project", projectDto);
+            model.addAttribute("managers", userRepository.findAll());
+            model.addAttribute("startDateStr", getDateStr(projectDto.startDate()));
+            model.addAttribute("endDateStr", getDateStr(projectDto.endDate()));
+            model.addAttribute("error", error);
+            return "project-form";
+        }
+
+        Project project = projectService.getProjectById(id)
+                .orElseThrow(() -> new RuntimeException("Project not found"));
+
+        projectMapper.updateEntity(project, projectDto);
         projectService.update(project);
         return "redirect:/projects";
     }
 
-    // ==================== SPRINTS (только ROLE_MANAGER и ROLE_ADMIN) ====================
-    @PreAuthorize("hasAnyRole('ROLE_MANAGER', 'ROLE_ADMIN')")
-    @GetMapping("/sprints")
-    public String sprintsPage(Model model) {
-        List<Sprint> sprints = sprintService.getAllSprints();
-        model.addAttribute("sprints", sprints);
-        return "sprints";
+    // ====================== ВАЛИДАЦИЯ ======================
+    private String validateProject(ProjectDto dto) {
+        if (dto.name() == null || dto.name().trim().isEmpty()) {
+            return "Название проекта обязательно";
+        }
+        if (dto.managerId() == null) {
+            return "Выберите менеджера";
+        }
+        if (dto.startDate() == null || dto.endDate() == null) {
+            return "Обе даты обязательны";
+        }
+        if (dto.startDate().isAfter(dto.endDate())) {
+            return "Дата начала должна быть раньше даты окончания";
+        }
+        return null;
     }
 
-    @PreAuthorize("hasAnyRole('ROLE_MANAGER', 'ROLE_ADMIN')")
-    @GetMapping("/sprints/new")
-    public String newSprintForm(Model model) {
-        model.addAttribute("sprint", new Sprint());
-        return "sprint-form";
-    }
-
-    @PreAuthorize("hasAnyRole('ROLE_MANAGER', 'ROLE_ADMIN')")
-    @PostMapping("/sprints")
-    public String createSprint(@ModelAttribute Sprint sprint) {
-        sprintService.create(sprint);
-        return "redirect:/sprints";
+    private String getDateStr(LocalDate date) {
+        return date != null ? date.format(DateTimeFormatter.ISO_LOCAL_DATE) : "";
     }
 }

@@ -25,12 +25,15 @@ public class CustomUserDetailsService implements UserDetailsService {
 
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found with email: " + email));
+        String roleName = user.getRole() != null ? user.getRole().getRoleName() : "ROLE_DEVELOPER";
 
-        // НОВАЯ связь — одна роль
-        SimpleGrantedAuthority authority = new SimpleGrantedAuthority("ROLE_" + user.getRole().getRoleName());
+        if (roleName.startsWith("ROLE_")) {
+            roleName = roleName.substring(5);
+        }
 
-        log.info("Пользователь успешно загружен → email={}, role={}",
-                user.getEmail(), user.getRole().getRoleName());
+        SimpleGrantedAuthority authority = new SimpleGrantedAuthority("ROLE_" + roleName);
+
+        log.info("Пользователь успешно загружен → email={}, role={}", user.getEmail(), roleName);
 
         return org.springframework.security.core.userdetails.User
                 .withUsername(user.getEmail())

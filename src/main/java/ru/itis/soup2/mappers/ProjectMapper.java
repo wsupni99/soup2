@@ -6,12 +6,17 @@ import ru.itis.soup2.dto.ProjectDto;
 import ru.itis.soup2.models.enums.ProjectStatus;
 import ru.itis.soup2.models.project.Project;
 import ru.itis.soup2.models.core.User;
+import ru.itis.soup2.repositories.core.UserRepository;
+import jakarta.persistence.EntityNotFoundException;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor
 public class ProjectMapper {
+
+    private final UserRepository userRepository;
+
     public ProjectDto toDto(Project project) {
         if (project == null) return null;
 
@@ -29,9 +34,7 @@ public class ProjectMapper {
     }
 
     public List<ProjectDto> toDtoList(List<Project> projects) {
-        return projects.stream()
-                .map(this::toDto)
-                .collect(Collectors.toList());
+        return projects.stream().map(this::toDto).collect(Collectors.toList());
     }
 
     public Project toEntity(ProjectDto dto) {
@@ -45,7 +48,8 @@ public class ProjectMapper {
         if (dto.status() != null) {
             project.setStatus(ProjectStatus.valueOf(dto.status()));
         }
-        // менеджер устанавливается отдельно в сервисе через UserRepository
+
+        setManager(project, dto.managerId());
         return project;
     }
 
@@ -58,6 +62,16 @@ public class ProjectMapper {
         project.setEndDate(dto.endDate());
         if (dto.status() != null) {
             project.setStatus(ProjectStatus.valueOf(dto.status()));
+        }
+
+        setManager(project, dto.managerId());
+    }
+
+    private void setManager(Project project, Integer managerId) {
+        if (managerId != null) {
+            User manager = userRepository.findById(managerId)
+                    .orElseThrow(() -> new EntityNotFoundException("Manager not found with id: " + managerId));
+            project.setManager(manager);
         }
     }
 }

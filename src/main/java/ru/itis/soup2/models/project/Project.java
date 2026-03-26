@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.format.annotation.DateTimeFormat;
 import ru.itis.soup2.models.core.User;
 import ru.itis.soup2.models.enums.ProjectStatus;
 
@@ -27,9 +28,11 @@ public class Project {
     private String description;
 
     @Column(name = "start_date")
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
     private LocalDate startDate;
 
     @Column(name = "end_date")
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
     private LocalDate endDate;
 
     @Enumerated(EnumType.STRING)
