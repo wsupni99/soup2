@@ -26,8 +26,6 @@ public class TaskController {
     private final SprintService sprintService;
     private final TaskMapper taskMapper;
 
-    // ====================== СПИСОК ЗАДАЧ С ФИЛЬТРАМИ ======================
-    @PreAuthorize("hasAnyRole('ROLE_MANAGER', 'ROLE_ADMIN')")
     @GetMapping("/tasks")
     public String tasksPage(
             @RequestParam(required = false) Integer projectId,
@@ -53,33 +51,30 @@ public class TaskController {
         return "tasks";
     }
 
-    /// ====================== ФОРМА СОЗДАНИЯ ======================
     @PreAuthorize("hasAnyRole('ROLE_MANAGER', 'ROLE_ADMIN')")
     @GetMapping("/tasks/new")
     public String newTaskForm(
-            @RequestParam(required = false) Integer selectedProjectId,   // <-- новый параметр
+            @RequestParam(required = false) Integer selectedProjectId,
             Model model) {
 
         model.addAttribute("task", new TaskDto("", "", null, "TODO", null, null, null, null));
 
         model.addAttribute("projects", projectService.getAllProjects());
 
-        // Загружаем спринты только для выбранного проекта
         if (selectedProjectId != null) {
             model.addAttribute("sprints", sprintService.findSprintsByProjectId(selectedProjectId));
         } else {
-            model.addAttribute("sprints", List.of()); // пустой список, пока проект не выбран
+            model.addAttribute("sprints", List.of());
         }
 
         model.addAttribute("users", taskService.getAllUsersForAssignment());
         model.addAttribute("deadlineStr", "");
-        model.addAttribute("selectedProjectId", selectedProjectId);   // важно для шаблона
+        model.addAttribute("selectedProjectId", selectedProjectId);
         model.addAttribute("error", null);
 
         return "task-form";
     }
 
-    // ====================== ФОРМА РЕДАКТИРОВАНИЯ ======================
     @PreAuthorize("hasAnyRole('ROLE_MANAGER', 'ROLE_ADMIN')")
     @GetMapping("/tasks/{id}/edit")
     public String editTask(@PathVariable Integer id, Model model) {
@@ -91,7 +86,6 @@ public class TaskController {
         model.addAttribute("task", dto);
         model.addAttribute("projects", projectService.getAllProjects());
 
-        // Если у задачи уже есть проект — показываем только его спринты
         if (task.getProject() != null) {
             model.addAttribute("sprints", sprintService.findSprintsByProjectId(task.getProject().getId()));
         } else {
@@ -106,7 +100,6 @@ public class TaskController {
         return "task-form";
     }
 
-    // ====================== СОЗДАНИЕ ======================
     @PreAuthorize("hasAnyRole('ROLE_MANAGER', 'ROLE_ADMIN')")
     @PostMapping("/tasks")
     public String createTask(@ModelAttribute TaskDto taskDto,
@@ -142,7 +135,6 @@ public class TaskController {
         return "redirect:/tasks";
     }
 
-    // ====================== ОБНОВЛЕНИЕ ЗАДАЧИ ======================
     @PreAuthorize("hasAnyRole('ROLE_MANAGER', 'ROLE_ADMIN')")
     @PostMapping("/tasks/{id}/update")
     public String updateTask(@PathVariable Integer id,
@@ -162,7 +154,7 @@ public class TaskController {
         if (error != null) {
             model.addAttribute("task", taskDto);
             model.addAttribute("projects", projectService.getAllProjects());
-            model.addAttribute("sprints", sprintService.getAllSprints());   // можно улучшить позже
+            model.addAttribute("sprints", sprintService.getAllSprints());
             model.addAttribute("users", taskService.getAllUsersForAssignment());
             model.addAttribute("deadlineStr", deadlineStr != null ? deadlineStr : "");
             model.addAttribute("error", error);
@@ -172,29 +164,21 @@ public class TaskController {
         Task task = taskService.getTaskById(id)
                 .orElseThrow(() -> new RuntimeException("Task not found"));
 
-        // Обновляем поля через mapper
         taskMapper.updateEntity(task, dtoForValidation);
 
-        // Обновляем проект
         projectService.getProjectById(taskDto.projectId()).ifPresent(task::setProject);
 
-        // === ИСПРАВЛЕННАЯ ЛОГИКА СПРИНТА ===
         if (taskDto.sprintId() != null && taskDto.sprintId() > 0) {
-            // Если явно выбран спринт — ставим его
             sprintService.getSprintById(taskDto.sprintId())
                     .ifPresent(task::setSprint);
-        }
-        // Если в форме выбрано "-- Без спринта --" (sprintId = null или 0), то убираем спринт
-        else if (taskDto.sprintId() != null && taskDto.sprintId() == 0) {
+        } else if (taskDto.sprintId() != null && taskDto.sprintId() == 0) {
             task.setSprint(null);
         }
-        // В остальных случаях (sprintId == null) — оставляем предыдущий спринт без изменений
 
         taskService.update(task, assigneeId);
         return "redirect:/tasks";
     }
 
-    // ====================== УДАЛЕНИЕ ======================
     @PreAuthorize("hasAnyRole('ROLE_MANAGER', 'ROLE_ADMIN')")
     @GetMapping("/tasks/{id}/delete")
     public String deleteTask(@PathVariable Integer id, Model model) {

@@ -1,5 +1,7 @@
 package ru.itis.soup2.services.core;
 
+import ru.itis.soup2.dto.AdminUserCreateDto;
+import ru.itis.soup2.dto.AdminUserUpdateDto;
 import ru.itis.soup2.dto.RegisterRequestDto;
 import ru.itis.soup2.dto.UserWithRoleDto;
 import ru.itis.soup2.models.core.User;
@@ -17,4 +19,7 @@ public interface UserService {
     Optional<User> getByEmail(String email);
     List<User> getAllManagers();
     List<UserWithRoleDto> getUsersWithRoles();
+    void createUser(AdminUserCreateDto dto);
+    void updateUser(AdminUserUpdateDto dto);
+    void deleteUser(Integer id);
 }

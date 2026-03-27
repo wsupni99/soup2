@@ -6,6 +6,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.itis.soup2.dto.AdminUserCreateDto;
+import ru.itis.soup2.dto.AdminUserUpdateDto;
 import ru.itis.soup2.dto.RegisterRequestDto;
 import ru.itis.soup2.dto.UserWithRoleDto;
 import ru.itis.soup2.models.core.Role;
@@ -90,6 +92,71 @@ public class UserServiceImpl implements UserService {
     @Override
     public void updateUser(User user) {
         userRepository.save(user);
+    }
+
+    @Transactional
+    @Override
+    public void createUser(AdminUserCreateDto dto) {
+        log.info("Админ создаёт пользователя: email={}", dto.email());
+
+        User user = new User();
+        user.setEmail(dto.email().trim());
+        user.setName(dto.name().trim());
+        user.setPassword(passwordEncoder.encode(dto.password().trim()));
+        user.setContactInfo(dto.contactInfo() != null ? dto.contactInfo().trim() : "");
+
+        User savedUser = userRepository.save(user);
+
+        // Назначаем роль
+        String roleName = normalizeRoleName(dto.roleName());
+        Role role = roleService.findByName(roleName)
+                .orElseGet(() -> roleService.findByName("ROLE_DEVELOPER")
+                        .orElseThrow(() -> new EntityNotFoundException("Default role ROLE_DEVELOPER not found")));
+
+        savedUser.setRole(role);
+        userRepository.save(savedUser);
+
+        log.info("Пользователь {} успешно создан с ролью {}", dto.email(), role.getRoleName());
+    }
+
+    @Transactional
+    @Override
+    public void updateUser(AdminUserUpdateDto dto) {
+        log.info("Админ обновляет пользователя ID={}", dto.id());
+
+        User user = userRepository.findById(dto.id())
+                .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + dto.id()));
+
+        user.setEmail(dto.email().trim());
+        user.setName(dto.name().trim());
+        user.setContactInfo(dto.contactInfo() != null ? dto.contactInfo().trim() : "");
+
+        // Меняем роль, если указана
+        if (dto.roleName() != null && !dto.roleName().isBlank()) {
+            String roleName = normalizeRoleName(dto.roleName());
+            Role newRole = roleService.findByName(roleName)
+                    .orElseThrow(() -> new EntityNotFoundException("Role not found: " + roleName));
+
+            user.setRole(newRole);
+        }
+
+        userRepository.save(user);
+        log.info("Пользователь ID={} успешно обновлён", dto.id());
+    }
+
+    @Override
+    public void deleteUser(Integer id) {
+        if (!userRepository.existsById(id)) {
+            throw new EntityNotFoundException("User not found with id: " + id);
+        }
+        userRepository.deleteById(id);
+    }
+
+    // Вспомогательный метод
+    private String normalizeRoleName(String roleName) {
+        if (roleName == null) return "ROLE_DEVELOPER";
+        String upper = roleName.trim().toUpperCase();
+        return upper.startsWith("ROLE_") ? upper : "ROLE_" + upper;
     }
 
     @Override
