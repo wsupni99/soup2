@@ -11,11 +11,12 @@ public interface SprintService {
 
     List<Sprint> getAllSprints();
 
-    List<Sprint> getSprintsByProjectId(Integer projectId);
-
     Optional<Sprint> getSprintById(Integer id);
 
     void update(Sprint sprint);
 
     void delete(Integer id);
+
+    List<Sprint> findSprintsByProjectId(Integer projectId);
+
 }

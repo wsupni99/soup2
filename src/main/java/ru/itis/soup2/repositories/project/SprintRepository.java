@@ -19,4 +19,6 @@ public interface SprintRepository extends JpaRepository<Sprint, Integer> {
     List<Sprint> findByProjectId(Integer projectId);
 
     List<Sprint> findAllBy();
+
+    List<Sprint> findByProjectIdOrderByStartDate(Integer projectId);
 }

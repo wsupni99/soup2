@@ -7,8 +7,9 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import ru.itis.soup2.models.project.Task;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 
 @Builder
 @AllArgsConstructor
@@ -17,6 +18,7 @@ import java.util.Set;
 @Entity
 @Table(name = "users", schema = "core")
 public class User {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "user_id")
@@ -35,6 +37,20 @@ public class User {
     @JoinColumn(name = "role_id")
     private Role role;
 
-    @ManyToMany(mappedBy = "assignees")
-    private Set<Task> tasks;
+    // Обратная связь: задачи, назначенные этому пользователю
+    @OneToMany(mappedBy = "assignee", fetch = FetchType.LAZY)
+    private List<Task> assignedTasks = new ArrayList<>();
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        User user = (User) o;
+        return Objects.equals(id, user.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
+    }
 }

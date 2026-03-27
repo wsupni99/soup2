@@ -8,11 +8,12 @@ import lombok.NoArgsConstructor;
 import ru.itis.soup2.models.core.User;
 import ru.itis.soup2.models.enums.TaskPriority;
 import ru.itis.soup2.models.enums.TaskStatus;
+
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
+import java.util.Objects;
 
 @Builder
 @AllArgsConstructor
@@ -21,13 +22,13 @@ import java.util.Set;
 @Entity
 @Table(name = "tasks", schema = "project")
 public class Task {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "task_id")
     private Integer id;
 
     private String name;
-
     private String description;
 
     @Enumerated(EnumType.STRING)
@@ -56,19 +57,28 @@ public class Task {
     @JoinColumn(name = "sprint_id")
     private Sprint sprint;
 
+    // Новый владелец связи — один исполнитель
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "assignee_id")
+    private User assignee;
+
     @OneToMany(mappedBy = "task")
-    private List<Attachment> attachments;
+    private List<Attachment> attachments = new ArrayList<>();
 
     @OneToMany(mappedBy = "task")
     private List<Comment> comments = new ArrayList<>();
 
-    @ManyToMany
-    @JoinTable(
-            name = "task_assignments",
-            schema = "project",
-            joinColumns = @JoinColumn(name = "task_id"),
-            inverseJoinColumns = @JoinColumn(name = "user_id")
-    )
-    private Set<User> assignees;
-}
+    // equals и hashCode только по id (безопасно)
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Task task = (Task) o;
+        return Objects.equals(id, task.id);
+    }
 
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
+    }
+}

@@ -29,8 +29,11 @@ public class SprintServiceImpl implements SprintService {
     }
 
     @Override
-    public List<Sprint> getSprintsByProjectId(Integer projectId) {
-        return sprintRepository.findByProjectId(projectId);   // с EntityGraph
+    public List<Sprint> findSprintsByProjectId(Integer projectId) {
+        if (projectId == null) {
+            return List.of();
+        }
+        return sprintRepository.findByProjectIdOrderByStartDate(projectId);
     }
 
     @Override

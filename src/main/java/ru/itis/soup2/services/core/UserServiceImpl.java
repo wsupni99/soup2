@@ -86,6 +86,12 @@ public class UserServiceImpl implements UserService {
         }
     }
 
+    @Transactional
+    @Override
+    public void updateUser(User user) {
+        userRepository.save(user);
+    }
+
     @Override
     public List<User> getAllUsers() {
         return userRepository.findAll();
