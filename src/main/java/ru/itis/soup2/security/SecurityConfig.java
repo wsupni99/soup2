@@ -1,4 +1,4 @@
-package ru.itis.soup2.config;
+package ru.itis.soup2.security;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;

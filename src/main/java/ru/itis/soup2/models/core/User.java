@@ -37,20 +37,6 @@ public class User {
     @JoinColumn(name = "role_id")
     private Role role;
 
-    // Обратная связь: задачи, назначенные этому пользователю
     @OneToMany(mappedBy = "assignee", fetch = FetchType.LAZY)
     private List<Task> assignedTasks = new ArrayList<>();
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        User user = (User) o;
-        return Objects.equals(id, user.id);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id);
-    }
 }

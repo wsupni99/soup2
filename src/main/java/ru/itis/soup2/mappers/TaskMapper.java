@@ -3,8 +3,9 @@ package ru.itis.soup2.mappers;
 import org.springframework.stereotype.Component;
 import ru.itis.soup2.dto.TaskDto;
 import ru.itis.soup2.models.enums.TaskStatus;
+import ru.itis.soup2.models.project.Project;
+import ru.itis.soup2.models.project.Sprint;
 import ru.itis.soup2.models.project.Task;
-import ru.itis.soup2.models.core.User;
 
 import java.util.List;
 
@@ -12,57 +13,71 @@ import java.util.List;
 public class TaskMapper {
 
     public TaskDto toDto(Task task) {
-        if (task == null) return null;
-
-        return new TaskDto(
-                task.getId(),
-                task.getName(),
-                task.getDescription(),
-                task.getPriority(),
-                task.getStatus() != null ? task.getStatus().name() : null,
-                task.getDeadline(),
-                task.getCreatedAt(),
-                task.getUpdatedAt(),
-
-                task.getProject() != null ? task.getProject().getId() : null,
-                task.getProject() != null ? task.getProject().getName() : null,
-                task.getSprint() != null ? task.getSprint().getId() : null,
-                task.getSprint() != null ? task.getSprint().getName() : null,
-                task.getParentTask() != null ? task.getParentTask().getId() : null,
-                task.getParentTask() != null ? task.getParentTask().getName() : null,
-
-                task.getAssignee() != null ? task.getAssignee().getId() : null,
-                task.getAssignee() != null ? task.getAssignee().getName() : null
-        );
+        return TaskDto.from(task);
     }
 
     public List<TaskDto> toDtoList(List<Task> tasks) {
-        return tasks.stream().map(this::toDto).toList();
+        return TaskDto.from(tasks);
     }
 
     public Task toEntity(TaskDto dto) {
         if (dto == null) return null;
 
         Task task = new Task();
-        task.setName(dto.name());
-        task.setDescription(dto.description());
-        task.setPriority(dto.priority());
-        if (dto.status() != null) {
-            task.setStatus(TaskStatus.valueOf(dto.status()));
+        task.setName(dto.getName());
+        task.setDescription(dto.getDescription());
+        task.setPriority(dto.getPriority());
+
+        if (dto.getStatus() != null && !dto.getStatus().trim().isEmpty()) {
+            task.setStatus(TaskStatus.valueOf(dto.getStatus().trim().toUpperCase()));
         }
-        task.setDeadline(dto.deadline());
+
+        task.setDeadline(dto.getDeadline());
+
+        // === Главное исправление ===
+        if (dto.getProjectId() != null) {
+            Project project = new Project();
+            project.setId(dto.getProjectId());
+            task.setProject(project);
+        }
+
+        if (dto.getSprintId() != null) {
+            Sprint sprint = new Sprint();
+            sprint.setId(dto.getSprintId());
+            task.setSprint(sprint);
+        }
+
         return task;
     }
 
     public void updateEntity(Task task, TaskDto dto) {
         if (dto == null || task == null) return;
 
-        task.setName(dto.name());
-        task.setDescription(dto.description());
-        task.setPriority(dto.priority());
-        if (dto.status() != null) {
-            task.setStatus(TaskStatus.valueOf(dto.status()));
+        task.setName(dto.getName());
+        task.setDescription(dto.getDescription());
+        task.setPriority(dto.getPriority());
+
+        if (dto.getStatus() != null && !dto.getStatus().trim().isEmpty()) {
+            task.setStatus(TaskStatus.valueOf(dto.getStatus().trim().toUpperCase()));
         }
-        task.setDeadline(dto.deadline());
+
+        task.setDeadline(dto.getDeadline());
+
+        // Обновление связей
+        if (dto.getProjectId() != null) {
+            Project project = new Project();
+            project.setId(dto.getProjectId());
+            task.setProject(project);
+        } else {
+            task.setProject(null);
+        }
+
+        if (dto.getSprintId() != null) {
+            Sprint sprint = new Sprint();
+            sprint.setId(dto.getSprintId());
+            task.setSprint(sprint);
+        } else {
+            task.setSprint(null);
+        }
     }
 }

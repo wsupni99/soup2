@@ -5,6 +5,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.itis.soup2.models.core.User;
+import ru.itis.soup2.models.enums.TaskPriority;
+import ru.itis.soup2.models.enums.TaskStatus;
 import ru.itis.soup2.models.project.Task;
 import ru.itis.soup2.repositories.core.UserRepository;
 import ru.itis.soup2.repositories.project.TaskRepository;
@@ -33,6 +35,34 @@ public class TaskServiceImpl implements TaskService {
     @Override
     public List<User> getAllUsersForAssignment() {
         return userRepository.findAll();
+    }
+
+    @Override
+    public List<Task> getAllTasksWithFilters(Integer projectId, Integer sprintId, String status,
+                                             String priority, Integer assigneeId, String search) {
+
+        TaskStatus statusEnum = null;
+        if (status != null && !status.trim().isEmpty()) {
+            try {
+                statusEnum = TaskStatus.valueOf(status.trim().toUpperCase());
+            } catch (IllegalArgumentException ignored) {}
+        }
+
+        TaskPriority priorityEnum = null;
+        if (priority != null && !priority.trim().isEmpty()) {
+            try {
+                priorityEnum = TaskPriority.valueOf(priority.trim().toUpperCase());
+            } catch (IllegalArgumentException ignored) {}
+        }
+
+        String cleanSearch = (search != null && !search.trim().isEmpty())
+                ? search.trim()
+                : null;
+
+        return taskRepository.findTasksWithFilters(
+                projectId, sprintId, status, statusEnum,
+                priority, priorityEnum, assigneeId, cleanSearch
+        );
     }
 
     @Transactional
@@ -68,24 +98,5 @@ public class TaskServiceImpl implements TaskService {
         }
 
         taskRepository.delete(task);
-    }
-
-    @Override
-    public List<Task> getAllTasksWithFilters(Integer projectId, Integer sprintId, String status,
-                                             String priority, Integer assigneeId) {
-        List<Task> tasks = taskRepository.findAllWithDetails();
-
-        return tasks.stream()
-                .filter(task -> projectId == null ||
-                        (task.getProject() != null && task.getProject().getId().equals(projectId)))
-                .filter(task -> sprintId == null ||
-                        (task.getSprint() != null && task.getSprint().getId().equals(sprintId)))
-                .filter(task -> status == null || status.isEmpty() ||
-                        (task.getStatus() != null && task.getStatus().name().equals(status)))
-                .filter(task -> priority == null || priority.isEmpty() ||
-                        (task.getPriority() != null && task.getPriority().name().equals(priority)))
-                .filter(task -> assigneeId == null ||
-                        (task.getAssignee() != null && task.getAssignee().getId().equals(assigneeId)))
-                .toList();
     }
 }
