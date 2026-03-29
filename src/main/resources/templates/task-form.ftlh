@@ -5,7 +5,7 @@
     <title><#if task.getId()??>Редактирование задачи<#else>Новая задача</#if></title>
     <link rel="stylesheet" href="/css/style.css">
 </head>
-<body>
+<body class="container-form">
 
 <h1>
     <#if task.getId()??>Редактирование задачи<#else>Новая задача</#if>
@@ -15,7 +15,7 @@
     <div class="error">${error}</div>
 </#if>
 
-<form class="container-form" id="taskForm" method="post"
+<form id="taskForm" method="post"
       action="<#if task.getId()??>/tasks/${task.getId()?c}/update<#else>/tasks</#if>">
 
     <#if task.getId()??>
@@ -85,7 +85,7 @@
     <label>Дедлайн</label>
     <input type="date"
            name="deadline"
-           value="${(task.getDeadline()!''?string('yyyy-MM-dd'))!''}">
+           value="${task.getDeadline()!''}">
 
     <button type="submit">
         <#if task.getId()??>Сохранить изменения<#else>Создать задачу</#if>
@@ -93,7 +93,7 @@
 </form>
 
 <br>
-<a href="/tasks">← Назад к списку задач</a>
+<a href="/tasks" class="btn btn-primary">← Назад к списку задач</a>
 
 <script>
     function changeProject(projectId) {
