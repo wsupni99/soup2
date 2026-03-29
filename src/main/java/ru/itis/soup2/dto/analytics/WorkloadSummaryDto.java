@@ -1,4 +1,4 @@
-package ru.itis.soup2.dto;
+package ru.itis.soup2.dto.analytics;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

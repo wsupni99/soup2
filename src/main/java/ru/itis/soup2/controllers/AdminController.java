@@ -8,15 +8,13 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-import ru.itis.soup2.dto.AdminUserCreateDto;
-import ru.itis.soup2.dto.AdminUserUpdateDto;
-import ru.itis.soup2.dto.TaskLogDto;
+import ru.itis.soup2.dto.core.AdminUserCreateDto;
+import ru.itis.soup2.dto.core.AdminUserUpdateDto;
+import ru.itis.soup2.dto.project.TaskLogDto;
 import ru.itis.soup2.models.core.User;
 import ru.itis.soup2.services.core.RoleService;
 import ru.itis.soup2.services.core.UserService;
 import ru.itis.soup2.services.project.TaskLogService;
-
-import java.util.List;
 
 @Controller
 @RequestMapping("/admin")

@@ -1,6 +1,6 @@
-package ru.itis.soup2.mappers;
+package ru.itis.soup2.mappers.project;
 
-import ru.itis.soup2.dto.CommentDto;
+import ru.itis.soup2.dto.project.CommentDto;
 import ru.itis.soup2.models.project.Comment;
 import java.util.List;
 import java.util.stream.Collectors;

@@ -4,8 +4,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import ru.itis.soup2.dto.TaskLogDto;
-import ru.itis.soup2.mappers.TaskLogMapper;
+import ru.itis.soup2.dto.project.TaskLogDto;
+import ru.itis.soup2.mappers.project.TaskLogMapper;
 import ru.itis.soup2.repositories.project.TaskLogRepository;
 
 @Service

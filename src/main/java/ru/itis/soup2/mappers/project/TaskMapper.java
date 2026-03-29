@@ -1,7 +1,7 @@
-package ru.itis.soup2.mappers;
+package ru.itis.soup2.mappers.project;
 
 import org.springframework.stereotype.Component;
-import ru.itis.soup2.dto.TaskDto;
+import ru.itis.soup2.dto.project.TaskDto;
 import ru.itis.soup2.models.enums.TaskStatus;
 import ru.itis.soup2.models.project.Project;
 import ru.itis.soup2.models.project.Sprint;

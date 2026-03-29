@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import ru.itis.soup2.dto.RegisterRequestDto;
+import ru.itis.soup2.dto.core.RegisterRequestDto;
 import ru.itis.soup2.services.core.UserService;
 
 @Slf4j

@@ -1,9 +1,9 @@
 package ru.itis.soup2.services.core;
 
-import ru.itis.soup2.dto.AdminUserCreateDto;
-import ru.itis.soup2.dto.AdminUserUpdateDto;
-import ru.itis.soup2.dto.RegisterRequestDto;
-import ru.itis.soup2.dto.UserWithRoleDto;
+import ru.itis.soup2.dto.core.AdminUserCreateDto;
+import ru.itis.soup2.dto.core.AdminUserUpdateDto;
+import ru.itis.soup2.dto.core.RegisterRequestDto;
+import ru.itis.soup2.dto.core.UserWithRoleDto;
 import ru.itis.soup2.models.core.User;
 
 import java.util.List;

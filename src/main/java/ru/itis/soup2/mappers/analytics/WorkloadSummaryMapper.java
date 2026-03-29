@@ -1,7 +1,7 @@
-package ru.itis.soup2.mappers;
+package ru.itis.soup2.mappers.analytics;
 
 import org.springframework.stereotype.Component;
-import ru.itis.soup2.dto.WorkloadSummaryDto;
+import ru.itis.soup2.dto.analytics.WorkloadSummaryDto;
 import ru.itis.soup2.models.analytics.WorkloadSummary;
 import java.util.List;
 import java.util.stream.Collectors;

@@ -1,4 +1,4 @@
-package ru.itis.soup2.dto;
+package ru.itis.soup2.dto.project;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -11,11 +11,11 @@ import java.time.LocalDateTime;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class TaskLogDto {
+public class CommentDto {
 
     private Integer id;
-    private String action;
-    private LocalDateTime changedAt;
+    private String text;
+    private LocalDateTime createdAt;
     private Integer userId;
     private String userName;
     private Integer taskId;

@@ -1,8 +1,8 @@
-package ru.itis.soup2.mappers;
+package ru.itis.soup2.mappers.project;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
-import ru.itis.soup2.dto.ProjectDto;
+import ru.itis.soup2.dto.project.ProjectDto;
 import ru.itis.soup2.models.enums.ProjectStatus;
 import ru.itis.soup2.models.project.Project;
 import ru.itis.soup2.models.core.User;

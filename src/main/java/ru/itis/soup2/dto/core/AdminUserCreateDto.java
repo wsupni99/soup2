@@ -1,4 +1,4 @@
-package ru.itis.soup2.dto;
+package ru.itis.soup2.dto.core;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,11 +9,11 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class AdminUserUpdateDto {
+public class AdminUserCreateDto {
 
-    private Integer id;
     private String email;
     private String name;
+    private String password;
     private String contactInfo;
     private String roleName;
 }

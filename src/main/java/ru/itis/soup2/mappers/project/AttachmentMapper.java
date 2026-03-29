@@ -1,6 +1,6 @@
-package ru.itis.soup2.mappers;
+package ru.itis.soup2.mappers.project;
 
-import ru.itis.soup2.dto.AttachmentDto;
+import ru.itis.soup2.dto.project.AttachmentDto;
 import ru.itis.soup2.models.project.Attachment;
 import java.util.List;
 import java.util.stream.Collectors;

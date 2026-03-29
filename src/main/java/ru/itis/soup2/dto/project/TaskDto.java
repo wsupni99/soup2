@@ -1,4 +1,4 @@
-package ru.itis.soup2.dto;
+package ru.itis.soup2.dto.project;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

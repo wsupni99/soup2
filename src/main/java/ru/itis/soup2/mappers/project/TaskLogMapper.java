@@ -1,7 +1,7 @@
-package ru.itis.soup2.mappers;
+package ru.itis.soup2.mappers.project;
 
 import org.springframework.stereotype.Component;
-import ru.itis.soup2.dto.TaskLogDto;
+import ru.itis.soup2.dto.project.TaskLogDto;
 import ru.itis.soup2.models.project.TaskLog;
 
 @Component

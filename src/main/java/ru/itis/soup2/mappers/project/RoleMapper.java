@@ -1,6 +1,6 @@
-package ru.itis.soup2.mappers;
+package ru.itis.soup2.mappers.project;
 
-import ru.itis.soup2.dto.RoleDto;
+import ru.itis.soup2.dto.core.RoleDto;
 import ru.itis.soup2.models.core.Role;
 import java.util.List;
 import java.util.stream.Collectors;
