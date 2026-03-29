@@ -3,45 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title><#if sprint.getId()??>Редактирование спринта<#else>Новый спринт</#if></title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            max-width: 700px;
-            margin: 40px auto;
-            padding: 20px;
-        }
-        form {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
-        label {
-            font-weight: bold;
-            margin-top: 8px;
-        }
-        input, select {
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 6px;
-            font-size: 16px;
-        }
-        button {
-            padding: 12px;
-            background: #4e73df;
-            color: white;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 16px;
-        }
-        .error {
-            color: red;
-            background: #ffe6e6;
-            padding: 12px;
-            border-radius: 6px;
-            margin: 10px 0;
-        }
-    </style>
+    <link rel="stylesheet" href="/css/style.css">
 </head>
 <body>
 
@@ -56,7 +18,7 @@
     <div class="error">${error}</div>
 </#if>
 
-<form method="post"
+<form class="container-form" method="post"
       action="<#if sprint.getId()??>/sprints/${sprint.getId()}/update<#else>/sprints</#if>">
 
     <#if sprint.getId()??>

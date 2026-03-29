@@ -3,36 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title><#if task.getId()??>Редактирование задачи<#else>Новая задача</#if></title>
-    <style>
-        body { font-family: Arial, sans-serif; max-width: 800px; margin: 40px auto; padding: 20px; }
-        form { display: flex; flex-direction: column; gap: 15px; }
-        label { font-weight: bold; margin-top: 8px; }
-        input, select, textarea {
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 6px;
-            font-size: 16px;
-        }
-        button {
-            padding: 12px;
-            background: #4e73df;
-            color: white;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 16px;
-        }
-        button:hover { background: #3a5bc7; }
-        .error {
-            color: #d32f2f;
-            background: #ffe6e6;
-            padding: 14px 16px;
-            border-radius: 6px;
-            margin: 15px 0;
-            border-left: 5px solid #d32f2f;
-        }
-        .required { color: red; }
-    </style>
+    <link rel="stylesheet" href="/css/style.css">
 </head>
 <body>
 
@@ -44,7 +15,7 @@
     <div class="error">${error}</div>
 </#if>
 
-<form id="taskForm" method="post"
+<form class="container-form" id="taskForm" method="post"
       action="<#if task.getId()??>/tasks/${task.getId()?c}/update<#else>/tasks</#if>">
 
     <#if task.getId()??>

@@ -3,34 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <title>Создание пользователя</title>
-    <style>
-        body { font-family: Arial, sans-serif; max-width: 800px; margin: 40px auto; padding: 20px; }
-        form { display: flex; flex-direction: column; gap: 15px; }
-        label { font-weight: bold; margin-top: 8px; }
-        input, select {
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 6px;
-            font-size: 16px;
-        }
-        button {
-            padding: 12px;
-            background: #4e73df;
-            color: white;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 16px;
-        }
-        button:hover { background: #3a5bc7; }
-        .required { color: red; }
-    </style>
+    <link rel="stylesheet" href="/css/style.css">
 </head>
 <body>
 
 <h1>Создание пользователя</h1>
 
-<form method="post" action="/admin/users/create">
+<form class="container-form" method="post" action="/admin/users/create">
     <label>Email <span class="required">*</span></label>
     <input type="email" name="email" value="${createDto.getEmail()!''}" required>
 

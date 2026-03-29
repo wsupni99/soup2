@@ -3,38 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Лог задач</title>
-    <style>
-        body { font-family: Arial, sans-serif; margin: 20px; }
-        h1 { color: #333; }
-        table { width: 100%; border-collapse: collapse; margin: 20px 0; }
-        th, td { border: 1px solid #ccc; padding: 10px; text-align: left; vertical-align: top; }
-        th { background: #f0f0f0; }
-        .filter-form { background: #f9f9f9; padding: 15px; border-radius: 8px; margin-bottom: 20px; }
-        .btn {
-            padding: 8px 12px;
-            text-decoration: none;
-            border-radius: 4px;
-            margin-right: 5px;
-            display: inline-block;
-            border: none;
-            cursor: pointer;
-            font-size: 14px;
-        }
-        .btn-primary { background: #4e73df; color: white; }
-        .pagination { margin: 20px 0; }
-        .page-link {
-            padding: 8px 12px;
-            margin: 0 2px;
-            border: 1px solid #ccc;
-            text-decoration: none;
-            background: white;
-            display: inline-block;
-        }
-        .page-link.active { background: #4e73df; color: white; }
-        .page-link:hover { background: #3a5bc7; color: white; }
-        .empty { color: #777; padding: 40px; text-align: center; font-style: italic; }
-        .stats { background: #e8f4f8; padding: 10px; border-radius: 4px; margin-bottom: 20px; }
-    </style>
+    <link rel="stylesheet" href="/css/style.css">
 </head>
 <body>
 
@@ -47,7 +16,7 @@
 </div>
 
 <div class="filter-form">
-    <form method="get" action="/admin/tasklogs">
+    <form method="get" action="/admin/tasklogs" id="filterForm">
         <label>Пользователь:
             <select name="userId">
                 <option value="">Все пользователи</option>

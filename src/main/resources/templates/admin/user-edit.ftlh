@@ -3,33 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <title>Редактирование пользователя</title>
-    <style>
-        body { font-family: Arial, sans-serif; max-width: 800px; margin: 40px auto; padding: 20px; }
-        form { display: flex; flex-direction: column; gap: 15px; }
-        label { font-weight: bold; margin-top: 8px; }
-        input, select {
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 6px;
-            font-size: 16px;
-        }
-        button {
-            padding: 12px;
-            background: #4e73df;
-            color: white;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 16px;
-        }
-        .required { color: red; }
-    </style>
+    <link rel="stylesheet" href="/css/style.css">
 </head>
 <body>
 
 <h1>Редактирование пользователя</h1>
 
-<form method="post" action="/admin/users/update">
+<form class="container-form" method="post" action="/admin/users/update">
     <input type="hidden" name="id" value="${updateDto.getId()!''}">
 
     <label>Email <span class="required">*</span></label>

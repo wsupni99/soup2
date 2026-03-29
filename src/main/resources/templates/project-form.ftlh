@@ -3,32 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title><#if project.getId()??>Редактирование проекта<#else>Новый проект</#if></title>
-    <style>
-        body { font-family: Arial, sans-serif; max-width: 700px; margin: 40px auto; padding: 20px; }
-        form { display: flex; flex-direction: column; gap: 15px; }
-        label { font-weight: bold; margin-top: 8px; }
-        input, select, textarea {
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 6px;
-            font-size: 16px;
-        }
-        button {
-            padding: 12px;
-            background: #4e73df;
-            color: white;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-        }
-        .error {
-            color: red;
-            background: #ffe6e6;
-            padding: 12px;
-            border-radius: 6px;
-            margin: 10px 0;
-        }
-    </style>
+    <link rel="stylesheet" href="/css/style.css">
 </head>
 <body>
 
@@ -38,7 +13,7 @@
     <div class="error">${error}</div>
 </#if>
 
-<form method="post" action="<#if project.getId()??>/projects/${project.getId()}/update<#else>/projects</#if>">
+<form class="container-form" method="post" action="<#if project.getId()??>/projects/${project.getId()}/update<#else>/projects</#if>">
 
     <input type="hidden" name="id" value="${project.getId()!''}">
 

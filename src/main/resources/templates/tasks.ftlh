@@ -3,67 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Задачи</title>
-    <style>
-        body { font-family: Arial, sans-serif; margin: 20px; }
-        h1 { color: #333; }
-        table { width: 100%; border-collapse: collapse; margin: 20px 0; }
-        th, td { border: 1px solid #ccc; padding: 10px; text-align: left; vertical-align: top; }
-        th { background: #f0f0f0; }
-        .btn {
-            padding: 8px 12px;
-            text-decoration: none;
-            border-radius: 4px;
-            margin-right: 5px;
-            display: inline-block;
-        }
-        .btn-primary { background: #4e73df; color: white; }
-        .btn-edit { background: #f39c12; color: white; }
-        .btn-delete { background: #e74c3c; color: white; }
-        .filter-form {
-            background: #f9f9f9;
-            padding: 20px;
-            border-radius: 8px;
-            margin-top: 15px;
-            border: 1px solid #ddd;
-        }
-        .filter-row {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 30px;
-            align-items: end;
-        }
-        .filter-group {
-            display: flex;
-            flex-direction: column;
-            min-width: 180px;
-        }
-        .filter-group label {
-            margin-bottom: 5px;
-            font-weight: 600;
-            font-size: 0.95em;
-        }
-        select, input[type="text"] {
-            padding: 8px 10px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            width: 100%;
-        }
-        .success-message {
-            color: #155724;
-            background: #d4edda;
-            border: 1px solid #c3e6cb;
-            padding: 12px;
-            border-radius: 6px;
-            margin: 10px 0;
-        }
-        .error {
-            color: red;
-            background: #ffe6e6;
-            padding: 12px;
-            border-radius: 6px;
-            margin: 10px 0;
-        }
-    </style>
+    <link rel="stylesheet" href="/css/style.css">
 </head>
 <body>
 <h1>Управление задачами</h1>
