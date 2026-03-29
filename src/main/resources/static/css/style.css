@@ -1,3 +1,5 @@
+/* style.css */
+
 body {
     font-family: Arial, sans-serif;
     margin: 20px;
@@ -25,12 +27,19 @@ th {
     background: #f0f0f0;
 }
 
+/* Общие формы (создание/редактирование) */
 form {
     display: flex;
     flex-direction: column;
     gap: 15px;
-    max-width: 1600px;
+    max-width: 800px;
     margin: 0 auto;
+}
+
+/* Специально для фильтров — делаем компактнее */
+.filter-form form {
+    display: block;           /* отключаем column flex для фильтров */
+    max-width: 100%;
 }
 
 label {
@@ -65,30 +74,14 @@ button:hover {
     border-radius: 4px;
     margin-right: 5px;
     display: inline-block;
-    border: none;
     cursor: pointer;
     font-size: 14px;
 }
 
-.btn-primary {
-    background: #4e73df;
-    color: white;
-}
-
-.btn-edit {
-    background: #f39c12;
-    color: white;
-}
-
-.btn-delete {
-    background: #e74c3c;
-    color: white;
-}
-
-.btn-danger {
-    background: #e74c3c;
-    color: white;
-}
+.btn-primary  { background: #4e73df; color: white; }
+.btn-edit     { background: #f39c12; color: white; }
+.btn-delete,
+.btn-danger   { background: #e74c3c; color: white; }
 
 .error {
     color: #d32f2f;
@@ -108,9 +101,7 @@ button:hover {
     margin: 10px 0;
 }
 
-.required {
-    color: red;
-}
+.required { color: red; }
 
 .filter-form {
     background: #f9f9f9;
@@ -123,7 +114,7 @@ button:hover {
 .filter-row {
     display: flex;
     flex-wrap: wrap;
-    gap: 10px;
+    gap: 20px;
     align-items: end;
 }
 
@@ -131,6 +122,7 @@ button:hover {
     display: flex;
     flex-direction: column;
     min-width: 180px;
+    flex: 1 1 200px;           /* позволяет элементам равномерно распределяться */
 }
 
 .filter-group label {
@@ -177,4 +169,59 @@ button:hover {
     max-width: 800px;
     margin: 40px auto;
     padding: 20px;
+}
+
+/* Стили для страницы логина */
+.login-page {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #f0f2f5;
+    margin: 0;
+    padding: 20px;
+}
+
+.container {
+    background: white;
+    padding: 40px;
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    width: 100%;
+    max-width: 380px;
+}
+
+.container h2 {
+    text-align: center;
+    margin-bottom: 30px;
+    color: #333;
+}
+
+.container input {
+    width: 100%;
+    padding: 12px;
+    margin: 10px 0;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-sizing: border-box;
+}
+
+.container button {
+    width: 100%;
+    padding: 12px;
+    margin-top: 10px;
+}
+
+.container p {
+    text-align: center;
+    margin-top: 20px;
+}
+
+.container a {
+    color: #4e73df;
+    text-decoration: none;
+}
+
+.container a:hover {
+    text-decoration: underline;
 }

@@ -6,7 +6,7 @@
     <title>Регистрация</title>
     <link rel="stylesheet" href="/css/style.css">
 </head>
-<body>
+<body class="login-page">
 <div class="container">
     <h2>Регистрация</h2>
 
@@ -25,7 +25,9 @@
         <button type="submit">Зарегистрироваться</button>
     </form>
 
-    <a href="/login">Уже есть аккаунт? Войти</a>
+    <p style="text-align: center;">
+        <a href="/login">Уже есть аккаунт? Войти</a>
+    </p>
 </div>
 </body>
 </html>
