@@ -31,11 +31,10 @@ public class ProjectController {
         return "projects";
     }
 
-    // Форма создания
     @PreAuthorize("hasAnyRole('ROLE_MANAGER', 'ROLE_ADMIN')")
     @GetMapping("/projects/new")
     public String newProjectForm(Model model) {
-        model.addAttribute("project", new ProjectDto(null, "", "", null, null, null, null, null));
+        model.addAttribute("project", new ProjectDto());
         model.addAttribute("managers", userRepository.findAll());
         model.addAttribute("startDateStr", "");
         model.addAttribute("endDateStr", "");
@@ -43,18 +42,16 @@ public class ProjectController {
         return "project-form";
     }
 
-    // Создание проекта
     @PreAuthorize("hasAnyRole('ROLE_MANAGER', 'ROLE_ADMIN')")
     @PostMapping("/projects")
     public String createProject(@ModelAttribute ProjectDto projectDto, Model model) {
-
         String error = validateProject(projectDto);
 
         if (error != null) {
             model.addAttribute("project", projectDto);
             model.addAttribute("managers", userRepository.findAll());
-            model.addAttribute("startDateStr", getDateStr(projectDto.startDate()));
-            model.addAttribute("endDateStr", getDateStr(projectDto.endDate()));
+            model.addAttribute("startDateStr", getDateStr(projectDto.getStartDate()));
+            model.addAttribute("endDateStr", getDateStr(projectDto.getEndDate()));
             model.addAttribute("error", error);
             return "project-form";
         }
@@ -64,7 +61,6 @@ public class ProjectController {
         return "redirect:/projects";
     }
 
-    // Форма редактирования
     @PreAuthorize("hasAnyRole('ROLE_MANAGER', 'ROLE_ADMIN')")
     @GetMapping("/projects/{id}/edit")
     public String editProject(@PathVariable Integer id, Model model) {
@@ -81,7 +77,6 @@ public class ProjectController {
         return "project-form";
     }
 
-    // Обновление проекта
     @PreAuthorize("hasAnyRole('ROLE_MANAGER', 'ROLE_ADMIN')")
     @PostMapping("/projects/{id}/update")
     public String updateProject(@PathVariable Integer id,
@@ -93,8 +88,8 @@ public class ProjectController {
         if (error != null) {
             model.addAttribute("project", projectDto);
             model.addAttribute("managers", userRepository.findAll());
-            model.addAttribute("startDateStr", getDateStr(projectDto.startDate()));
-            model.addAttribute("endDateStr", getDateStr(projectDto.endDate()));
+            model.addAttribute("startDateStr", getDateStr(projectDto.getStartDate()));
+            model.addAttribute("endDateStr", getDateStr(projectDto.getEndDate()));
             model.addAttribute("error", error);
             return "project-form";
         }
@@ -107,7 +102,6 @@ public class ProjectController {
         return "redirect:/projects";
     }
 
-    // ====================== УДАЛЕНИЕ ПРОЕКТА ======================
     @PreAuthorize("hasAnyRole('ROLE_MANAGER', 'ROLE_ADMIN')")
     @GetMapping("/projects/{id}/delete")
     public String deleteProject(@PathVariable Integer id, Model model) {
@@ -115,30 +109,27 @@ public class ProjectController {
             projectService.delete(id);
             return "redirect:/projects";
         } catch (IllegalStateException e) {
-            // Бизнес-ошибка: есть спринты или задачи
             model.addAttribute("error", e.getMessage());
         } catch (Exception e) {
             model.addAttribute("error", "Произошла ошибка при удалении проекта");
         }
 
-        // Возвращаем список проектов с ошибкой
         List<Project> projects = projectService.getAllProjects();
         model.addAttribute("projects", projectMapper.toDtoList(projects));
         return "projects";
     }
 
-    // ====================== ВАЛИДАЦИЯ ======================
     private String validateProject(ProjectDto dto) {
-        if (dto.name() == null || dto.name().trim().isEmpty()) {
+        if (dto.getName() == null || dto.getName().trim().isEmpty()) {
             return "Название проекта обязательно";
         }
-        if (dto.managerId() == null) {
+        if (dto.getManagerId() == null) {
             return "Выберите менеджера";
         }
-        if (dto.startDate() == null || dto.endDate() == null) {
+        if (dto.getStartDate() == null || dto.getEndDate() == null) {
             return "Обе даты обязательны";
         }
-        if (dto.startDate().isAfter(dto.endDate())) {
+        if (dto.getStartDate().isAfter(dto.getEndDate())) {
             return "Дата начала должна быть раньше даты окончания";
         }
         return null;

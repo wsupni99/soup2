@@ -24,7 +24,6 @@ public class AuthController {
                             @RequestParam(value = "registered", required = false) String registered,
                             Model model) {
         if (error != null) {
-            log.warn("Попытка логина с ошибкой");
             model.addAttribute("error", "Неверный email или пароль");
         }
         if (logout != null) {
@@ -43,13 +42,11 @@ public class AuthController {
 
     @PostMapping("/register")
     public String register(@ModelAttribute RegisterRequestDto dto) {
-        log.info("Запрос регистрации: {} ({})", dto.email(), dto.roleName());
-
         try {
             userService.register(dto);
             return "redirect:/login?registered=true";
         } catch (Exception e) {
-            log.error("Ошибка при регистрации {}", dto.email(), e);
+            log.error("Ошибка при регистрации {}", dto.getEmail(), e);
             return "redirect:/register?error=true";
         }
     }

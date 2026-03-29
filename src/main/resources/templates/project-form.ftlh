@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title><#if project.id()??>Редактирование проекта<#else>Новый проект</#if></title>
+    <title><#if project.getId()??>Редактирование проекта<#else>Новый проект</#if></title>
     <style>
         body { font-family: Arial, sans-serif; max-width: 700px; margin: 40px auto; padding: 20px; }
         form { display: flex; flex-direction: column; gap: 15px; }
@@ -32,21 +32,21 @@
 </head>
 <body>
 
-<h1><#if project.id()??>Редактирование проекта<#else>Новый проект</#if></h1>
+<h1><#if project.getId()??>Редактирование проекта<#else>Новый проект</#if></h1>
 
 <#if error??>
     <div class="error">${error}</div>
 </#if>
 
-<form method="post" action="<#if project.id()??>/projects/${project.id()}/update<#else>/projects</#if>">
+<form method="post" action="<#if project.getId()??>/projects/${project.getId()}/update<#else>/projects</#if>">
 
-    <input type="hidden" name="id" value="${project.id()!''}">
+    <input type="hidden" name="id" value="${project.getId()!''}">
 
     <label>Название проекта *</label>
-    <input type="text" name="name" value="${project.name()!''}" required>
+    <input type="text" name="name" value="${project.getName()!''}" required>
 
     <label>Описание</label>
-    <textarea name="description" rows="4">${project.description()!''}</textarea>
+    <textarea name="description" rows="4">${project.getDescription()!''}</textarea>
 
     <label>Дата начала *</label>
     <input type="date" name="startDate" value="${(startDateStr)!''}" required>
@@ -56,10 +56,10 @@
 
     <label>Статус</label>
     <select name="status">
-        <option value="PLANNED"   ${(project.status()?? && project.status() == 'PLANNED')?string('selected','')}>Планируется</option>
-        <option value="ACTIVE"    ${(project.status()?? && project.status() == 'ACTIVE')?string('selected','')}>Активный</option>
-        <option value="COMPLETED" ${(project.status()?? && project.status() == 'COMPLETED')?string('selected','')}>Завершён</option>
-        <option value="CANCELLED" ${(project.status()?? && project.status() == 'CANCELLED')?string('selected','')}>Отменён</option>
+        <option value="PLANNED"   ${(project.getStatus()?? && project.getStatus() == 'PLANNED')?string('selected','')}>Планируется</option>
+        <option value="ACTIVE"    ${(project.getStatus()?? && project.getStatus() == 'ACTIVE')?string('selected','')}>Активный</option>
+        <option value="COMPLETED" ${(project.getStatus()?? && project.getStatus() == 'COMPLETED')?string('selected','')}>Завершён</option>
+        <option value="CANCELLED" ${(project.getStatus()?? && project.getStatus() == 'CANCELLED')?string('selected','')}>Отменён</option>
     </select>
 
     <label>Менеджер *</label>
@@ -67,7 +67,7 @@
         <option value="">Выберите менеджера</option>
         <#list managers as manager>
             <option value="${manager.id}"
-                    ${(project.managerId()?? && project.managerId() == manager.id)?string('selected','')}>
+                    ${(project.getManagerId()?? && project.getManagerId() == manager.id)?string('selected','')}>
                 ${manager.name} (${manager.email})
             </option>
         </#list>

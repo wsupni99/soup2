@@ -84,11 +84,11 @@
         </tr>
         <#list logs as log>
             <tr>
-                <td>${log.id()!''}</td>
-                <td>${log.action()!''}</td>
-                <td>${log.changedAt()!''}</td>
-                <td>${log.userName()!''} (ID: ${log.userId()!''})</td>
-                <td>${log.taskId()!''}</td>
+                <td>${log.getId()!''}</td>
+                <td>${log.getAction()!''}</td>
+                <td>${log.getChangedAt()!''}</td>
+                <td>${log.getUserName()!''} (ID: ${log.getUserId()!''})</td>
+                <td>${log.getTaskId()!''}</td>
             </tr>
         </#list>
     </table>

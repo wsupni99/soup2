@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -12,15 +11,11 @@ import org.springframework.web.bind.annotation.*;
 import ru.itis.soup2.dto.AdminUserCreateDto;
 import ru.itis.soup2.dto.AdminUserUpdateDto;
 import ru.itis.soup2.dto.TaskLogDto;
-import ru.itis.soup2.models.core.Role;
 import ru.itis.soup2.models.core.User;
 import ru.itis.soup2.services.core.RoleService;
 import ru.itis.soup2.services.core.UserService;
 import ru.itis.soup2.services.project.TaskLogService;
-import ru.itis.soup2.services.project.TaskService;
 
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @Controller
@@ -31,18 +26,14 @@ public class AdminController {
 
     private final UserService userService;
     private final RoleService roleService;
-    private final TaskService taskService;
-    private  final TaskLogService taskLogService;
+    private final TaskLogService taskLogService;
 
-    // === Список всех пользователей ===
     @GetMapping("/users")
     public String usersPage(Model model) {
-        List<User> users = userService.getAllUsers();
-        model.addAttribute("users", users);
+        model.addAttribute("users", userService.getAllUsers());
         return "admin/users";
     }
 
-    // === Форма создания пользователя ===
     @GetMapping("/users/create")
     public String createUserForm(Model model) {
         model.addAttribute("createDto", new AdminUserCreateDto("", "", "", "", ""));
@@ -56,7 +47,6 @@ public class AdminController {
         return "redirect:/admin/users";
     }
 
-    // === Форма редактирования пользователя ===
     @GetMapping("/users/{id}/edit")
     public String editUserForm(@PathVariable Integer id, Model model) {
         User user = userService.getUserById(id)
@@ -89,13 +79,9 @@ public class AdminController {
             Model model) {
 
         Pageable pageable = PageRequest.of(page, size);
-        Page<TaskLogDto> logs;
-
-        if (userId != null && userId > 0) {
-            logs = taskLogService.findByUserIdOptional(userId, pageable);
-        } else {
-            logs = taskLogService.findAllOrdered(pageable);
-        }
+        Page<TaskLogDto> logs = (userId != null && userId > 0)
+                ? taskLogService.findByUserIdOptional(userId, pageable)
+                : taskLogService.findAllOrdered(pageable);
 
         model.addAttribute("logs", logs.getContent());
         model.addAttribute("users", userService.getAllUsers());

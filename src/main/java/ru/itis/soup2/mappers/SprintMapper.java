@@ -45,18 +45,18 @@ public class SprintMapper {
         if (dto == null) return null;
 
         return Sprint.builder()
-                .id(dto.id())
-                .name(dto.name())
-                .startDate(dto.startDate())
-                .endDate(dto.endDate())
+                .id(dto.getId())
+                .name(dto.getName())
+                .startDate(dto.getStartDate())
+                .endDate(dto.getEndDate())
                 .build();
     }
 
     public void updateEntity(Sprint sprint, SprintDto dto) {
         if (dto == null || sprint == null) return;
 
-        sprint.setName(dto.name());
-        sprint.setStartDate(dto.startDate());
-        sprint.setEndDate(dto.endDate());
+        sprint.setName(dto.getName());
+        sprint.setStartDate(dto.getStartDate());
+        sprint.setEndDate(dto.getEndDate());
     }
 }

@@ -32,23 +32,23 @@
 
 <form method="post" action="/admin/users/create">
     <label>Email <span class="required">*</span></label>
-    <input type="email" name="email" value="${createDto.email()!''}" required>
+    <input type="email" name="email" value="${createDto.getEmail()!''}" required>
 
     <label>Пароль <span class="required">*</span></label>
-    <input type="password" name="password" value="${createDto.password()!''}" required>
+    <input type="password" name="password" value="${createDto.getPassword()!''}" required>
 
     <label>Имя <span class="required">*</span></label>
-    <input type="text" name="name" value="${createDto.name()!''}" required>
+    <input type="text" name="name" value="${createDto.getName()!''}" required>
 
     <label>Контактная информация</label>
-    <input type="text" name="contactInfo" value="${createDto.contactInfo()!''}">
+    <input type="text" name="contactInfo" value="${createDto.getContactInfo()!''}">
 
     <label>Роль <span class="required">*</span></label>
     <select name="roleName" required>
         <option value="">-- Выберите роль --</option>
         <#list roles as role>
             <option value="${role.roleName!''}"
-                    ${(createDto.roleName()?? && createDto.roleName() == role.roleName)?string('selected','')}>
+                    ${(createDto.getRoleName()?? && createDto.getRoleName() == role.roleName)?string('selected','')}>
                 ${role.roleName!''}
             </option>
         </#list>

@@ -41,30 +41,30 @@ public class ProjectMapper {
         if (dto == null) return null;
 
         Project project = new Project();
-        project.setName(dto.name());
-        project.setDescription(dto.description());
-        project.setStartDate(dto.startDate());
-        project.setEndDate(dto.endDate());
-        if (dto.status() != null) {
-            project.setStatus(ProjectStatus.valueOf(dto.status()));
+        project.setName(dto.getName());
+        project.setDescription(dto.getDescription());
+        project.setStartDate(dto.getStartDate());
+        project.setEndDate(dto.getEndDate());
+        if (dto.getStatus() != null) {
+            project.setStatus(ProjectStatus.valueOf(dto.getStatus()));
         }
 
-        setManager(project, dto.managerId());
+        setManager(project, dto.getManagerId());
         return project;
     }
 
     public void updateEntity(Project project, ProjectDto dto) {
         if (dto == null || project == null) return;
 
-        project.setName(dto.name());
-        project.setDescription(dto.description());
-        project.setStartDate(dto.startDate());
-        project.setEndDate(dto.endDate());
-        if (dto.status() != null) {
-            project.setStatus(ProjectStatus.valueOf(dto.status()));
+        project.setName(dto.getName());
+        project.setDescription(dto.getDescription());
+        project.setStartDate(dto.getStartDate());
+        project.setEndDate(dto.getEndDate());
+        if (dto.getStatus() != null) {
+            project.setStatus(ProjectStatus.valueOf(dto.getStatus()));
         }
 
-        setManager(project, dto.managerId());
+        setManager(project, dto.getManagerId());
     }
 
     private void setManager(Project project, Integer managerId) {

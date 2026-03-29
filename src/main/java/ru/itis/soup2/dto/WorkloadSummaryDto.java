@@ -1,13 +1,23 @@
 package ru.itis.soup2.dto;
 
-public record WorkloadSummaryDto(
-        Integer id,
-        Integer userId,
-        String userName,
-        Integer projectId,
-        String projectName,
-        Integer sprintId,
-        String sprintName,
-        Integer openTasksCount,
-        Integer closedTasksCount
-) {}
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+public class WorkloadSummaryDto {
+
+    private Integer id;
+    private Integer userId;
+    private String userName;
+    private Integer projectId;
+    private String projectName;
+    private Integer sprintId;
+    private String sprintName;
+    private Integer openTasksCount;
+    private Integer closedTasksCount;
+}

@@ -1,10 +1,12 @@
 package ru.itis.soup2.mappers;
 
+import org.springframework.stereotype.Component;
 import ru.itis.soup2.dto.UserDto;
 import ru.itis.soup2.models.core.User;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Component
 public final class UserMapper {
 
     private UserMapper() {}
@@ -32,9 +34,9 @@ public final class UserMapper {
     public static User toEntity(UserDto dto) {
         if (dto == null) return null;
         User user = new User();
-        user.setEmail(dto.email());
-        user.setName(dto.name());
-        user.setContactInfo(dto.contactInfo());
+        user.setEmail(dto.getEmail());
+        user.setName(dto.getName());
+        user.setContactInfo(dto.getContactInfo());
         return user;
     }
 }

@@ -16,10 +16,11 @@ import ru.itis.soup2.repositories.core.UserRepository;
 
 import java.util.List;
 import java.util.Optional;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
-@Transactional(readOnly = true)   // по умолчанию все методы только чтение
+@Transactional(readOnly = true)
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
@@ -31,18 +32,17 @@ public class UserServiceImpl implements UserService {
     @Transactional
     @Override
     public void register(RegisterRequestDto dto) {
-        log.info("Регистрация пользователя: email={}, роль={}", dto.email(), dto.roleName());
+        log.info("Регистрация пользователя: email={}, роль={}", dto.getEmail(), dto.getRoleName());
 
         User user = new User();
-        user.setEmail(dto.email().trim());
-        user.setName(dto.name().trim());
-        user.setPassword(passwordEncoder.encode(dto.password().trim()));
+        user.setEmail(dto.getEmail().trim());
+        user.setName(dto.getName().trim());
+        user.setPassword(passwordEncoder.encode(dto.getPassword().trim()));
         user.setContactInfo("");
 
         User savedUser = userRepository.save(user);
 
-        // Определяем роль
-        String roleName = dto.roleName() != null ? dto.roleName().trim().toUpperCase() : "ROLE_DEVELOPER";
+        String roleName = dto.getRoleName() != null ? dto.getRoleName().trim().toUpperCase() : "ROLE_DEVELOPER";
 
         if (!roleName.startsWith("ROLE_")) {
             roleName = "ROLE_" + roleName;
@@ -52,10 +52,10 @@ public class UserServiceImpl implements UserService {
                 .orElseGet(() -> roleService.findByName("ROLE_DEVELOPER")
                         .orElseThrow(() -> new EntityNotFoundException("Default role not found")));
 
-        savedUser.setRole(role);           // ← новая связь!
+        savedUser.setRole(role);
         userRepository.save(savedUser);
 
-        log.info("Пользователь {} успешно зарегистрирован с ролью {}", dto.email(), roleName);
+        log.info("Пользователь {} успешно зарегистрирован с ролью {}", dto.getEmail(), roleName);
     }
 
     @Override
@@ -70,14 +70,7 @@ public class UserServiceImpl implements UserService {
         }
 
         User user = userOpt.get();
-        log.info("Пользователь найден. ID = {}, Name = {}", user.getId(), user.getName());
-
         boolean passwordMatches = passwordEncoder.matches(rawPassword.trim(), user.getPassword());
-
-        log.info("Сравнение паролей:");
-        log.info("  Введённый пароль: {}", rawPassword.trim());
-        log.info("  Хэш из БД: {}", user.getPassword());
-        log.info("  Результат matches(): {}", passwordMatches);
 
         if (passwordMatches) {
             log.info("Логин УСПЕШНЫЙ для пользователя {}", email);
@@ -97,18 +90,17 @@ public class UserServiceImpl implements UserService {
     @Transactional
     @Override
     public void createUser(AdminUserCreateDto dto) {
-        log.info("Админ создаёт пользователя: email={}", dto.email());
+        log.info("Админ создаёт пользователя: email={}", dto.getEmail());
 
         User user = new User();
-        user.setEmail(dto.email().trim());
-        user.setName(dto.name().trim());
-        user.setPassword(passwordEncoder.encode(dto.password().trim()));
-        user.setContactInfo(dto.contactInfo() != null ? dto.contactInfo().trim() : "");
+        user.setEmail(dto.getEmail().trim());
+        user.setName(dto.getName().trim());
+        user.setPassword(passwordEncoder.encode(dto.getPassword().trim()));
+        user.setContactInfo(dto.getContactInfo() != null ? dto.getContactInfo().trim() : "");
 
         User savedUser = userRepository.save(user);
 
-        // Назначаем роль
-        String roleName = normalizeRoleName(dto.roleName());
+        String roleName = normalizeRoleName(dto.getRoleName());
         Role role = roleService.findByName(roleName)
                 .orElseGet(() -> roleService.findByName("ROLE_DEVELOPER")
                         .orElseThrow(() -> new EntityNotFoundException("Default role ROLE_DEVELOPER not found")));
@@ -116,24 +108,23 @@ public class UserServiceImpl implements UserService {
         savedUser.setRole(role);
         userRepository.save(savedUser);
 
-        log.info("Пользователь {} успешно создан с ролью {}", dto.email(), role.getRoleName());
+        log.info("Пользователь {} успешно создан с ролью {}", dto.getEmail(), role.getRoleName());
     }
 
     @Transactional
     @Override
     public void updateUser(AdminUserUpdateDto dto) {
-        log.info("Админ обновляет пользователя ID={}", dto.id());
+        log.info("Админ обновляет пользователя ID={}", dto.getId());
 
-        User user = userRepository.findById(dto.id())
-                .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + dto.id()));
+        User user = userRepository.findById(dto.getId())
+                .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + dto.getId()));
 
-        user.setEmail(dto.email().trim());
-        user.setName(dto.name().trim());
-        user.setContactInfo(dto.contactInfo() != null ? dto.contactInfo().trim() : "");
+        user.setEmail(dto.getEmail().trim());
+        user.setName(dto.getName().trim());
+        user.setContactInfo(dto.getContactInfo() != null ? dto.getContactInfo().trim() : "");
 
-        // Меняем роль, если указана
-        if (dto.roleName() != null && !dto.roleName().isBlank()) {
-            String roleName = normalizeRoleName(dto.roleName());
+        if (dto.getRoleName() != null && !dto.getRoleName().isBlank()) {
+            String roleName = normalizeRoleName(dto.getRoleName());
             Role newRole = roleService.findByName(roleName)
                     .orElseThrow(() -> new EntityNotFoundException("Role not found: " + roleName));
 
@@ -141,7 +132,7 @@ public class UserServiceImpl implements UserService {
         }
 
         userRepository.save(user);
-        log.info("Пользователь ID={} успешно обновлён", dto.id());
+        log.info("Пользователь ID={} успешно обновлён", dto.getId());
     }
 
     @Override
@@ -152,7 +143,6 @@ public class UserServiceImpl implements UserService {
         userRepository.deleteById(id);
     }
 
-    // Вспомогательный метод
     private String normalizeRoleName(String roleName) {
         if (roleName == null) return "ROLE_DEVELOPER";
         String upper = roleName.trim().toUpperCase();

@@ -1,15 +1,14 @@
 package ru.itis.soup2.mappers;
 
+import org.springframework.stereotype.Component;
 import ru.itis.soup2.dto.WorkloadSummaryDto;
 import ru.itis.soup2.models.analytics.WorkloadSummary;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public final class WorkloadSummaryMapper {
-
-    private WorkloadSummaryMapper() {}
-
-    public static WorkloadSummaryDto toDto(WorkloadSummary summary) {
+@Component
+public class WorkloadSummaryMapper {
+    public WorkloadSummaryDto toDto(WorkloadSummary summary) {
         if (summary == null) return null;
 
         return new WorkloadSummaryDto(
@@ -25,9 +24,9 @@ public final class WorkloadSummaryMapper {
         );
     }
 
-    public static List<WorkloadSummaryDto> toDtoList(List<WorkloadSummary> summaries) {
+    public List<WorkloadSummaryDto> toDtoList(List<WorkloadSummary> summaries) {
         return summaries.stream()
-                .map(WorkloadSummaryMapper::toDto)
+                .map(this::toDto)
                 .collect(Collectors.toList());
     }
 }

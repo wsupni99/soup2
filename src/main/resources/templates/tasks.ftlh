@@ -111,7 +111,7 @@
                     <#list sprints as sprint>
                         <option value="${sprint.getId()}"
                                 <#if selectedSprintId?? && selectedSprintId == sprint.getId()>selected</#if>>
-                            ${sprint.name!''}
+                            ${sprint.getName()!''}
                         </option>
                     </#list>
                 </select>

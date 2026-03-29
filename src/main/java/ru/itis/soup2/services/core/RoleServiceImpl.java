@@ -13,6 +13,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class RoleServiceImpl implements RoleService {
+
     private final RoleRepository roleRepository;
 
     @Override

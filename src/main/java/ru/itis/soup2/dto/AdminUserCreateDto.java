@@ -1,9 +1,19 @@
 package ru.itis.soup2.dto;
 
-public record AdminUserCreateDto(
-        String email,
-        String name,
-        String password,
-        String contactInfo,
-        String roleName
-) {}
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+public class AdminUserCreateDto {
+
+    private String email;
+    private String name;
+    private String password;
+    private String contactInfo;
+    private String roleName;
+}

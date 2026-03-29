@@ -1,14 +1,24 @@
 package ru.itis.soup2.dto;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
 import java.time.LocalDate;
 
-public record ProjectDto(
-        Integer id,
-        String name,
-        String description,
-        LocalDate startDate,
-        LocalDate endDate,
-        String status,
-        Integer managerId,
-        String managerName
-) {}
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+public class ProjectDto {
+
+    private Integer id;
+    private String name;
+    private String description;
+    private LocalDate startDate;
+    private LocalDate endDate;
+    private String status;
+    private Integer managerId;
+    private String managerName;
+}

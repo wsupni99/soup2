@@ -1,7 +1,17 @@
 package ru.itis.soup2.dto;
 
-public record RoleDto(
-        Integer id,
-        String roleName,
-        String description
-) {}
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+public class RoleDto {
+
+    private Integer id;
+    private String roleName;
+    private String description;
+}

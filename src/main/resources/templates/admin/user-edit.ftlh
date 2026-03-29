@@ -30,23 +30,23 @@
 <h1>Редактирование пользователя</h1>
 
 <form method="post" action="/admin/users/update">
-    <input type="hidden" name="id" value="${updateDto.id()!''}">
+    <input type="hidden" name="id" value="${updateDto.getId()!''}">
 
     <label>Email <span class="required">*</span></label>
-    <input type="email" name="email" value="${updateDto.email()!''}" required>
+    <input type="email" name="email" value="${updateDto.getEmail()!''}" required>
 
     <label>Имя <span class="required">*</span></label>
-    <input type="text" name="name" value="${updateDto.name()!''}" required>
+    <input type="text" name="name" value="${updateDto.getName()!''}" required>
 
     <label>Контактная информация</label>
-    <input type="text" name="contactInfo" value="${updateDto.contactInfo()!''}">
+    <input type="text" name="contactInfo" value="${updateDto.getContactInfo()!''}">
 
     <label>Роль <span class="required">*</span></label>
     <select name="roleName" required>
         <option value="">-- Выберите роль --</option>
         <#list roles as role>
             <option value="${role.roleName!''}"
-                    ${(updateDto.roleName()?? && updateDto.roleName() == role.roleName)?string('selected','')}>
+                    ${(updateDto.getRoleName()?? && updateDto.getRoleName() == role.roleName)?string('selected','')}>
                 ${role.roleName!''}
             </option>
         </#list>

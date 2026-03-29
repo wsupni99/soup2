@@ -49,15 +49,15 @@
     </tr>
     <#list sprints as sprint>
         <tr>
-            <td>${sprint.id()!''}</td>
-            <td>${sprint.name()!''}</td>
-            <td>${sprint.projectName()!''}</td>
-            <td>${sprint.startDate()!''}</td>
-            <td>${sprint.endDate()!''}</td>
-            <td>${sprint.taskCount()!0}</td>
+            <td>${sprint.getId()!''}</td>
+            <td>${sprint.getName()!''}</td>
+            <td>${sprint.getProjectName()!''}</td>
+            <td>${sprint.getStartDate()!''}</td>
+            <td>${sprint.getEndDate()!''}</td>
+            <td>${sprint.getTaskCount()!0}</td>
             <td>
-                <a href="/sprints/${sprint.id()}/edit" class="btn btn-edit">Редактировать</a>
-                <a href="/sprints/${sprint.id()}/delete"
+                <a href="/sprints/${sprint.getId()}/edit" class="btn btn-edit">Редактировать</a>
+                <a href="/sprints/${sprint.getId()}/delete"
                    class="btn btn-danger"
                    onclick="return confirm('Вы действительно хотите удалить этот спринт?')">Удалить</a>
             </td>

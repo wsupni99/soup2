@@ -23,7 +23,6 @@ public class SprintController {
     private final ProjectService projectService;
     private final SprintMapper sprintMapper;
 
-    // ====================== СПИСОК СПРИНТОВ ======================
     @PreAuthorize("hasAnyRole('ROLE_MANAGER', 'ROLE_ADMIN')")
     @GetMapping("/sprints")
     public String sprintsPage(Model model) {
@@ -32,11 +31,10 @@ public class SprintController {
         return "sprints";
     }
 
-    // ====================== ФОРМА СОЗДАНИЯ ======================
     @PreAuthorize("hasAnyRole('ROLE_MANAGER', 'ROLE_ADMIN')")
     @GetMapping("/sprints/new")
     public String newSprintForm(Model model) {
-        model.addAttribute("sprint", new SprintDto(null, "", null, null, null, null));
+        model.addAttribute("sprint", new SprintDto());
         model.addAttribute("projects", projectService.getAllProjects());
         model.addAttribute("startDateStr", "");
         model.addAttribute("endDateStr", "");
@@ -44,7 +42,6 @@ public class SprintController {
         return "sprint-form";
     }
 
-    // ====================== СОЗДАНИЕ СПРИНТА ======================
     @PreAuthorize("hasAnyRole('ROLE_MANAGER', 'ROLE_ADMIN')")
     @PostMapping("/sprints")
     public String createSprint(@ModelAttribute SprintDto sprintDto,
@@ -52,24 +49,22 @@ public class SprintController {
                                @RequestParam("endDate") String endDateStr,
                                Model model) {
 
-        // Парсим даты перед валидацией
         LocalDate startDate = parseLocalDate(startDateStr);
         LocalDate endDate = parseLocalDate(endDateStr);
 
-        // Создаём DTO с распарсенными датами для валидации
         SprintDto dtoForValidation = new SprintDto(
-                sprintDto.id(),
-                sprintDto.name(),
+                null,
+                sprintDto.getName(),
                 startDate,
                 endDate,
-                sprintDto.projectId(),
-                sprintDto.projectName()
+                sprintDto.getProjectId(),
+                null
         );
 
         String error = validateSprint(dtoForValidation);
 
         if (error != null) {
-            model.addAttribute("sprint", sprintDto);           // возвращаем то, что пришло от пользователя
+            model.addAttribute("sprint", sprintDto);
             model.addAttribute("projects", projectService.getAllProjects());
             model.addAttribute("startDateStr", startDateStr);
             model.addAttribute("endDateStr", endDateStr);
@@ -77,24 +72,14 @@ public class SprintController {
             return "sprint-form";
         }
 
-        SprintDto correctedDto = new SprintDto(
-                null,
-                sprintDto.name(),
-                startDate,
-                endDate,
-                sprintDto.projectId(),
-                null
-        );
-
-        Sprint sprint = sprintMapper.toEntity(correctedDto);
-        projectService.getProjectById(correctedDto.projectId())
+        Sprint sprint = sprintMapper.toEntity(dtoForValidation);
+        projectService.getProjectById(sprintDto.getProjectId())
                 .ifPresent(sprint::setProject);
 
         sprintService.create(sprint);
         return "redirect:/sprints";
     }
 
-    // ====================== ФОРМА РЕДАКТИРОВАНИЯ ======================
     @PreAuthorize("hasAnyRole('ROLE_MANAGER', 'ROLE_ADMIN')")
     @GetMapping("/sprints/{id}/edit")
     public String editSprint(@PathVariable Integer id, Model model) {
@@ -111,7 +96,6 @@ public class SprintController {
         return "sprint-form";
     }
 
-    // ====================== ОБНОВЛЕНИЕ СПРИНТА ======================
     @PreAuthorize("hasAnyRole('ROLE_MANAGER', 'ROLE_ADMIN')")
     @PostMapping("/sprints/{id}/update")
     public String updateSprint(@PathVariable Integer id,
@@ -124,12 +108,12 @@ public class SprintController {
         LocalDate endDate = parseLocalDate(endDateStr);
 
         SprintDto dtoForValidation = new SprintDto(
-                sprintDto.id(),
-                sprintDto.name(),
+                null,
+                sprintDto.getName(),
                 startDate,
                 endDate,
-                sprintDto.projectId(),
-                sprintDto.projectName()
+                sprintDto.getProjectId(),
+                null
         );
 
         String error = validateSprint(dtoForValidation);
@@ -147,18 +131,18 @@ public class SprintController {
                 .orElseThrow(() -> new RuntimeException("Sprint not found"));
 
         SprintDto correctedDto = new SprintDto(
-                sprintDto.id(),
-                sprintDto.name(),
+                null,
+                sprintDto.getName(),
                 startDate,
                 endDate,
-                sprintDto.projectId(),
+                sprintDto.getProjectId(),
                 null
         );
 
         sprintMapper.updateEntity(sprint, correctedDto);
 
-        if (correctedDto.projectId() != null) {
-            projectService.getProjectById(correctedDto.projectId())
+        if (sprintDto.getProjectId() != null) {
+            projectService.getProjectById(sprintDto.getProjectId())
                     .ifPresent(sprint::setProject);
         }
 
@@ -166,7 +150,6 @@ public class SprintController {
         return "redirect:/sprints";
     }
 
-    // ====================== УДАЛЕНИЕ СПРИНТА ======================
     @PreAuthorize("hasAnyRole('ROLE_MANAGER', 'ROLE_ADMIN')")
     @GetMapping("/sprints/{id}/delete")
     public String deleteSprint(@PathVariable Integer id, Model model) {
@@ -174,9 +157,7 @@ public class SprintController {
             sprintService.delete(id);
             return "redirect:/sprints";
         } catch (IllegalStateException e) {
-            // Перехватываем бизнес-ошибку (есть задачи)
             model.addAttribute("error", e.getMessage());
-            // Возвращаем обратно на список спринтов с ошибкой
             List<Sprint> sprints = sprintService.getAllSprints();
             model.addAttribute("sprints", sprintMapper.toDtoList(sprints));
             return "sprints";
@@ -188,18 +169,17 @@ public class SprintController {
         }
     }
 
-    // ====================== ВАЛИДАЦИЯ ======================
     private String validateSprint(SprintDto dto) {
-        if (dto.name() == null || dto.name().trim().isEmpty()) {
+        if (dto.getName() == null || dto.getName().trim().isEmpty()) {
             return "Название спринта обязательно";
         }
-        if (dto.projectId() == null) {
+        if (dto.getProjectId() == null) {
             return "Выберите проект";
         }
-        if (dto.startDate() == null || dto.endDate() == null) {
+        if (dto.getStartDate() == null || dto.getEndDate() == null) {
             return "Обе даты обязательны";
         }
-        if (dto.startDate().isAfter(dto.endDate())) {
+        if (dto.getStartDate().isAfter(dto.getEndDate())) {
             return "Дата начала должна быть раньше даты окончания";
         }
         return null;
