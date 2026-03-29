@@ -28,7 +28,7 @@ public class ProjectController {
     public String projectsPage(Model model) {
         List<Project> projects = projectService.getAllProjects();
         model.addAttribute("projects", projectMapper.toDtoList(projects));
-        return "projects";
+        return "projects/projects";
     }
 
     @PreAuthorize("hasAnyRole('ROLE_MANAGER', 'ROLE_ADMIN')")
@@ -39,7 +39,7 @@ public class ProjectController {
         model.addAttribute("startDateStr", "");
         model.addAttribute("endDateStr", "");
         model.addAttribute("error", null);
-        return "project-form";
+        return "projects/project-form";
     }
 
     @PreAuthorize("hasAnyRole('ROLE_MANAGER', 'ROLE_ADMIN')")
@@ -53,7 +53,7 @@ public class ProjectController {
             model.addAttribute("startDateStr", getDateStr(projectDto.getStartDate()));
             model.addAttribute("endDateStr", getDateStr(projectDto.getEndDate()));
             model.addAttribute("error", error);
-            return "project-form";
+            return "projects/project-form";
         }
 
         Project project = projectMapper.toEntity(projectDto);
@@ -74,7 +74,7 @@ public class ProjectController {
         model.addAttribute("startDateStr", getDateStr(project.getStartDate()));
         model.addAttribute("endDateStr", getDateStr(project.getEndDate()));
         model.addAttribute("error", null);
-        return "project-form";
+        return "projects/project-form";
     }
 
     @PreAuthorize("hasAnyRole('ROLE_MANAGER', 'ROLE_ADMIN')")
@@ -91,7 +91,7 @@ public class ProjectController {
             model.addAttribute("startDateStr", getDateStr(projectDto.getStartDate()));
             model.addAttribute("endDateStr", getDateStr(projectDto.getEndDate()));
             model.addAttribute("error", error);
-            return "project-form";
+            return "projects/project-form";
         }
 
         Project project = projectService.getProjectById(id)
@@ -116,7 +116,7 @@ public class ProjectController {
 
         List<Project> projects = projectService.getAllProjects();
         model.addAttribute("projects", projectMapper.toDtoList(projects));
-        return "projects";
+        return "projects/projects";
     }
 
     private String validateProject(ProjectDto dto) {

@@ -32,12 +32,12 @@ public class AuthController {
         if (registered != null) {
             model.addAttribute("message", "Регистрация прошла успешно! Теперь можно войти.");
         }
-        return "login";
+        return "auth/login";
     }
 
     @GetMapping("/register")
     public String registerForm() {
-        return "register";
+        return "auth/register";
     }
 
     @PostMapping("/register")

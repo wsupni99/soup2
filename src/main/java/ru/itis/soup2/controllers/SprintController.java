@@ -28,7 +28,7 @@ public class SprintController {
     public String sprintsPage(Model model) {
         List<Sprint> sprints = sprintService.getAllSprints();
         model.addAttribute("sprints", sprintMapper.toDtoList(sprints));
-        return "sprints";
+        return "sprints/sprints";
     }
 
     @PreAuthorize("hasAnyRole('ROLE_MANAGER', 'ROLE_ADMIN')")
@@ -39,7 +39,7 @@ public class SprintController {
         model.addAttribute("startDateStr", "");
         model.addAttribute("endDateStr", "");
         model.addAttribute("error", null);
-        return "sprint-form";
+        return "sprints/sprint-form";
     }
 
     @PreAuthorize("hasAnyRole('ROLE_MANAGER', 'ROLE_ADMIN')")
@@ -69,7 +69,7 @@ public class SprintController {
             model.addAttribute("startDateStr", startDateStr);
             model.addAttribute("endDateStr", endDateStr);
             model.addAttribute("error", error);
-            return "sprint-form";
+            return "sprints/sprint-form";
         }
 
         Sprint sprint = sprintMapper.toEntity(dtoForValidation);
@@ -93,7 +93,7 @@ public class SprintController {
         model.addAttribute("startDateStr", getDateStr(sprint.getStartDate()));
         model.addAttribute("endDateStr", getDateStr(sprint.getEndDate()));
         model.addAttribute("error", null);
-        return "sprint-form";
+        return "sprints/sprint-form";
     }
 
     @PreAuthorize("hasAnyRole('ROLE_MANAGER', 'ROLE_ADMIN')")
@@ -124,7 +124,7 @@ public class SprintController {
             model.addAttribute("startDateStr", startDateStr);
             model.addAttribute("endDateStr", endDateStr);
             model.addAttribute("error", error);
-            return "sprint-form";
+            return "sprints/sprint-form";
         }
 
         Sprint sprint = sprintService.getSprintById(id)
@@ -160,12 +160,12 @@ public class SprintController {
             model.addAttribute("error", e.getMessage());
             List<Sprint> sprints = sprintService.getAllSprints();
             model.addAttribute("sprints", sprintMapper.toDtoList(sprints));
-            return "sprints";
+            return "sprints/sprints";
         } catch (Exception e) {
             model.addAttribute("error", "Произошла ошибка при удалении спринта");
             List<Sprint> sprints = sprintService.getAllSprints();
             model.addAttribute("sprints", sprintMapper.toDtoList(sprints));
-            return "sprints";
+            return "sprints/sprints";
         }
     }
 

@@ -69,7 +69,7 @@ public class TaskController {
                 : "ROLE_USER";
         model.addAttribute("currentUserRole", currentUserRole);
 
-        return "tasks";
+        return "tasks/tasks";
     }
 
     @PreAuthorize("hasAnyRole('ROLE_MANAGER', 'ROLE_ADMIN')")
@@ -79,7 +79,7 @@ public class TaskController {
         model.addAttribute("projects", projectService.getAllProjects());
         model.addAttribute("sprints", List.of());
         model.addAttribute("users", taskService.getAllUsersForAssignment());
-        return "task-form";
+        return "tasks/task-form";
     }
 
     @PreAuthorize("hasAnyRole('ROLE_MANAGER', 'ROLE_ADMIN')")
@@ -94,7 +94,7 @@ public class TaskController {
                 ? sprintService.findSprintsByProjectId(task.getProject().getId())
                 : List.of());
         model.addAttribute("users", taskService.getAllUsersForAssignment());
-        return "task-form";
+        return "tasks/task-form";
     }
 
     @PreAuthorize("hasAnyRole('ROLE_MANAGER', 'ROLE_ADMIN')")
