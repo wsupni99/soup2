@@ -29,7 +29,7 @@ public interface TaskRepository extends JpaRepository<Task, Integer> {
       AND (:status IS NULL OR :status = '' OR t.status = :statusEnum)
       AND (:priority IS NULL OR :priority = '' OR t.priority = :priorityEnum)
       AND (:assigneeId IS NULL OR t.assignee.id = :assigneeId)
-      AND (:search IS NULL OR :search = '' 
+      AND (:search IS NULL OR :search = ''
            OR LOWER(t.name) LIKE LOWER(CONCAT('%', :search, '%'))
            OR LOWER(COALESCE(t.description, '')) LIKE LOWER(CONCAT('%', :search, '%')))
     ORDER BY t.id DESC

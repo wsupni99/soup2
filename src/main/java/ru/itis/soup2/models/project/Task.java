@@ -57,8 +57,7 @@ public class Task {
     @JoinColumn(name = "sprint_id")
     private Sprint sprint;
 
-    // Новый владелец связи — один исполнитель
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "assignee_id")
     private User assignee;
 
@@ -67,18 +66,4 @@ public class Task {
 
     @OneToMany(mappedBy = "task")
     private List<Comment> comments = new ArrayList<>();
-
-    // equals и hashCode только по id (безопасно)
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Task task = (Task) o;
-        return Objects.equals(id, task.id);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id);
-    }
 }

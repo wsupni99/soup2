@@ -1,5 +1,6 @@
 package ru.itis.soup2.controllers;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -19,6 +20,7 @@ import ru.itis.soup2.services.project.TaskService;
 import java.util.List;
 
 @Controller
+@RequiredArgsConstructor
 public class TaskController {
 
     private final TaskService taskService;
@@ -26,18 +28,6 @@ public class TaskController {
     private final SprintService sprintService;
     private final TaskMapper taskMapper;
     private final SprintMapper sprintMapper;
-
-    @Autowired
-    public TaskController(TaskService taskService,
-                          ProjectService projectService,
-                          SprintService sprintService,
-                          TaskMapper taskMapper, SprintMapper sprintMapper) {
-        this.taskService = taskService;
-        this.projectService = projectService;
-        this.sprintService = sprintService;
-        this.taskMapper = taskMapper;
-        this.sprintMapper = sprintMapper;
-    }
 
     @PreAuthorize("isAuthenticated()")
     @GetMapping("/tasks")
@@ -126,6 +116,7 @@ public class TaskController {
     @PreAuthorize("hasAnyRole('ROLE_MANAGER', 'ROLE_ADMIN')")
     @GetMapping("/sprints/byProject")
     @ResponseBody
+    // AJAX
     public List<SprintDto> getSprintsByProject(@RequestParam Integer projectId) {
         return sprintService.findSprintsByProjectId(projectId)
                 .stream()

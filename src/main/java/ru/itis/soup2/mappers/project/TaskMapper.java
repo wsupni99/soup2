@@ -34,7 +34,6 @@ public class TaskMapper {
 
         task.setDeadline(dto.getDeadline());
 
-        // === Главное исправление ===
         if (dto.getProjectId() != null) {
             Project project = new Project();
             project.setId(dto.getProjectId());
@@ -63,7 +62,6 @@ public class TaskMapper {
 
         task.setDeadline(dto.getDeadline());
 
-        // Обновление связей
         if (dto.getProjectId() != null) {
             Project project = new Project();
             project.setId(dto.getProjectId());

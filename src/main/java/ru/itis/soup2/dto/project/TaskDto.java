@@ -64,16 +64,4 @@ public class TaskDto {
                 .map(TaskDto::from)
                 .toList();
     }
-
-    public TaskDto(String name, String description, TaskPriority priority, String status,
-                   LocalDate deadline, Integer projectId, Integer sprintId, Integer assigneeId) {
-        this.name = name;
-        this.description = description;
-        this.priority = priority;
-        this.status = status;
-        this.deadline = deadline;
-        this.projectId = projectId;
-        this.sprintId = sprintId;
-        this.assigneeId = assigneeId;
-    }
 }

@@ -8,17 +8,11 @@ import java.util.List;
 import java.util.Optional;
 
 public interface SprintRepository extends JpaRepository<Sprint, Integer> {
-
     @EntityGraph(attributePaths = {"project", "tasks"})
     List<Sprint> findAll();
 
     @EntityGraph(attributePaths = {"project", "tasks"})
     Optional<Sprint> findById(Integer id);
-
-    @EntityGraph(attributePaths = {"project", "tasks"})
-    List<Sprint> findByProjectId(Integer projectId);
-
-    List<Sprint> findAllBy();
 
     List<Sprint> findByProjectIdOrderByStartDate(Integer projectId);
 }

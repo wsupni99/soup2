@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import ru.itis.soup2.dto.core.RegisterRequestDto;
 import ru.itis.soup2.services.core.UserService;
 
-@Slf4j
 @Controller
 @RequiredArgsConstructor
 public class AuthController {
@@ -46,7 +45,6 @@ public class AuthController {
             userService.register(dto);
             return "redirect:/login?registered=true";
         } catch (Exception e) {
-            log.error("Ошибка при регистрации {}", dto.getEmail(), e);
             return "redirect:/register?error=true";
         }
     }

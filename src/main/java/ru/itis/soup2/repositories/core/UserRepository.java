@@ -9,7 +9,6 @@ import java.util.List;
 import java.util.Optional;
 
 public interface UserRepository extends JpaRepository<User, Integer> {
-
     Optional<User> findByEmail(String email);
 
     @Query("""
@@ -23,9 +22,6 @@ public interface UserRepository extends JpaRepository<User, Integer> {
         LEFT JOIN u.role r
         """)
     List<UserWithRoleDto> findUsersWithRoles();
-
-    @Query("SELECT u FROM User u WHERE u.role.roleName = :roleName")
-    List<User> findByRoleName(String roleName);
 
     @Query("SELECT u FROM User u WHERE u.role.roleName = 'ROLE_MANAGER'")
     List<User> findManagers();

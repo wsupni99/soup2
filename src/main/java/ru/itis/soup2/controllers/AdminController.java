@@ -32,17 +32,12 @@ public class AdminController {
         return "admin/users";
     }
 
-    @GetMapping("/users/create")
-    public String createUserForm(Model model) {
-        model.addAttribute("createDto", new AdminUserCreateDto("", "", "", "", ""));
+    @GetMapping("/users/new")
+    public String newUserForm(Model model) {
+        model.addAttribute("userDto", new AdminUserCreateDto("", "", "", "", ""));
         model.addAttribute("roles", roleService.findAll());
-        return "admin/user-create";
-    }
-
-    @PostMapping("/users/create")
-    public String createUser(@ModelAttribute("createDto") AdminUserCreateDto dto) {
-        userService.createUser(dto);
-        return "redirect:/admin/users";
+        model.addAttribute("isEdit", false);
+        return "admin/user-form";
     }
 
     @GetMapping("/users/{id}/edit")
@@ -58,13 +53,20 @@ public class AdminController {
                 user.getRole() != null ? user.getRole().getRoleName() : null
         );
 
-        model.addAttribute("updateDto", updateDto);
+        model.addAttribute("userDto", updateDto);
         model.addAttribute("roles", roleService.findAll());
-        return "admin/user-edit";
+        model.addAttribute("isEdit", true);
+        return "admin/user-form";
     }
 
-    @PostMapping("/users/update")
-    public String updateUser(@ModelAttribute("updateDto") AdminUserUpdateDto dto) {
+    @PostMapping("/users")
+    public String createUser(@ModelAttribute("userDto") AdminUserCreateDto dto) {
+        userService.createUser(dto);
+        return "redirect:/admin/users";
+    }
+
+    @PostMapping("/users/{id}/update")
+    public String updateUser(@PathVariable Integer id, @ModelAttribute("userDto") AdminUserUpdateDto dto) {
         userService.updateUser(dto);
         return "redirect:/admin/users";
     }

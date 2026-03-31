@@ -86,8 +86,8 @@
 </#if>
 
 <br><br>
-<a href="/admin/users" class="btn btn-primary">← К пользователям</a>
-<a href="/admin/users" class="btn btn-primary">← Админка</a>
+<a href="/admin/users" class="btn btn-primary">К пользователям</a>
+<a href="/admin/users" class="btn btn-primary">Админка</a>
 
 </body>
 </html>

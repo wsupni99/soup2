@@ -11,15 +11,8 @@ import java.util.Optional;
 
 public interface UserService {
     void register(RegisterRequestDto dto);
-    Optional<User> login(String email, String rawPassword);
-    void updateUser(User user);
-
     List<User> getAllUsers();
     Optional<User> getUserById(Integer id);
-    Optional<User> getByEmail(String email);
-    List<User> getAllManagers();
-    List<UserWithRoleDto> getUsersWithRoles();
     void createUser(AdminUserCreateDto dto);
     void updateUser(AdminUserUpdateDto dto);
-    void deleteUser(Integer id);
 }
