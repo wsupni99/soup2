@@ -99,28 +99,54 @@
 </div>
 
 <table>
+    <thead>
     <tr>
         <th>ID</th>
-        <th>Название</th>
+        <th>Название задачи</th>
         <th>Проект</th>
         <th>Спринт</th>
         <th>Приоритет</th>
         <th>Статус</th>
         <th>Дедлайн</th>
         <th>Исполнитель</th>
-        <#if currentUserRole == "ROLE_ADMIN" || currentUserRole == "ROLE_MANAGER">
-            <th>Действия</th>
-        </#if>
     </tr>
+    </thead>
+    <tbody>
     <#list tasks as task>
         <tr>
-            <td>${task.id!''}</td>
-            <td>${task.name!''}</td>
+            <td><strong>#${task.id!''}</strong></td>
+
+            <td>
+                <a href="/tasks/${task.id?c}" class="task-link">
+                    ${task.name!''}
+                </a>
+            </td>
+
             <td>${task.projectName!''}</td>
             <td>${task.sprintName!''}</td>
-            <td>${task.priority!''}</td>
-            <td>${task.status!''}</td>
-            <td>${task.deadline!''}</td>
+
+            <td>
+                <#if task.priority??>
+                    <span class="priority-badge priority-${task.priority?lower_case}">
+                            ${task.priority}
+                        </span>
+                <#else>
+                    —
+                </#if>
+            </td>
+
+            <td>
+                <#if task.status??>
+                    <span class="status-badge status-${task.status?lower_case}">
+                            ${task.status}
+                        </span>
+                <#else>
+                    —
+                </#if>
+            </td>
+
+            <td>${task.deadline! '—'}</td>
+
             <td>
                 <#if task.assigneeName?? && task.assigneeName?has_content>
                     ${task.assigneeName}
@@ -128,18 +154,9 @@
                     <span style="color: #999;">—</span>
                 </#if>
             </td>
-            <#if currentUserRole == "ROLE_ADMIN" || currentUserRole == "ROLE_MANAGER">
-                <td>
-                    <a href="/tasks/${task.id?c}/edit" class="btn btn-edit">Редактировать</a>
-                    <a href="/tasks/${task.id?c}/delete"
-                       class="btn btn-delete"
-                       onclick="return confirm('Вы уверены, что хотите удалить задачу?')">
-                        Удалить
-                    </a>
-                </td>
-            </#if>
         </tr>
     </#list>
+    </tbody>
 </table>
 
 </body>

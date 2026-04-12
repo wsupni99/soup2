@@ -7,6 +7,8 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+import ru.itis.soup2.dto.project.AttachmentDto;
 import ru.itis.soup2.dto.project.SprintDto;
 import ru.itis.soup2.dto.project.TaskDto;
 import ru.itis.soup2.mappers.project.SprintMapper;
@@ -103,7 +105,7 @@ public class TaskController {
 
         taskMapper.updateEntity(task, taskDto);
         taskService.update(task, taskDto.getAssigneeId());
-        return "redirect:/tasks";
+        return "redirect:/tasks/" + id;
     }
 
     @PreAuthorize("hasAnyRole('ROLE_MANAGER', 'ROLE_ADMIN')")
@@ -122,5 +124,50 @@ public class TaskController {
                 .stream()
                 .map(sprintMapper::toDto)
                 .toList();
+    }
+
+    @PreAuthorize("isAuthenticated()")
+    @GetMapping("/tasks/{id}")
+    public String taskDetail(@PathVariable Integer id,
+                             Model model,
+                             @AuthenticationPrincipal CustomUserDetails userDetails) {
+
+        Task task = taskService.getTaskById(id)
+                .orElseThrow(() -> new RuntimeException("Task not found"));
+
+        String currentUserRole = (userDetails != null && userDetails.getUser().getRole() != null)
+                ? userDetails.getUser().getRole().getRoleName()
+                : "ROLE_USER";
+
+        model.addAttribute("task", taskMapper.toDto(task));
+        model.addAttribute("currentUserRole", currentUserRole);
+
+        return "tasks/task-detail";
+    }
+
+    // AJAX создание подзадачи
+    @PreAuthorize("hasAnyRole('ROLE_MANAGER', 'ROLE_ADMIN')")
+    @PostMapping("/tasks/{parentId}/subtasks")
+    @ResponseBody
+    public TaskDto createSubTask(@PathVariable("parentId") Integer parentId,
+                                 @RequestParam String name) {
+
+        Task subTask = new Task();
+        subTask.setName(name.trim());
+
+        Task saved = taskService.createSubTask(parentId, subTask, null); // assignee пока null
+        return taskMapper.toDto(saved);
+    }
+
+    // AJAX загрузка файла
+    @PreAuthorize("isAuthenticated()")
+    @PostMapping("/tasks/{taskId}/attachments")
+    @ResponseBody
+    public AttachmentDto uploadAttachment(@PathVariable Integer taskId,
+                                          @RequestParam("file") MultipartFile file) {
+        Task task = taskService.addAttachment(taskId, file);
+        return task.getAttachments().isEmpty()
+                ? null
+                : AttachmentDto.from(task.getAttachments().get(task.getAttachments().size() - 1));
     }
 }

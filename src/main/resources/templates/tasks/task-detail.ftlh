@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Задача #${task.id?c} — ${task.name}</title>
+    <link rel="stylesheet" href="/css/style.css">
+
+    <!-- CSRF защита -->
+    <meta name="_csrf" content="${_csrf.token}">
+    <meta name="_csrf_header" content="${_csrf.headerName}">
+</head>
+<body class="container-form">
+
+<h1>Задача №${task.id?c}: ${task.name}</h1>
+
+<#if currentUserRole == "ROLE_ADMIN" || currentUserRole == "ROLE_MANAGER">
+    <div class="task-actions" style="margin-bottom: 25px;">
+        <a href="/tasks/${task.id?c}/edit" class="btn btn-edit">Редактировать задачу</a>
+        <a href="/tasks/${task.id?c}/delete"
+           class="btn btn-delete"
+           onclick="return confirm('Вы уверены, что хотите удалить задачу №${task.id?c}? Это действие нельзя отменить.')">
+            Удалить задачу
+        </a>
+    </div>
+</#if>
+<div class="task-detail-card">
+
+    <!-- Основная информация -->
+    <div class="info-section">
+        <h3>Информация о задаче</h3>
+        <div class="info-grid">
+            <div class="info-row">
+                <span class="info-label">Проект:</span>
+                <span class="info-value">${task.projectName! '—'}</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Спринт:</span>
+                <span class="info-value">${task.sprintName! '—'}</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Статус:</span>
+                <span class="status-badge status-${(task.status!'TODO')?lower_case}">
+            ${task.status! 'TODO'}
+        </span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Приоритет:</span>
+                <span class="priority-badge priority-${(task.priority!'MEDIUM')?lower_case}">
+            ${task.priority! 'MEDIUM'}
+        </span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Дедлайн:</span>
+                <span class="info-value">${task.deadline! '—'}</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Исполнитель:</span>
+                <span class="info-value">${task.assigneeName! '—'}</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Описание -->
+    <div class="description-section">
+        <h3>Описание задачи</h3>
+        <div class="description-content">
+            <#if task.description?? && task.description?has_content>
+                ${task.description?no_esc}
+            <#else>
+                <p class="empty">Описание отсутствует</p>
+            </#if>
+        </div>
+    </div>
+
+    <!-- Подзадачи -->
+    <div class="subtasks-section">
+        <h3>Подзадачи (${task.subTasks?size!0})</h3>
+        <button type="button" onclick="createSubTask()" class="btn btn-primary">
+            + Добавить подзадачу
+        </button>
+
+        <div id="subtasks-list" class="subtask-list">
+            <#list task.subTasks as sub>
+                <div class="subtask-item">
+                    <a href="/tasks/${sub.id?c}" class="subtask-link">
+                        #${sub.id?c} — ${sub.name}
+                    </a>
+                </div>
+            </#list>
+            <#if !task.subTasks?? || task.subTasks?size == 0>
+                <p class="empty">Подзадач пока нет</p>
+            </#if>
+        </div>
+    </div>
+
+    <!-- Прикреплённые файлы -->
+    <div class="attachments-section">
+        <h3>Прикреплённые файлы</h3>
+
+        <div class="upload-area">
+            <form id="uploadForm" enctype="multipart/form-data">
+                <input type="file" name="file" id="fileInput" accept="image/*,.pdf,.doc,.docx,.txt">
+                <button type="button" onclick="uploadFile()" class="btn btn-primary">Загрузить файл</button>
+            </form>
+        </div>
+
+        <div id="attachments-list" class="attachment-list">
+            <#list task.attachments as att>
+                <div class="attachment-item">
+                    <div class="attachment-preview">
+                        <#if att.fileType?starts_with("image")>
+                            <img src="${att.fileUrl}" alt="${att.fileName}">
+                        <#else>
+                            <span class="file-icon">📄</span>
+                        </#if>
+                    </div>
+                    <div class="attachment-info">
+                        <div class="attachment-name">${att.fileName}</div>
+                        <div class="attachment-type">${att.fileType!''}</div>
+                    </div>
+                    <a href="${att.fileUrl}" target="_blank" class="btn btn-download">Открыть файл</a>
+                </div>
+            </#list>
+
+            <#if !task.attachments?? || task.attachments?size == 0>
+                <p class="empty">Пока нет прикреплённых файлов</p>
+            </#if>
+        </div>
+    </div>
+
+</div>
+
+<br>
+<a href="/tasks" class="btn btn-primary">← Назад к списку задач</a>
+
+<script>
+    function getCsrfToken() {
+        return document.querySelector('meta[name="_csrf"]').getAttribute('content');
+    }
+
+    function createSubTask() {
+        const name = prompt("Введите название подзадачи:");
+        if (!name || name.trim() === '') return;
+
+        fetch('/tasks/${task.id?c}/subtasks', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'X-CSRF-TOKEN': getCsrfToken()
+            },
+            body: 'name=' + encodeURIComponent(name.trim())
+        })
+            .then(response => response.ok ? location.reload() : alert('Ошибка при создании подзадачи'))
+            .catch(() => alert('Ошибка соединения'));
+    }
+
+    function uploadFile() {
+        const fileInput = document.getElementById('fileInput');
+        if (!fileInput.files.length) {
+            alert('Выберите файл');
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append('file', fileInput.files[0]);
+
+        fetch('/tasks/${task.id?c}/attachments', {
+            method: 'POST',
+            headers: { 'X-CSRF-TOKEN': getCsrfToken() },
+            body: formData
+        })
+            .then(response => response.ok ? location.reload() : alert('Ошибка загрузки файла'))
+            .catch(() => alert('Ошибка соединения'));
+    }
+</script>
+
+</body>
+</html>

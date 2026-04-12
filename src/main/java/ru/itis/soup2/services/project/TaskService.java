@@ -1,6 +1,7 @@
 package ru.itis.soup2.services.project;
 
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 import ru.itis.soup2.models.core.User;
 import ru.itis.soup2.models.project.Task;
 
@@ -25,4 +26,12 @@ public interface TaskService {
 
     @Transactional
     void delete(Integer id);
+
+    @Transactional
+    Task createSubTask(Integer parentTaskId, Task subTask, Integer assigneeId);
+
+    @Transactional
+    Task addAttachment(Integer taskId, MultipartFile file);
+
+    List<Task> getSubTasks(Integer parentTaskId);
 }

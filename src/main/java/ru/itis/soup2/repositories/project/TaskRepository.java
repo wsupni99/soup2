@@ -44,4 +44,12 @@ public interface TaskRepository extends JpaRepository<Task, Integer> {
             @Param("assigneeId") Integer assigneeId,
             @Param("search") String search
     );
+
+    @EntityGraph(attributePaths = {
+            "project", "sprint", "assignee", "parentTask",
+            "project.manager", "project.manager.role",
+            "sprint.project", "sprint.project.manager", "sprint.project.manager.role"
+    })
+    @Query("SELECT t FROM Task t WHERE t.parentTask.id = :parentId ORDER BY t.id")
+    List<Task> findByParentTaskId(@Param("parentId") Integer parentId);
 }
