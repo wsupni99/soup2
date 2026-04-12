@@ -9,7 +9,7 @@
 <h1>Управление пользователями</h1>
 
 <div class="top-actions">
-    <a href="/admin/users/create" class="btn btn-primary">+ Создать пользователя</a>
+    <a href="/admin/users/new" class="btn btn-primary">+ Создать пользователя</a>
 </div>
 
 <#if users?? && users?size gt 0>

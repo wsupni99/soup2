@@ -11,6 +11,7 @@
     <h2>Регистрация</h2>
 
     <form class="container-form" action="/register" method="post">
+        <input type="hidden" name="_csrf" value="${_csrf.token}">
         <input type="text" name="name" placeholder="Ваше имя" required>
         <input type="email" name="email" placeholder="Email" required>
         <input type="password" name="password" placeholder="Пароль" required minlength="6">

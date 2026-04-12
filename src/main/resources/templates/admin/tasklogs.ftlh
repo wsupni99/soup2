@@ -7,8 +7,6 @@
 </head>
 <body>
 
-<#assign pmin = (currentPage - 4 > 0)?then(currentPage - 4, 0)>
-
 <h1>Лог задач</h1>
 
 <div class="stats">
@@ -53,17 +51,14 @@
         </tr>
         <#list logs as log>
             <tr>
-                <td>${log.getId()!''}</td>
-                <td>${log.getAction()!''}</td>
-                <td>${log.getChangedAt()!''}</td>
-                <td>${log.getUserName()!''} (ID: ${log.getUserId()!''})</td>
-                <td>${log.getTaskId()!''}</td>
+                <td>${log.id!''}</td>
+                <td>${log.action!''}</td>
+                <td>${log.changedAt!''}</td>
+                <td>${log.userName!''} (ID: ${log.userId!''})</td>
+                <td>${log.taskId!''}</td>
             </tr>
         </#list>
     </table>
-
-    <#assign pmin = (currentPage - 4 > 0)?then(currentPage - 4, 0)>
-    <#assign pmax = (currentPage + 5 < totalPages)?then(currentPage + 5, totalPages - 1)>
 
     <div class="pagination">
         <#if currentPage gt 0>
@@ -71,7 +66,7 @@
                class="page-link">« Предыдущая</a>
         </#if>
 
-        <#list pmin..pmax as i>
+        <#list (currentPage - 4 > 0)?then(currentPage - 4, 0)..(currentPage + 5 < totalPages)?then(currentPage + 5, totalPages - 1) as i>
             <a href="/admin/tasklogs?page=${i}<#if selectedUserId??>&userId=${selectedUserId?c}</#if>&size=50"
                class="page-link <#if i == currentPage>active</#if>">${i + 1}</a>
         </#list>
@@ -87,7 +82,6 @@
 
 <br><br>
 <a href="/admin/users" class="btn btn-primary">К пользователям</a>
-<a href="/admin/users" class="btn btn-primary">Админка</a>
 
 </body>
 </html>

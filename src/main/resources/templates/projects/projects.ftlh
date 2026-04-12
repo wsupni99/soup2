@@ -26,14 +26,14 @@
     </tr>
     <#list projects as project>
         <tr>
-            <td>${project.getId()!''}</td>
-            <td>${project.getName()!''}</td>
-            <td>${project.getDescription()!''}</td>
-            <td>${project.getStatus()!''}</td>
-            <td>${project.getManagerName()!''}</td>
+            <td>${project.id!''}</td>
+            <td>${project.name!''}</td>
+            <td>${project.description!''}</td>
+            <td>${project.status!''}</td>
+            <td>${project.managerName!''}</td>
             <td>
-                <a href="/projects/${project.getId()}/edit" class="btn btn-edit">Редактировать</a>
-                <a href="/projects/${project.getId()}/delete"
+                <a href="/projects/${project.id}/edit" class="btn btn-edit">Редактировать</a>
+                <a href="/projects/${project.id}/delete"
                    class="btn btn-danger"
                    onclick="return confirm('Вы действительно хотите удалить этот проект?')">Удалить</a>
             </td>

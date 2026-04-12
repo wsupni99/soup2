@@ -17,6 +17,7 @@
     </#if>
 
     <form action="/login" method="post">
+        <input type="hidden" name="_csrf" value="${_csrf.token}">
         <input type="email" name="email" placeholder="Email" required autofocus>
         <input type="password" name="password" placeholder="Пароль" required autocomplete="current-password">
 

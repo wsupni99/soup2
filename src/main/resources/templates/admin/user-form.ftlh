@@ -16,6 +16,7 @@
     <#if isEdit>
         <input type="hidden" name="id" value="${userDto.id!''}">
     </#if>
+    <input type="hidden" name="_csrf" value="${_csrf.token}">
 
     <label>Email <span class="required">*</span></label>
     <input type="email" name="email" value="${userDto.email!''}" required>
@@ -36,7 +37,7 @@
         <option value="">-- Выберите роль --</option>
         <#list roles as role>
             <option value="${role.roleName!''}"
-                    ${(userDto.roleName?? && userDto.roleName == role.roleName)?string('selected','')}>
+                    <#if userDto.roleName?? && userDto.roleName == role.roleName>selected</#if>>
                 ${role.roleName!''}
             </option>
         </#list>

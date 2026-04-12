@@ -12,12 +12,6 @@
     <div class="error">${error}</div>
 </#if>
 
-<#if successMessage??>
-    <div class="success-message">
-        ${successMessage}
-    </div>
-</#if>
-
 <a href="/tasks/new" class="btn btn-primary">Новая задача</a>
 <a href="/sprints" class="btn">К спринтам</a>
 <a href="/projects" class="btn">К проектам</a>
@@ -25,6 +19,7 @@
     <a href="/admin/users" class="btn">Админ: users</a>
     <a href="/admin/tasklogs" class="btn">Админ: tasklogs</a>
 </#if>
+
 <div class="filter-form">
     <form method="get" action="/tasks" id="filterForm">
         <div class="filter-row">
@@ -39,7 +34,7 @@
                 <select name="projectId" id="projectSelect">
                     <option value="">Все проекты</option>
                     <#list projects as project>
-                        <option value="${project.getId()}"
+                        <option value="${project.id}"
                                 <#if selectedProjectId?? && selectedProjectId == project.id>selected</#if>>
                             ${project.name!''}
                         </option>
@@ -52,9 +47,9 @@
                 <select name="sprintId" id="sprintSelect">
                     <option value="">Все спринты</option>
                     <#list sprints as sprint>
-                        <option value="${sprint.getId()}"
-                                <#if selectedSprintId?? && selectedSprintId == sprint.getId()>selected</#if>>
-                            ${sprint.getName()!''}
+                        <option value="${sprint.id}"
+                                <#if selectedSprintId?? && selectedSprintId == sprint.id>selected</#if>>
+                            ${sprint.name!''}
                         </option>
                     </#list>
                 </select>
@@ -87,10 +82,9 @@
                 <select name="assigneeId">
                     <option value="">Все исполнители</option>
                     <#list users as user>
-                        <option value="${user.getId()}"
-                                <#if selectedAssigneeId?? && selectedAssigneeId == user.getId()>selected</#if>>
+                        <option value="${user.id}"
+                                <#if selectedAssigneeId?? && selectedAssigneeId == user.id>selected</#if>>
                             ${user.name!''}
-                            <#if user.email?? && user.email?has_content>(${user.email})</#if>
                         </option>
                     </#list>
                 </select>
@@ -147,15 +141,6 @@
         </tr>
     </#list>
 </table>
-
-<script>
-    document.getElementById('projectSelect').addEventListener('change', function() {
-        const projectId = this.value;
-        const sprintSelect = document.getElementById('sprintSelect');
-        sprintSelect.innerHTML = '<option value="">Все спринты</option>';
-        if (!projectId) return;
-    });
-</script>
 
 </body>
 </html>
