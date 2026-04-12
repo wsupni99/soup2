@@ -5,6 +5,8 @@ import org.springframework.web.multipart.MultipartFile;
 import ru.itis.soup2.models.core.User;
 import ru.itis.soup2.models.project.Task;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -28,7 +30,7 @@ public interface TaskService {
     void delete(Integer id);
 
     @Transactional
-    Task createSubTask(Integer parentTaskId, Task subTask, Integer assigneeId);
+    Task createSubTask(Integer parentTaskId, Task subTask, Integer assigneeId, LocalDate deadline);
 
     @Transactional
     Task addAttachment(Integer taskId, MultipartFile file);

@@ -19,6 +19,7 @@ import ru.itis.soup2.services.project.ProjectService;
 import ru.itis.soup2.services.project.SprintService;
 import ru.itis.soup2.services.project.TaskService;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Controller
@@ -141,21 +142,32 @@ public class TaskController {
 
         model.addAttribute("task", taskMapper.toDto(task));
         model.addAttribute("currentUserRole", currentUserRole);
+        model.addAttribute("users", taskService.getAllUsersForAssignment());
 
         return "tasks/task-detail";
     }
 
-    // AJAX создание подзадачи
+    // AJAX создание подзадачи с полными данными
     @PreAuthorize("hasAnyRole('ROLE_MANAGER', 'ROLE_ADMIN')")
     @PostMapping("/tasks/{parentId}/subtasks")
     @ResponseBody
     public TaskDto createSubTask(@PathVariable("parentId") Integer parentId,
-                                 @RequestParam String name) {
+                                 @RequestParam String name,
+                                 @RequestParam(required = false) Integer assigneeId,
+                                 @RequestParam(required = false) String deadline) {
 
         Task subTask = new Task();
         subTask.setName(name.trim());
 
-        Task saved = taskService.createSubTask(parentId, subTask, null); // assignee пока null
+        // Преобразуем строку даты в LocalDate
+        LocalDate deadlineDate = null;
+        if (deadline != null && !deadline.isEmpty()) {
+            try {
+                deadlineDate = LocalDate.parse(deadline);
+            } catch (Exception ignored) {}
+        }
+
+        Task saved = taskService.createSubTask(parentId, subTask, assigneeId, deadlineDate);
         return taskMapper.toDto(saved);
     }
 

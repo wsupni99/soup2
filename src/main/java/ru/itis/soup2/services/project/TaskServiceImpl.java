@@ -13,6 +13,7 @@ import ru.itis.soup2.models.project.Task;
 import ru.itis.soup2.repositories.core.UserRepository;
 import ru.itis.soup2.repositories.project.TaskRepository;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -106,13 +107,12 @@ public class TaskServiceImpl implements TaskService {
 
     @Override
     @Transactional
-    public Task createSubTask(Integer parentTaskId, Task subTask, Integer assigneeId) {
-        Task parent = taskRepository.findById(parentTaskId)
+    public Task createSubTask(Integer parentTaskId, Task subTask, Integer assigneeId, LocalDate deadline) {
+        Task parent = taskRepository.findWithDetailsById(parentTaskId)
                 .orElseThrow(() -> new EntityNotFoundException("Parent task not found"));
 
         if (assigneeId != null) {
-            userRepository.findById(assigneeId)
-                    .ifPresent(subTask::setAssignee);
+            userRepository.findById(assigneeId).ifPresent(subTask::setAssignee);
         }
 
         subTask.setParentTask(parent);
@@ -121,6 +121,10 @@ public class TaskServiceImpl implements TaskService {
         subTask.setStatus(TaskStatus.TODO);
         subTask.setCreatedAt(LocalDateTime.now());
         subTask.setUpdatedAt(LocalDateTime.now());
+
+        if (deadline != null) {
+            subTask.setDeadline(deadline);
+        }
 
         return taskRepository.save(subTask);
     }

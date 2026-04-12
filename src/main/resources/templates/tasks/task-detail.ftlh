@@ -74,22 +74,63 @@
 
     <!-- Подзадачи -->
     <div class="subtasks-section">
-        <h3>Подзадачи (${task.subTasks?size!0})</h3>
-        <button type="button" onclick="createSubTask()" class="btn btn-primary">
-            + Добавить подзадачу
-        </button>
+        <div class="section-header">
+            <h3>Подзадачи (${task.subTasks?size!0})</h3>
+            <button onclick="showCreateSubtaskModal()" class="btn btn-primary">
+                + Добавить подзадачу
+            </button>
+        </div>
 
-        <div id="subtasks-list" class="subtask-list">
+        <div id="subtasks-list" class="subtask-grid">
             <#list task.subTasks as sub>
-                <div class="subtask-item">
-                    <a href="/tasks/${sub.id?c}" class="subtask-link">
-                        #${sub.id?c} — ${sub.name}
-                    </a>
+                <div class="subtask-card">
+                    <div class="subtask-header">
+                        <a href="/tasks/${sub.id?c}" class="subtask-link">
+                            #${sub.id?c} — ${sub.name}
+                        </a>
+                    </div>
+                    <div class="subtask-body">
+                        <div>Исполнитель: <strong>${sub.assigneeName!'—'}</strong></div>
+                        <div>Дедлайн: <strong>${sub.deadline! '—'}</strong></div>
+                        <#if sub.status??>
+                            <span class="status-badge status-${sub.status?lower_case}">${sub.status}</span>
+                        </#if>
+                    </div>
                 </div>
             </#list>
+
             <#if !task.subTasks?? || task.subTasks?size == 0>
                 <p class="empty">Подзадач пока нет</p>
             </#if>
+        </div>
+    </div>
+
+    <!-- Модальное окно -->
+    <div id="subtaskModal" class="modal">
+        <div class="modal-content">
+            <span class="modal-close" onclick="hideModal()">&times;</span>
+            <h3>Создать подзадачу</h3>
+
+            <form id="subtaskForm">
+                <label>Название подзадачи <span class="required">*</span></label>
+                <input type="text" id="subtaskName" required placeholder="Введите название">
+
+                <label>Исполнитель</label>
+                <select id="subtaskAssignee">
+                    <option value="">— Не назначен —</option>
+                    <#list users as user>
+                        <option value="${user.id}">${user.name}</option>
+                    </#list>
+                </select>
+
+                <label>Дедлайн</label>
+                <input type="date" id="subtaskDeadline">
+
+                <div class="modal-buttons">
+                    <button type="button" onclick="hideModal()" class="btn">Отмена</button>
+                    <button type="button" onclick="createSubtaskFromModal()" class="btn btn-primary">Создать</button>
+                </div>
+            </form>
         </div>
     </div>
 
@@ -171,6 +212,58 @@
         })
             .then(response => response.ok ? location.reload() : alert('Ошибка загрузки файла'))
             .catch(() => alert('Ошибка соединения'));
+    }
+
+    function showCreateSubtaskModal() {
+        const modal = document.getElementById('subtaskModal');
+        modal.classList.add('show');
+        document.getElementById('subtaskName').focus();
+    }
+
+    function hideModal() {
+        const modal = document.getElementById('subtaskModal');
+        modal.classList.remove('show');
+        document.getElementById('subtaskForm').reset(); // очищаем форму
+    }
+
+    function createSubtaskFromModal() {
+        const name = document.getElementById('subtaskName').value.trim();
+        if (!name) {
+            alert("Название подзадачи обязательно");
+            return;
+        }
+
+        const assigneeId = document.getElementById('subtaskAssignee').value;
+        const deadline = document.getElementById('subtaskDeadline').value;
+
+        const formData = new URLSearchParams();
+        formData.append('name', name);
+        if (assigneeId) formData.append('assigneeId', assigneeId);
+        if (deadline) formData.append('deadline', deadline);
+
+        fetch('/tasks/${task.id?c}/subtasks', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'X-CSRF-TOKEN': getCsrfToken()
+            },
+            body: formData
+        })
+            .then(response => {
+                if (response.ok) {
+                    hideModal();
+                    location.reload();
+                } else {
+                    alert('Ошибка при создании подзадачи');
+                }
+            })
+            .catch(() => alert('Ошибка соединения'));
+    }
+
+    // Закрытие модального окна при клике вне его
+    window.onclick = function(event) {
+        const modal = document.getElementById('subtaskModal');
+        if (event.target === modal) hideModal();
     }
 </script>
 
