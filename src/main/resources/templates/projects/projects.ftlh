@@ -22,6 +22,7 @@
         <th>Описание</th>
         <th>Статус</th>
         <th>Менеджер</th>
+        <th>Участники</th>
         <th>Действия</th>
     </tr>
     <#list projects as project>
@@ -31,6 +32,11 @@
             <td>${project.description!''}</td>
             <td>${project.status!''}</td>
             <td>${project.managerName!''}</td>
+            <td>
+                <#if project.memberNames?? && project.memberNames?size gt 0>
+                    ${project.memberNames?join(", ")}
+                <#else>—</#if>
+            </td>
             <td>
                 <a href="/projects/${project.id}/edit" class="btn btn-edit">Редактировать</a>
                 <a href="/projects/${project.id}/delete"

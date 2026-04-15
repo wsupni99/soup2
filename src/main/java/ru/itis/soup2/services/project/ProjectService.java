@@ -10,5 +10,6 @@ public interface ProjectService {
     List<Project> getAllProjects();
     Optional<Project> getProjectById(Integer id);
     void update(Project project);
-    void delete(Integer id);  // Только один delete с ID
+    void delete(Integer id);
+    void updateMembers(Integer projectId, List<Integer> memberIds);
 }

@@ -6,13 +6,13 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class ProjectDto {
-
     private Integer id;
     private String name;
     private String description;
@@ -21,4 +21,6 @@ public class ProjectDto {
     private String status;
     private Integer managerId;
     private String managerName;
+    private List<Integer> memberIds;
+    private List<String> memberNames;
 }

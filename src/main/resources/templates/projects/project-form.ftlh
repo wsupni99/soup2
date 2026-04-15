@@ -50,6 +50,33 @@
         </#list>
     </select>
 
+    <label>Участники проекта</label>
+    <div class="mb-3">
+        <select name="memberIds" multiple id="memberSelect" class="form-select" size="6">
+            <#list allUsers as u>
+                <#if u.role?? && u.role.roleName != "ROLE_ADMIN">
+                    <option value="${u.id}"
+                            <#if project.memberIds?? && project.memberIds?seq_contains(u.id)>selected</#if>>
+                        ${u.name} — ${u.email}
+                    </option>
+                </#if>
+            </#list>
+        </select>
+        <small class="text-muted">Удерживайте Ctrl (или Cmd) для выбора нескольких участников</small>
+    </div>
+
+    <#-- Показываем текущих участников красивыми бейджами -->
+    <#if project.memberNames?? && project.memberNames?size gt 0>
+        <div class="mb-3">
+            <small class="text-muted">Текущие участники:</small>
+            <div class="d-flex flex-wrap gap-2 mt-1">
+                <#list project.memberNames as name>
+                    <span class="badge bg-primary fs-6">${name}</span>
+                </#list>
+            </div>
+        </div>
+    </#if>
+
     <button type="submit">Сохранить проект</button>
 </form>
 

@@ -39,6 +39,7 @@ public class ProjectController {
         model.addAttribute("startDateStr", "");
         model.addAttribute("endDateStr", "");
         model.addAttribute("error", null);
+        model.addAttribute("allUsers", userRepository.findAll());
         return "projects/project-form";
     }
 
@@ -58,6 +59,7 @@ public class ProjectController {
 
         Project project = projectMapper.toEntity(projectDto);
         projectService.create(project);
+        projectService.updateMembers(project.getId(), projectDto.getMemberIds());
         return "redirect:/projects";
     }
 
@@ -74,6 +76,9 @@ public class ProjectController {
         model.addAttribute("startDateStr", getDateStr(project.getStartDate()));
         model.addAttribute("endDateStr", getDateStr(project.getEndDate()));
         model.addAttribute("error", null);
+        model.addAttribute("allUsers", userRepository.findAll().stream()
+                .filter(user -> user.getRole() == null || !"ROLE_ADMIN".equals(user.getRole().getRoleName()))
+                .toList());
         return "projects/project-form";
     }
 
@@ -99,6 +104,7 @@ public class ProjectController {
 
         projectMapper.updateEntity(project, projectDto);
         projectService.update(project);
+        projectService.updateMembers(id, projectDto.getMemberIds());
         return "redirect:/projects";
     }
 
