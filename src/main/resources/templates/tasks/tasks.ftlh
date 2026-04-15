@@ -79,14 +79,8 @@
 
             <div class="filter-group">
                 <label>Исполнитель:</label>
-                <select name="assigneeId">
+                <select name="assigneeId" id="filterAssignee">
                     <option value="">Все исполнители</option>
-                    <#list users as user>
-                        <option value="${user.id}"
-                                <#if selectedAssigneeId?? && selectedAssigneeId == user.id>selected</#if>>
-                            ${user.name!''}
-                        </option>
-                    </#list>
                 </select>
             </div>
         </div>
@@ -159,5 +153,26 @@
     </tbody>
 </table>
 
+<script>
+    document.getElementById('projectSelect').addEventListener('change', function() {
+        const projectId = this.value;
+        const assigneeSelect = document.getElementById('filterAssignee');
+
+        assigneeSelect.innerHTML = '<option value="">Все исполнители</option>';
+
+        if (!projectId) return;
+
+        fetch('/users/byProject?projectId=' + projectId)
+            .then(r => r.ok ? r.json() : [])
+            .then(users => {
+                users.forEach(u => {
+                    const opt = document.createElement('option');
+                    opt.value = u.id;
+                    opt.textContent = u.name;
+                    assigneeSelect.appendChild(opt);
+                });
+            });
+    });
+</script>
 </body>
 </html>

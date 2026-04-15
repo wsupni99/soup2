@@ -8,9 +8,11 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import ru.itis.soup2.dto.core.UserDto;
 import ru.itis.soup2.dto.project.AttachmentDto;
 import ru.itis.soup2.dto.project.SprintDto;
 import ru.itis.soup2.dto.project.TaskDto;
+import ru.itis.soup2.mappers.core.UserMapper;
 import ru.itis.soup2.mappers.project.SprintMapper;
 import ru.itis.soup2.mappers.project.TaskMapper;
 import ru.itis.soup2.models.project.Task;
@@ -81,12 +83,17 @@ public class TaskController {
         Task task = taskService.getTaskById(id)
                 .orElseThrow(() -> new RuntimeException("Task not found"));
 
-        model.addAttribute("task", taskMapper.toDto(task));
+        TaskDto dto = taskMapper.toDto(task);
+
+        model.addAttribute("task", dto);
         model.addAttribute("projects", projectService.getAllProjects());
+
         model.addAttribute("sprints", task.getProject() != null
                 ? sprintService.findSprintsByProjectId(task.getProject().getId())
                 : List.of());
+
         model.addAttribute("users", taskService.getAllUsersForAssignment());
+
         return "tasks/task-form";
     }
 
@@ -181,5 +188,15 @@ public class TaskController {
         return task.getAttachments().isEmpty()
                 ? null
                 : AttachmentDto.from(task.getAttachments().get(task.getAttachments().size() - 1));
+    }
+
+    // AJAX: пользователи по проекту
+    @PreAuthorize("isAuthenticated()")
+    @GetMapping("/users/byProject")
+    @ResponseBody
+    public List<UserDto> getUsersByProject(@RequestParam Integer projectId) {
+        return taskService.getUsersByProjectId(projectId).stream()
+                .map(UserMapper::toDto)
+                .toList();
     }
 }

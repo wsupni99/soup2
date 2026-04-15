@@ -118,9 +118,6 @@
                 <label>Исполнитель</label>
                 <select id="subtaskAssignee">
                     <option value="">— Не назначен —</option>
-                    <#list users as user>
-                        <option value="${user.id}">${user.name}</option>
-                    </#list>
                 </select>
 
                 <label>Дедлайн</label>
@@ -218,6 +215,28 @@
         const modal = document.getElementById('subtaskModal');
         modal.classList.add('show');
         document.getElementById('subtaskName').focus();
+
+        const projectId = "${task.projectId!''}";
+        if (projectId) {
+            loadProjectUsersForSubtask(projectId);
+        }
+    }
+
+    function loadProjectUsersForSubtask(projectId) {
+        const assigneeSelect = document.getElementById('subtaskAssignee');
+        assigneeSelect.innerHTML = '<option value="">— Не назначен —</option>';
+
+        fetch('/users/byProject?projectId=' + projectId)
+            .then(response => response.ok ? response.json() : [])
+            .then(users => {
+                users.forEach(user => {
+                    const option = document.createElement('option');
+                    option.value = user.id;
+                    option.textContent = user.name + ' (' + user.email + ')';
+                    assigneeSelect.appendChild(option);
+                });
+            })
+            .catch(() => console.error('Не удалось загрузить участников проекта'));
     }
 
     function hideModal() {

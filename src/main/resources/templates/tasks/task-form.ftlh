@@ -54,14 +54,8 @@
     </select>
 
     <label>Исполнитель</label>
-    <select name="assigneeId">
+    <select name="assigneeId" id="assigneeSelect">
         <option value="">-- Не назначен --</option>
-        <#list users as user>
-            <option value="${user.id}"
-                    <#if task.assigneeId?? && task.assigneeId == user.id>selected</#if>>
-                ${user.name!''}
-            </option>
-        </#list>
     </select>
 
     <label>Приоритет</label>
@@ -95,15 +89,15 @@
 <script>
     function changeProject(projectId) {
         const sprintSelect = document.getElementById('sprintSelect');
+        const assigneeSelect = document.getElementById('assigneeSelect');
+
         sprintSelect.innerHTML = '<option value="">-- Без спринта --</option>';
+        assigneeSelect.innerHTML = '<option value="">-- Не назначен --</option>';
 
         if (!projectId) return;
 
         fetch('/sprints/byProject?projectId=' + projectId)
-            .then(response => {
-                if (!response.ok) throw new Error('Ошибка сервера');
-                return response.json();
-            })
+            .then(response => response.ok ? response.json() : [])
             .then(data => {
                 data.forEach(sprint => {
                     const option = document.createElement('option');
@@ -114,11 +108,38 @@
                     }
                     sprintSelect.appendChild(option);
                 });
-            })
-            .catch(error => {
-                console.error('Ошибка загрузки спринтов:', error);
+                const currentSprintId = "${task.sprintId!''}";
+                if (currentSprintId) {
+                    sprintSelect.value = currentSprintId;
+                }
+            });
+
+        fetch('/users/byProject?projectId=' + projectId)
+            .then(response => response.ok ? response.json() : [])
+            .then(users => {
+                users.forEach(user => {
+                    const option = document.createElement('option');
+                    option.value = user.id;
+                    option.textContent = user.name + ' (' + user.email + ')';
+                    assigneeSelect.appendChild(option);
+                });
+
+                const currentAssigneeId = "${task.assigneeId!''}";
+                if (currentAssigneeId) {
+                    assigneeSelect.value = currentAssigneeId;
+                }
             });
     }
+
+    window.onload = function() {
+        const projectSelect = document.getElementById('projectSelect');
+        if (projectSelect && projectSelect.value) {
+            // Небольшая задержка, чтобы DOM полностью загрузился
+            setTimeout(() => {
+                changeProject(projectSelect.value);
+            }, 100);
+        }
+    };
 </script>
 
 </body>

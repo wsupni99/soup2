@@ -9,8 +9,10 @@ import ru.itis.soup2.models.core.User;
 import ru.itis.soup2.models.enums.TaskPriority;
 import ru.itis.soup2.models.enums.TaskStatus;
 import ru.itis.soup2.models.project.Attachment;
+import ru.itis.soup2.models.project.ProjectMember;
 import ru.itis.soup2.models.project.Task;
 import ru.itis.soup2.repositories.core.UserRepository;
+import ru.itis.soup2.repositories.project.ProjectMemberRepository;
 import ru.itis.soup2.repositories.project.TaskRepository;
 
 import java.time.LocalDate;
@@ -26,6 +28,7 @@ public class TaskServiceImpl implements TaskService {
     private final TaskRepository taskRepository;
     private final UserRepository userRepository;
     private final AttachmentService attachmentService;
+    private final ProjectMemberRepository projectMemberRepository;
 
     @Override
     public List<Task> getAllTasks() {
@@ -178,5 +181,15 @@ public class TaskServiceImpl implements TaskService {
     @Override
     public List<Task> getSubTasks(Integer parentTaskId) {
         return taskRepository.findByParentTaskId(parentTaskId);
+    }
+
+    @Override
+    public List<User> getUsersByProjectId(Integer projectId) {
+        if (projectId == null) {
+            return List.of();
+        }
+        return projectMemberRepository.findByProjectId(projectId).stream()
+                .map(ProjectMember::getUser)
+                .toList();
     }
 }

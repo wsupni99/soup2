@@ -78,7 +78,7 @@ button:hover {
     font-size: 14px;
 }
 
-.btn-primary  { background: #4e73df; color: white; }
+.btn-primary  { background: #4e73df; color: white; text-align: center; }
 .btn-edit     { background: #f39c12; color: white; }
 .btn-delete,
 .btn-danger   { background: #e74c3c; color: white; }
@@ -412,9 +412,10 @@ button:hover {
     border-radius: 20px;
     font-size: 0.9em;
     font-weight: 500;
+    max-width: 55px;
 }
 
-.status-todo { background: #e3f2fd; color: #1976d2; }
+.status-todo { background: #e3f2fd; color: #1976d2;}
 .status-in_progress { background: #fff3e0; color: #f57c00; }
 .status-done { background: #e8f5e9; color: #388e3c; }
 .status-blocked { background: #ffebee; color: #d32f2f; }
@@ -503,7 +504,7 @@ button:hover {
 }
 
 .upload-area form {
-    display: flex;
+    display: block;
     gap: 10px;
     align-items: center;
     flex-wrap: wrap;

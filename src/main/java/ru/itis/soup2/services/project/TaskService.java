@@ -36,4 +36,6 @@ public interface TaskService {
     Task addAttachment(Integer taskId, MultipartFile file);
 
     List<Task> getSubTasks(Integer parentTaskId);
+
+    List<User> getUsersByProjectId(Integer projectId);
 }
