@@ -155,7 +155,7 @@ public class TaskController {
     }
 
     // AJAX создание подзадачи с полными данными
-    @PreAuthorize("hasAnyRole('ROLE_MANAGER', 'ROLE_ADMIN')")
+    @PreAuthorize("isAuthenticated()")
     @PostMapping("/tasks/{parentId}/subtasks")
     @ResponseBody
     public TaskDto createSubTask(@PathVariable("parentId") Integer parentId,
@@ -166,7 +166,6 @@ public class TaskController {
         Task subTask = new Task();
         subTask.setName(name.trim());
 
-        // Преобразуем строку даты в LocalDate
         LocalDate deadlineDate = null;
         if (deadline != null && !deadline.isEmpty()) {
             try {

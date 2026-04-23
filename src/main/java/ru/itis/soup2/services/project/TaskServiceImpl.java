@@ -31,11 +31,6 @@ public class TaskServiceImpl implements TaskService {
     private final ProjectMemberRepository projectMemberRepository;
 
     @Override
-    public List<Task> getAllTasks() {
-        return taskRepository.findAllWithDetails();
-    }
-
-    @Override
     public Optional<Task> getTaskById(Integer id) {
         return taskRepository.findWithDetailsById(id);
     }
@@ -176,11 +171,6 @@ public class TaskServiceImpl implements TaskService {
             e.printStackTrace();
             throw new RuntimeException("Ошибка при сохранении файла: " + e.getMessage(), e);
         }
-    }
-
-    @Override
-    public List<Task> getSubTasks(Integer parentTaskId) {
-        return taskRepository.findByParentTaskId(parentTaskId);
     }
 
     @Override

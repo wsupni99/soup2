@@ -16,7 +16,6 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class TaskDto {
-
     private Integer id;
     private String name;
     private String description;

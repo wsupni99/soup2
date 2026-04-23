@@ -11,8 +11,6 @@ import java.util.List;
 import java.util.Optional;
 
 public interface TaskService {
-    List<Task> getAllTasks();
-
     Optional<Task> getTaskById(Integer id);
 
     List<User> getAllUsersForAssignment();
@@ -34,8 +32,6 @@ public interface TaskService {
 
     @Transactional
     Task addAttachment(Integer taskId, MultipartFile file);
-
-    List<Task> getSubTasks(Integer parentTaskId);
 
     List<User> getUsersByProjectId(Integer projectId);
 }

@@ -11,7 +11,6 @@ import ru.itis.soup2.models.core.Role;
 @NoArgsConstructor
 @AllArgsConstructor
 public class UserDto {
-
     private Integer id;
     private String email;
     private String name;

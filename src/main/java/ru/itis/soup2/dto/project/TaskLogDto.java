@@ -12,7 +12,6 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 public class TaskLogDto {
-
     private Integer id;
     private String action;
     private LocalDateTime changedAt;

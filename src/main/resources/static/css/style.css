@@ -286,12 +286,6 @@ button:hover {
     gap: 8px;
 }
 
-.attachment-item:hover {
-    border-color: #4e73df;
-    box-shadow: 0 4px 12px rgba(78, 115, 223, 0.15);
-    transform: translateY(-2px);
-}
-
 .attachment-preview {
     width: 100%;
     height: 160px;

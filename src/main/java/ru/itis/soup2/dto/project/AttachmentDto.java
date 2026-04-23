@@ -11,7 +11,6 @@ import ru.itis.soup2.models.project.Attachment;
 @NoArgsConstructor
 @AllArgsConstructor
 public class AttachmentDto {
-
     private Integer id;
     private String fileName;
     private String fileUrl;

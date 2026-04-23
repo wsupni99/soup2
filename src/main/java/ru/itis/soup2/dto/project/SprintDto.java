@@ -13,7 +13,6 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class SprintDto {
-
     private Integer id;
     private String name;
     private LocalDate startDate;

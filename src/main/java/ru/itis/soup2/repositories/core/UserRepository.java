@@ -10,19 +10,4 @@ import java.util.Optional;
 
 public interface UserRepository extends JpaRepository<User, Integer> {
     Optional<User> findByEmail(String email);
-
-    @Query("""
-        SELECT new ru.itis.soup2.dto.core.UserWithRoleDto(
-            u.id,
-            u.name,
-            u.email,
-            r.roleName
-        )
-        FROM User u
-        LEFT JOIN u.role r
-        """)
-    List<UserWithRoleDto> findUsersWithRoles();
-
-    @Query("SELECT u FROM User u WHERE u.role.roleName = 'ROLE_MANAGER'")
-    List<User> findManagers();
 }

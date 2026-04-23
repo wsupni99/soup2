@@ -10,7 +10,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class AdminUserUpdateDto {
-
     private Integer id;
     private String email;
     private String name;
