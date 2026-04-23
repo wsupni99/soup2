@@ -11,6 +11,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import ru.itis.soup2.dto.core.UserDto;
 import ru.itis.soup2.dto.core.UserWithRoleDto;
 import ru.itis.soup2.dto.project.AttachmentDto;
+import ru.itis.soup2.dto.project.CommentDto;
 import ru.itis.soup2.dto.project.SprintDto;
 import ru.itis.soup2.dto.project.TaskDto;
 import ru.itis.soup2.mappers.core.UserMapper;
@@ -19,6 +20,7 @@ import ru.itis.soup2.mappers.project.TaskMapper;
 import ru.itis.soup2.models.core.User;
 import ru.itis.soup2.models.project.Task;
 import ru.itis.soup2.security.CustomUserDetails;
+import ru.itis.soup2.services.project.CommentService;
 import ru.itis.soup2.services.project.ProjectService;
 import ru.itis.soup2.services.project.SprintService;
 import ru.itis.soup2.services.project.TaskService;
@@ -35,6 +37,7 @@ public class TaskController {
     private final SprintService sprintService;
     private final TaskMapper taskMapper;
     private final SprintMapper sprintMapper;
+    private final CommentService commentService;
 
     @PreAuthorize("isAuthenticated()")
     @GetMapping("/tasks")
@@ -147,7 +150,6 @@ public class TaskController {
     public String taskDetail(@PathVariable Integer id,
                              Model model,
                              @AuthenticationPrincipal CustomUserDetails userDetails) {
-
         Task task = taskService.getTaskById(id)
                 .orElseThrow(() -> new RuntimeException("Task not found"));
 
@@ -155,9 +157,15 @@ public class TaskController {
                 ? userDetails.getUser().getRole().getRoleName()
                 : "ROLE_USER";
 
+        List<CommentDto> comments = commentService.findByTaskId(id)
+                .stream()
+                .map(CommentDto::from)
+                .toList();
+
         model.addAttribute("task", taskMapper.toDto(task));
         model.addAttribute("currentUserRole", currentUserRole);
         model.addAttribute("users", taskService.getAllUsersForAssignment());
+        model.addAttribute("comments", comments);
 
         return "tasks/task-detail";
     }

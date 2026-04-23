@@ -1,11 +1,15 @@
+// ru.itis.soup2.services.project.CommentServiceImpl
 package ru.itis.soup2.services.project;
 
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.itis.soup2.models.core.User;
 import ru.itis.soup2.models.project.Comment;
 import ru.itis.soup2.models.project.Task;
+import ru.itis.soup2.repositories.core.UserRepository;
 import ru.itis.soup2.repositories.project.CommentRepository;
 import ru.itis.soup2.repositories.project.TaskRepository;
 import ru.itis.soup2.services.mail.MailService;
@@ -22,6 +26,7 @@ public class CommentServiceImpl implements CommentService {
 
     private final CommentRepository commentRepository;
     private final TaskRepository taskRepository;
+    private final UserRepository userRepository;
     private final MailService mailService;
 
     @Transactional
@@ -51,6 +56,22 @@ public class CommentServiceImpl implements CommentService {
             log.error("Ошибка при создании комментария. Причина: {}", e.getMessage(), e);
             throw e;
         }
+    }
+
+    @Override
+    @Transactional
+    public Comment createComment(Integer taskId, Integer userId, String text) {
+        Task task = taskRepository.findById(taskId)
+                .orElseThrow(() -> new EntityNotFoundException("Task not found with id: " + taskId));
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + userId));
+
+        Comment comment = new Comment();
+        comment.setTask(task);
+        comment.setUser(user);
+        comment.setText(text);
+
+        return createComment(comment);
     }
 
     @Override

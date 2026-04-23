@@ -164,6 +164,31 @@
         </div>
     </div>
 
+    <!-- Блок комментариев -->
+    <div class="comments-section">
+        <h3>Комментарии (${comments?size})</h3>
+
+        <div id="comments-list" class="comments-list">
+            <#list comments as comment>
+                <div class="comment-item">
+                    <div class="comment-header">
+                        <strong>${comment.userName!''}</strong>
+                        <span class="comment-date">
+                            ${comment.formattedCreatedAt!''}
+</span>
+                    </div>
+                    <div class="comment-text">${comment.text?no_esc}</div>
+                </div>
+            <#else>
+                <p class="empty">Пока нет комментариев</p>
+            </#list>
+        </div>
+
+        <div class="comment-form">
+            <textarea id="commentText" rows="3" placeholder="Напишите комментарий..." required></textarea>
+            <button onclick="addComment()" class="btn btn-primary">Отправить</button>
+        </div>
+    </div>
 </div>
 
 
@@ -289,6 +314,34 @@
     window.onclick = function(event) {
         const modal = document.getElementById('subtaskModal');
         if (event.target === modal) hideModal();
+    }
+
+    function addComment() {
+        const text = document.getElementById('commentText').value.trim();
+        if (!text) {
+            alert('Введите текст комментария');
+            return;
+        }
+
+        const formData = new URLSearchParams();
+        formData.append('text', text);
+
+        fetch('/tasks/${task.id?c}/comments', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'X-CSRF-TOKEN': getCsrfToken()
+            },
+            body: formData
+        })
+            .then(response => {
+                if (response.ok) {
+                    location.reload();
+                } else {
+                    alert('Ошибка при добавлении комментария');
+                }
+            })
+            .catch(() => alert('Ошибка соединения'));
     }
 </script>
 
