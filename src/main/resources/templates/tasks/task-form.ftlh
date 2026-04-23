@@ -14,6 +14,9 @@
 <#if error??>
     <div class="error">${error}</div>
 </#if>
+<#if successMessage??>
+    <div class="success-message">${successMessage}</div>
+</#if>
 
 <form id="taskForm" method="post"
       action="<#if task.id??>/tasks/${task.id?c}/update<#else>/tasks</#if>">

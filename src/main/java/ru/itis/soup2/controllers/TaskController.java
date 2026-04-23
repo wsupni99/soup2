@@ -8,6 +8,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import ru.itis.soup2.dto.core.UserDto;
 import ru.itis.soup2.dto.project.AttachmentDto;
 import ru.itis.soup2.dto.project.SprintDto;
@@ -117,9 +118,17 @@ public class TaskController {
     }
 
     @PreAuthorize("hasAnyRole('ROLE_MANAGER', 'ROLE_ADMIN')")
-    @GetMapping("/tasks/{id}/delete")
-    public String deleteTask(@PathVariable("id") Integer id) {
+    @PostMapping("/tasks/{id}/delete")
+    public String deleteTask(@PathVariable("id") Integer id, RedirectAttributes redirectAttributes) {
+        Task task = taskService.getTaskById(id)
+                .orElseThrow(() -> new RuntimeException("Task not found"));
+
+        String taskName = task.getName();
         taskService.delete(id);
+
+        redirectAttributes.addFlashAttribute("successMessage",
+                "Задача №" + id + " \"" + taskName + "\" успешно удалена");
+
         return "redirect:/tasks";
     }
 
@@ -150,6 +159,8 @@ public class TaskController {
         model.addAttribute("task", taskMapper.toDto(task));
         model.addAttribute("currentUserRole", currentUserRole);
         model.addAttribute("users", taskService.getAllUsersForAssignment());
+        model.addAttribute("commentsCount", task.getComments().size());
+        model.addAttribute("attachmentsCount", task.getAttachments().size());
 
         return "tasks/task-detail";
     }

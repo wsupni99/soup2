@@ -96,10 +96,6 @@ public class TaskServiceImpl implements TaskService {
         Task task = taskRepository.findWithDetailsById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Task not found"));
 
-        if (!task.getComments().isEmpty() || !task.getAttachments().isEmpty()) {
-            throw new IllegalStateException("Нельзя удалить задачу, у которой есть комментарии или прикреплённые файлы");
-        }
-
         taskRepository.delete(task);
     }
 

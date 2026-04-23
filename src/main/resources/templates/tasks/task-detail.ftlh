@@ -16,11 +16,10 @@
 <#if currentUserRole == "ROLE_ADMIN" || currentUserRole == "ROLE_MANAGER">
     <div class="task-actions" style="margin-bottom: 25px;">
         <a href="/tasks/${task.id?c}/edit" class="btn btn-edit">Редактировать задачу</a>
-        <a href="/tasks/${task.id?c}/delete"
-           class="btn btn-delete"
-           onclick="return confirm('Вы уверены, что хотите удалить задачу №${task.id?c}? Это действие нельзя отменить.')">
-            Удалить задачу
-        </a>
+        <form action="/tasks/${task.id?c}/delete" method="post" style="display: inline;" onsubmit="return confirmDelete()">
+            <input type="hidden" name="_csrf" value="${_csrf.token}">
+            <button type="submit" class="btn btn-delete">Удалить задачу</button>
+        </form>
     </div>
 </#if>
 <div class="task-detail-card">
@@ -242,7 +241,7 @@
     function hideModal() {
         const modal = document.getElementById('subtaskModal');
         modal.classList.remove('show');
-        document.getElementById('subtaskForm').reset(); // очищаем форму
+        document.getElementById('subtaskForm').reset();
     }
 
     function createSubtaskFromModal() {
@@ -283,6 +282,22 @@
     window.onclick = function(event) {
         const modal = document.getElementById('subtaskModal');
         if (event.target === modal) hideModal();
+    }
+
+    function confirmDelete() {
+        let message = 'Вы уверены, что хотите удалить задачу №${task.id?c}: "${task.name?js_string}"?\n\nЭто действие нельзя отменить.';
+
+        <#if commentsCount gt 0 || attachmentsCount gt 0>
+        message += '\n\nВместе с задачей будут удалены:';
+        <#if commentsCount gt 0>
+        message += '\n• Комментарии: ${commentsCount} шт.';
+        </#if>
+        <#if attachmentsCount gt 0>
+        message += '\n• Прикреплённые файлы: ${attachmentsCount} шт.';
+        </#if>
+        </#if>
+
+        return confirm(message);
     }
 </script>
 
