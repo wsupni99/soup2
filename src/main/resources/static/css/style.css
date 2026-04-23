@@ -78,7 +78,7 @@ button:hover {
     font-size: 14px;
 }
 
-.btn-primary  { background: #4e73df; color: white; text-align: center; }
+.btn-primary  { background: #4e73df; color: white; text-align: center; margin-bottom: 14px; }
 .btn-edit     { background: #f39c12; color: white; }
 .btn-delete,
 .btn-danger   { background: #e74c3c; color: white; }
@@ -777,21 +777,4 @@ button:hover {
     color: #94a3b8;
     margin-bottom: 1.5rem;
     font-family: monospace;
-}
-
-.btn {
-    display: inline-block;
-    background-color: #0d6efd;
-    color: white;
-    text-decoration: none;
-    padding: 0.75rem 2rem;
-    border-radius: 40px;
-    font-weight: 500;
-    transition: background-color 0.2s ease;
-    border: none;
-    cursor: pointer;
-}
-
-.btn:hover {
-    background-color: #0b5ed7;
 }

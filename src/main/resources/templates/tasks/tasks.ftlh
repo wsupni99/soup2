@@ -8,10 +8,6 @@
 <body>
 <h1>Управление задачами</h1>
 
-<#if error??>
-    <div class="error">${error}</div>
-</#if>
-
 <a href="/tasks/new" class="btn btn-primary">Новая задача</a>
 <a href="/sprints" class="btn">К спринтам</a>
 <a href="/projects" class="btn">К проектам</a>

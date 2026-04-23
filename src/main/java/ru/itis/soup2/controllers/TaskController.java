@@ -7,13 +7,16 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import ru.itis.soup2.dto.core.UserDto;
+import ru.itis.soup2.dto.core.UserWithRoleDto;
 import ru.itis.soup2.dto.project.AttachmentDto;
 import ru.itis.soup2.dto.project.SprintDto;
 import ru.itis.soup2.dto.project.TaskDto;
 import ru.itis.soup2.mappers.core.UserMapper;
 import ru.itis.soup2.mappers.project.SprintMapper;
 import ru.itis.soup2.mappers.project.TaskMapper;
+import ru.itis.soup2.models.core.User;
 import ru.itis.soup2.models.project.Task;
 import ru.itis.soup2.security.CustomUserDetails;
 import ru.itis.soup2.services.project.ProjectService;
@@ -91,7 +94,10 @@ public class TaskController {
                 ? sprintService.findSprintsByProjectId(task.getProject().getId())
                 : List.of());
 
-        model.addAttribute("users", taskService.getAllUsersForAssignment());
+        List<User> projectUsers = task.getProject() != null
+                ? taskService.getUsersByProjectId(task.getProject().getId())
+                : taskService.getAllUsersForAssignment();
+        model.addAttribute("projectUsers", projectUsers);
 
         return "tasks/task-form";
     }
@@ -106,12 +112,15 @@ public class TaskController {
 
     @PreAuthorize("hasAnyRole('ROLE_MANAGER', 'ROLE_ADMIN')")
     @PostMapping("/tasks/{id}/update")
-    public String updateTask(@PathVariable("id") Integer id, @ModelAttribute TaskDto taskDto) {
+    public String updateTask(@PathVariable("id") Integer id,
+                             @ModelAttribute TaskDto taskDto,
+                             RedirectAttributes redirectAttributes) {
         Task task = taskService.getTaskById(id)
                 .orElseThrow(() -> new RuntimeException("Task not found"));
 
         taskMapper.updateEntity(task, taskDto);
         taskService.update(task, taskDto.getAssigneeId());
+        redirectAttributes.addFlashAttribute("successMessage", "Задача успешно обновлена");
         return "redirect:/tasks/" + id;
     }
 
@@ -190,12 +199,16 @@ public class TaskController {
     }
 
     // AJAX: пользователи по проекту
-    @PreAuthorize("isAuthenticated()")
     @GetMapping("/users/byProject")
     @ResponseBody
-    public List<UserDto> getUsersByProject(@RequestParam Integer projectId) {
+    public List<UserWithRoleDto> getUsersByProject(@RequestParam Integer projectId) {
         return taskService.getUsersByProjectId(projectId).stream()
-                .map(UserMapper::toDto)
+                .map(user -> UserWithRoleDto.builder()
+                        .userId(user.getId())
+                        .name(user.getName())
+                        .email(user.getEmail())
+                        .roleName(user.getRole() != null ? user.getRole().getRoleName() : null)
+                        .build())
                 .toList();
     }
 }

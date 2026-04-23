@@ -88,7 +88,7 @@ public class ProjectServiceImpl implements ProjectService {
             Project project = projectRepository.findById(projectId)
                     .orElseThrow(() -> new EntityNotFoundException("Project not found"));
 
-            List<ProjectMember> current = projectMemberRepository.findByProjectId(projectId);
+            List<ProjectMember> current = projectMemberRepository.findAllByProjectId(projectId);
             List<Integer> currentIds = current.stream()
                     .map(m -> m.getUser().getId())
                     .toList();

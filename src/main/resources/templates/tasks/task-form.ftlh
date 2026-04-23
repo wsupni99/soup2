@@ -56,6 +56,14 @@
     <label>Исполнитель</label>
     <select name="assigneeId" id="assigneeSelect">
         <option value="">-- Не назначен --</option>
+        <#if projectUsers?has_content>
+            <#list projectUsers as user>
+                <option value="${user.id}"
+                        <#if task.assigneeId?? && task.assigneeId == user.id>selected</#if>>
+                    ${user.name} (${user.email})
+                </option>
+            </#list>
+        </#if>
     </select>
 
     <label>Приоритет</label>
@@ -87,44 +95,45 @@
 <a href="/tasks" class="btn btn-primary">← Назад к списку задач</a>
 
 <script>
-    function changeProject(projectId) {
+    function changeProject(projectId, isInitialLoad = false) {
         const sprintSelect = document.getElementById('sprintSelect');
         const assigneeSelect = document.getElementById('assigneeSelect');
 
-        sprintSelect.innerHTML = '<option value="">-- Без спринта --</option>';
-        assigneeSelect.innerHTML = '<option value="">-- Не назначен --</option>';
+        // Если это не первая загрузка (пользователь сам сменил проект), чистим списки
+        if (!isInitialLoad) {
+            sprintSelect.innerHTML = '<option value="">-- Без спринта --</option>';
+            assigneeSelect.innerHTML = '<option value="">-- Не назначен --</option>';
+        }
 
         if (!projectId) return;
 
+        // Загрузка спринтов
         fetch('/sprints/byProject?projectId=' + projectId)
             .then(response => response.ok ? response.json() : [])
             .then(data => {
-                data.forEach(sprint => {
-                    const option = document.createElement('option');
-                    option.value = sprint.id;
-                    option.textContent = sprint.name;
-                    if (sprint.startDate && sprint.endDate) {
-                        option.textContent += ' (' + sprint.startDate + ' — ' + sprint.endDate + ')';
-                    }
-                    sprintSelect.appendChild(option);
-                });
-                const currentSprintId = "${task.sprintId!''}";
-                if (currentSprintId) {
-                    sprintSelect.value = currentSprintId;
+                if (!isInitialLoad) {
+                    data.forEach(sprint => {
+                        const option = document.createElement('option');
+                        option.value = sprint.id;
+                        option.textContent = sprint.name;
+                        sprintSelect.appendChild(option);
+                    });
                 }
+                const currentSprintId = "${(task.sprintId?c)!''}"; // Используем ?c для чисел
+                if (currentSprintId) sprintSelect.value = currentSprintId;
             });
 
+        // Загрузка пользователей выбранного проекта
         fetch('/users/byProject?projectId=' + projectId)
             .then(response => response.ok ? response.json() : [])
             .then(users => {
                 users.forEach(user => {
                     const option = document.createElement('option');
-                    option.value = user.id;
+                    option.value = user.userId;
                     option.textContent = user.name + ' (' + user.email + ')';
                     assigneeSelect.appendChild(option);
                 });
-
-                const currentAssigneeId = "${task.assigneeId!''}";
+                const currentAssigneeId = "${(task.assigneeId?c)!''}";
                 if (currentAssigneeId) {
                     assigneeSelect.value = currentAssigneeId;
                 }
@@ -134,10 +143,8 @@
     window.onload = function() {
         const projectSelect = document.getElementById('projectSelect');
         if (projectSelect && projectSelect.value) {
-            // Небольшая задержка, чтобы DOM полностью загрузился
-            setTimeout(() => {
-                changeProject(projectSelect.value);
-            }, 100);
+            // Передаем true, чтобы скрипт знал, что это инициализация
+            changeProject(projectSelect.value, true);
         }
     };
 </script>

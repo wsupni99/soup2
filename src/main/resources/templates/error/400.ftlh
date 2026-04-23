@@ -10,7 +10,7 @@
     <div class="error-code">400</div>
     <h1>Неверный запрос</h1>
     <p class="error-message">${_errorMessage!}</p>
-    <a href="/" class="btn">Вернуться на главную</a>
+    <a href="/" class="btn btn-primary">Вернуться на главную</a>
 </div>
 </body>
 </html>

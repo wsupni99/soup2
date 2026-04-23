@@ -11,7 +11,7 @@
     <div class="error-code">403</div>
     <h1>Доступ запрещён</h1>
     <p class="error-message">${_errorMessage!}</p>
-    <a href="/" class="btn">Вернуться на главную</a>
+    <a href="/" class="btn btn-primary">Вернуться на главную</a>
 </div>
 </body>
 </html>

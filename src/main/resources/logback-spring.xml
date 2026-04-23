@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
-    <!-- Консольный аппендер для разработки (нужен, чтобы не было WARN) -->
+    <!-- Консольный аппендер для разработки -->
     <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
             <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
         </encoder>
     </appender>
 
-    <!-- USER_FILE -->
+    <!-- Файлы для сущностей -->
     <appender name="USER_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <file>logs/user.log</file>
         <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
@@ -17,12 +17,23 @@
             <totalSizeCap>100MB</totalSizeCap>
         </rollingPolicy>
         <encoder>
-            <!-- %nopex убирает стектрейс -->
             <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%nopex%n</pattern>
         </encoder>
     </appender>
 
-    <!-- TASK_FILE -->
+    <appender name="ROLE_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>logs/role.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <fileNamePattern>logs/role-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+            <maxFileSize>10MB</maxFileSize>
+            <maxHistory>7</maxHistory>
+            <totalSizeCap>100MB</totalSizeCap>
+        </rollingPolicy>
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%nopex%n</pattern>
+        </encoder>
+    </appender>
+
     <appender name="TASK_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <file>logs/task.log</file>
         <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
@@ -36,25 +47,113 @@
         </encoder>
     </appender>
 
-    <!-- Логгер для сотрудников-->
-    <logger name="ru.itis.soup2.services.core" level="ERROR" additivity="false">
+    <appender name="PROJECT_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>logs/project.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <fileNamePattern>logs/project-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+            <maxFileSize>10MB</maxFileSize>
+            <maxHistory>7</maxHistory>
+            <totalSizeCap>100MB</totalSizeCap>
+        </rollingPolicy>
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%nopex%n</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="SPRINT_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>logs/sprint.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <fileNamePattern>logs/sprint-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+            <maxFileSize>10MB</maxFileSize>
+            <maxHistory>7</maxHistory>
+            <totalSizeCap>100MB</totalSizeCap>
+        </rollingPolicy>
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%nopex%n</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="COMMENT_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>logs/comment.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <fileNamePattern>logs/comment-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+            <maxFileSize>10MB</maxFileSize>
+            <maxHistory>7</maxHistory>
+            <totalSizeCap>100MB</totalSizeCap>
+        </rollingPolicy>
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%nopex%n</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="ATTACHMENT_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>logs/attachment.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <fileNamePattern>logs/attachment-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+            <maxFileSize>10MB</maxFileSize>
+            <maxHistory>7</maxHistory>
+            <totalSizeCap>100MB</totalSizeCap>
+        </rollingPolicy>
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%nopex%n</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="TASKLOG_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>logs/tasklog.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <fileNamePattern>logs/tasklog-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+            <maxFileSize>10MB</maxFileSize>
+            <maxHistory>7</maxHistory>
+            <totalSizeCap>100MB</totalSizeCap>
+        </rollingPolicy>
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%nopex%n</pattern>
+        </encoder>
+    </appender>
+
+    <!-- Логгеры для каждого сервиса (сущности) -->
+    <logger name="ru.itis.soup2.services.core.UserServiceImpl" level="ERROR" additivity="false">
         <appender-ref ref="USER_FILE"/>
         <appender-ref ref="CONSOLE"/>
     </logger>
 
-    <!-- Логгер для контроллеров -->
-    <logger name="ru.itis.soup2.controllers" level="ERROR" additivity="false">
-        <appender-ref ref="USER_FILE"/>
+    <logger name="ru.itis.soup2.services.core.RoleServiceImpl" level="ERROR" additivity="false">
+        <appender-ref ref="ROLE_FILE"/>
         <appender-ref ref="CONSOLE"/>
     </logger>
 
-    <!-- Логгер для задач, проектов, спринтов -->
-    <logger name="ru.itis.soup2.services.project" level="ERROR" additivity="false">
+    <logger name="ru.itis.soup2.services.project.TaskServiceImpl" level="ERROR" additivity="false">
         <appender-ref ref="TASK_FILE"/>
         <appender-ref ref="CONSOLE"/>
     </logger>
 
-    <!-- Корневой логгер-->
+    <logger name="ru.itis.soup2.services.project.ProjectServiceImpl" level="ERROR" additivity="false">
+        <appender-ref ref="PROJECT_FILE"/>
+        <appender-ref ref="CONSOLE"/>
+    </logger>
+
+    <logger name="ru.itis.soup2.services.project.SprintServiceImpl" level="ERROR" additivity="false">
+        <appender-ref ref="SPRINT_FILE"/>
+        <appender-ref ref="CONSOLE"/>
+    </logger>
+
+    <logger name="ru.itis.soup2.services.project.CommentServiceImpl" level="ERROR" additivity="false">
+        <appender-ref ref="COMMENT_FILE"/>
+        <appender-ref ref="CONSOLE"/>
+    </logger>
+
+    <logger name="ru.itis.soup2.services.project.AttachmentServiceImpl" level="ERROR" additivity="false">
+        <appender-ref ref="ATTACHMENT_FILE"/>
+        <appender-ref ref="CONSOLE"/>
+    </logger>
+
+    <logger name="ru.itis.soup2.services.project.TaskLogService" level="ERROR" additivity="false">
+        <appender-ref ref="TASKLOG_FILE"/>
+        <appender-ref ref="CONSOLE"/>
+    </logger>
+
+    <!-- Корневой логгер -->
     <root level="INFO">
         <appender-ref ref="CONSOLE"/>
     </root>

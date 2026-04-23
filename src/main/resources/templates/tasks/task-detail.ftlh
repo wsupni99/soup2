@@ -13,17 +13,15 @@
 
 <h1>Задача №${task.id?c}: ${task.name}</h1>
 
-<#if currentUserRole == "ROLE_ADMIN" || currentUserRole == "ROLE_MANAGER">
-    <div class="task-actions" style="margin-bottom: 25px;">
-        <a href="/tasks/${task.id?c}/edit" class="btn btn-edit">Редактировать задачу</a>
-        <a href="/tasks/${task.id?c}/delete"
-           class="btn btn-delete"
-           onclick="return confirm('Вы уверены, что хотите удалить задачу №${task.id?c}? Это действие нельзя отменить.')">
-            Удалить задачу
-        </a>
-    </div>
-</#if>
+<a href="/tasks" class="btn btn-primary">← Назад к списку задач</a>
+
 <div class="task-detail-card">
+    <#if successMessage??>
+        <div class="success-message">${successMessage}</div>
+    </#if>
+    <#if errorMessage??>
+        <div class="error">${errorMessage}</div>
+    </#if>
 
     <!-- Основная информация -->
     <div class="info-section">
@@ -168,8 +166,17 @@
 
 </div>
 
-<br>
-<a href="/tasks" class="btn btn-primary">← Назад к списку задач</a>
+
+<#if currentUserRole == "ROLE_ADMIN" || currentUserRole == "ROLE_MANAGER">
+    <div class="task-actions" style="margin-bottom: 25px;">
+        <a href="/tasks/${task.id?c}/edit" class="btn btn-edit">Редактировать задачу</a>
+        <a href="/tasks/${task.id?c}/delete"
+           class="btn btn-delete"
+           onclick="return confirm('Вы уверены, что хотите удалить задачу №${task.id?c}? Это действие нельзя отменить.')">
+            Удалить задачу
+        </a>
+    </div>
+</#if>
 
 <script>
     function getCsrfToken() {
@@ -242,7 +249,7 @@
     function hideModal() {
         const modal = document.getElementById('subtaskModal');
         modal.classList.remove('show');
-        document.getElementById('subtaskForm').reset(); // очищаем форму
+        document.getElementById('subtaskForm').reset();
     }
 
     function createSubtaskFromModal() {
@@ -279,7 +286,6 @@
             .catch(() => alert('Ошибка соединения'));
     }
 
-    // Закрытие модального окна при клике вне его
     window.onclick = function(event) {
         const modal = document.getElementById('subtaskModal');
         if (event.target === modal) hideModal();
