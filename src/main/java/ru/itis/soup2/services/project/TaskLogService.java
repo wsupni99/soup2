@@ -21,7 +21,7 @@ public class TaskLogService {
         try {
             return taskLogRepository.findAllOrdered(pageable).map(taskLogMapper::toDto);
         } catch (Exception e) {
-            log.error("Ошибка при получении логов задач", e);
+            log.error("Ошибка при получении логов задач. Причина: {}", e.getMessage(), e);
             throw e;
         }
     }
@@ -30,7 +30,7 @@ public class TaskLogService {
         try {
             return taskLogRepository.findByUserIdOptional(userId, pageable).map(taskLogMapper::toDto);
         } catch (Exception e) {
-            log.error("Ошибка при получении логов задач для пользователя с id: {}", userId, e);
+            log.error("Ошибка при получении логов задач для пользователя с id: {}. Причина: {}", userId, e.getMessage(), e);
             throw e;
         }
     }

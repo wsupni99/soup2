@@ -25,7 +25,7 @@ public class SprintServiceImpl implements SprintService {
         try {
             sprintRepository.save(sprint);
         } catch (Exception e) {
-            log.error("Ошибка при создании спринта: {}", sprint.getName(), e);
+            log.error("Ошибка при создании спринта: {}. Причина: {}", sprint.getName(), e.getMessage(), e);
             throw e;
         }
     }
@@ -54,7 +54,7 @@ public class SprintServiceImpl implements SprintService {
         try {
             sprintRepository.save(sprint);
         } catch (Exception e) {
-            log.error("Ошибка при обновлении спринта с id: {}", sprint.getId(), e);
+            log.error("Ошибка при обновлении спринта с id: {}. Причина: {}", sprint.getId(), e.getMessage(), e);
             throw e;
         }
     }
@@ -72,7 +72,7 @@ public class SprintServiceImpl implements SprintService {
 
             sprintRepository.delete(sprint);
         } catch (Exception e) {
-            log.error("Ошибка при удалении спринта с id: {}", id, e);
+            log.error("Ошибка при удалении спринта с id: {}. Причина: {}", id, e.getMessage(), e);
             throw e;
         }
     }

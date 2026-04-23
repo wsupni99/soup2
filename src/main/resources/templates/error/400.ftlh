@@ -2,14 +2,13 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>403 — Доступ запрещён</title>
+    <title>400 — Неверный запрос</title>
     <link rel="stylesheet" href="/css/style.css">
 </head>
 <body class="error-page">
 <div class="error-container">
-    <div class="error-code">403</div>
-    <h1>Доступ запрещён</h1>
+    <div class="error-code">400</div>
+    <h1>Неверный запрос</h1>
     <p class="error-message">${_errorMessage!}</p>
     <a href="/" class="btn">Вернуться на главную</a>
 </div>

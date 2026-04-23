@@ -85,7 +85,7 @@ public class TaskServiceImpl implements TaskService {
             }
             taskRepository.save(task);
         } catch (Exception e) {
-            log.error("Ошибка при создании задачи: {}", task.getName(), e);
+            log.error("Ошибка при создании задачи: {}. Причина: {}", task.getName(), e.getMessage(), e);
             throw e;
         }
     }
@@ -102,7 +102,7 @@ public class TaskServiceImpl implements TaskService {
             }
             taskRepository.save(task);
         } catch (Exception e) {
-            log.error("Ошибка при обновлении задачи с id: {}", task.getId(), e);
+            log.error("Ошибка при обновлении задачи с id: {}. Причина: {}", task.getId(), e.getMessage(), e);
             throw e;
         }
     }
@@ -120,7 +120,7 @@ public class TaskServiceImpl implements TaskService {
 
             taskRepository.delete(task);
         } catch (Exception e) {
-            log.error("Ошибка при удалении задачи с id: {}", id, e);
+            log.error("Ошибка при удалении задачи с id: {}. Причина: {}", id, e.getMessage(), e);
             throw e;
         }
     }
@@ -149,7 +149,7 @@ public class TaskServiceImpl implements TaskService {
 
             return taskRepository.save(subTask);
         } catch (Exception e) {
-            log.error("Ошибка при создании подзадачи для задачи с id: {}", parentTaskId, e);
+            log.error("Ошибка при создании подзадачи для задачи с id: {}. Причина: {}", parentTaskId, e.getMessage(), e);
             throw e;
         }
     }
@@ -195,7 +195,7 @@ public class TaskServiceImpl implements TaskService {
             return task;
 
         } catch (Exception e) {
-            log.error("Ошибка при добавлении вложения к задаче с id: {}", taskId, e);
+            log.error("Ошибка при добавлении вложения к задаче с id: {}. Причина: {}", taskId, e.getMessage(), e);
             throw new RuntimeException("Ошибка при сохранении файла: " + e.getMessage(), e);
         }
     }

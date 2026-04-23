@@ -22,7 +22,7 @@ public class AttachmentServiceImpl implements AttachmentService {
         try {
             return attachmentRepository.save(attachment);
         } catch (Exception e) {
-            log.error("Ошибка при сохранении вложения", e);
+            log.error("Ошибка при сохранении вложения. Причина: {}", e.getMessage(), e);
             throw e;
         }
     }
@@ -32,7 +32,7 @@ public class AttachmentServiceImpl implements AttachmentService {
         try {
             return attachmentRepository.findById(id);
         } catch (Exception e) {
-            log.error("Ошибка при поиске вложения с id: {}", id, e);
+            log.error("Ошибка при поиске вложения с id: {}. Причина: {}", id, e.getMessage(), e);
             throw e;
         }
     }
@@ -42,7 +42,7 @@ public class AttachmentServiceImpl implements AttachmentService {
         try {
             return attachmentRepository.findByTaskId(taskId);
         } catch (Exception e) {
-            log.error("Ошибка при поиске вложений по задаче с id: {}", taskId, e);
+            log.error("Ошибка при поиске вложений по задаче с id: {}. Причина: {}", taskId, e.getMessage(), e);
             throw e;
         }
     }

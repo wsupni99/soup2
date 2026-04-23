@@ -23,7 +23,7 @@ public class RoleServiceImpl implements RoleService {
         try {
             return roleRepository.findByRoleName(roleName);
         } catch (Exception e) {
-            log.error("Ошибка при поиске роли по имени: {}", roleName, e);
+            log.error("Ошибка при поиске роли по имени: {}. Причина: {}", roleName, e.getMessage(), e);
             throw e;
         }
     }
@@ -33,7 +33,7 @@ public class RoleServiceImpl implements RoleService {
         try {
             return roleRepository.findAll();
         } catch (Exception e) {
-            log.error("Ошибка при получении списка ролей", e);
+            log.error("Ошибка при получении списка ролей. Причина: {}", e.getMessage(), e);
             throw e;
         }
     }

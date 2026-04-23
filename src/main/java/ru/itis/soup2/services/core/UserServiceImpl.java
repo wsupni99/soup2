@@ -53,7 +53,7 @@ public class UserServiceImpl implements UserService {
             savedUser.setRole(role);
             userRepository.save(savedUser);
         } catch (Exception e) {
-            log.error("Ошибка при регистрации пользователя с email: {}", dto.getEmail(), e);
+            log.error("Ошибка при регистрации пользователя с email: {}. Причина: {}", dto.getEmail(), e.getMessage(), e);
             throw e;
         }
     }
@@ -78,7 +78,7 @@ public class UserServiceImpl implements UserService {
             savedUser.setRole(role);
             userRepository.save(savedUser);
         } catch (Exception e) {
-            log.error("Ошибка при создании пользователя админом: {}", dto.getEmail(), e);
+            log.error("Ошибка при создании пользователя админом: {}. Причина: {}", dto.getEmail(), e.getMessage(), e);
             throw e;
         }
     }
@@ -104,7 +104,7 @@ public class UserServiceImpl implements UserService {
 
             userRepository.save(user);
         } catch (Exception e) {
-            log.error("Ошибка при обновлении пользователя с id: {}", dto.getId(), e);
+            log.error("Ошибка при обновлении пользователя с id: {}. Причина: {}", dto.getId(), e.getMessage(), e);
             throw e;
         }
     }

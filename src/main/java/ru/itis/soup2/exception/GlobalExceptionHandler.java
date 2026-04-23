@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.servlet.ModelAndView;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -41,7 +42,7 @@ public class GlobalExceptionHandler {
     private Object handleException(HttpStatus status, String message, HttpServletRequest request) {
         if (isAjax(request)) {
             Map<String, Object> body = new HashMap<>();
-            body.put("timestamp", LocalDateTime.now().toString());
+            body.put("timestamp", LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm:ss")));
             body.put("status", status.value());
             body.put("error", status.getReasonPhrase());
             body.put("message", message);
@@ -51,8 +52,7 @@ public class GlobalExceptionHandler {
             ModelAndView mav = new ModelAndView();
             mav.setStatus(status);
             mav.setViewName(ERROR_VIEW_PREFIX + status.value());
-            mav.addObject("errorCode", status.value());
-            mav.addObject("errorMessage", message);
+            mav.addObject("_errorMessage", message);
             return mav;
         }
     }

@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
-    <!-- Консольный аппендер для разработки -->
+    <!-- Консольный аппендер для разработки (нужен, чтобы не было WARN) -->
     <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
             <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
         </encoder>
     </appender>
 
-    <!-- Файл для логов пользователей -->
+    <!-- USER_FILE -->
     <appender name="USER_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <file>logs/user.log</file>
         <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
@@ -17,11 +17,12 @@
             <totalSizeCap>100MB</totalSizeCap>
         </rollingPolicy>
         <encoder>
-            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+            <!-- %nopex убирает стектрейс -->
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%nopex%n</pattern>
         </encoder>
     </appender>
 
-    <!-- Файл для логов основного функционала -->
+    <!-- TASK_FILE -->
     <appender name="TASK_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <file>logs/task.log</file>
         <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
@@ -31,7 +32,7 @@
             <totalSizeCap>100MB</totalSizeCap>
         </rollingPolicy>
         <encoder>
-            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%nopex%n</pattern>
         </encoder>
     </appender>
 

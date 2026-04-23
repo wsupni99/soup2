@@ -10,7 +10,7 @@
 <div class="error-container">
     <div class="error-code">404</div>
     <h1>Страница не найдена</h1>
-    <p class="error-message">${errorMessage!}</p>
+    <p class="error-message">${_errorMessage!}</p>
     <a href="/" class="btn">Вернуться на главную</a>
 </div>
 </body>

@@ -34,7 +34,7 @@ public class ProjectServiceImpl implements ProjectService {
         try {
             projectRepository.save(project);
         } catch (Exception e) {
-            log.error("Ошибка при создании проекта: {}", project.getName(), e);
+            log.error("Ошибка при создании проекта: {}. Причина: {}", project.getName(), e.getMessage(), e);
             throw e;
         }
     }
@@ -55,7 +55,7 @@ public class ProjectServiceImpl implements ProjectService {
         try {
             projectRepository.save(project);
         } catch (Exception e) {
-            log.error("Ошибка при обновлении проекта с id: {}", project.getId(), e);
+            log.error("Ошибка при обновлении проекта с id: {}. Причина: {}", project.getId(), e.getMessage(), e);
             throw e;
         }
     }
@@ -74,7 +74,7 @@ public class ProjectServiceImpl implements ProjectService {
             }
             projectRepository.delete(project);
         } catch (Exception e) {
-            log.error("Ошибка при удалении проекта с id: {}", id, e);
+            log.error("Ошибка при удалении проекта с id: {}. Причина: {}", id, e.getMessage(), e);
             throw e;
         }
     }
@@ -118,7 +118,7 @@ public class ProjectServiceImpl implements ProjectService {
                 projectMemberRepository.save(member);
             }
         } catch (Exception e) {
-            log.error("Ошибка при обновлении участников проекта с id: {}", projectId, e);
+            log.error("Ошибка при обновлении участников проекта с id: {}. Причина: {}", projectId, e.getMessage(), e);
             throw e;
         }
     }

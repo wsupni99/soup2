@@ -23,7 +23,7 @@ public class CommentServiceImpl implements CommentService {
             comment.setCreatedAt(LocalDateTime.now());
             return commentRepository.save(comment);
         } catch (Exception e) {
-            log.error("Ошибка при создании комментария", e);
+            log.error("Ошибка при создании комментария. Причина: {}", e.getMessage(), e);
             throw e;
         }
     }
@@ -33,7 +33,7 @@ public class CommentServiceImpl implements CommentService {
         try {
             return commentRepository.findByTaskId(taskId);
         } catch (Exception e) {
-            log.error("Ошибка при поиске комментариев по задаче с id: {}", taskId, e);
+            log.error("Ошибка при поиске комментариев по задаче с id: {}. Причина: {}", taskId, e.getMessage(), e);
             throw e;
         }
     }
