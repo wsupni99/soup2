@@ -2,6 +2,7 @@ package ru.itis.soup2.services.core;
 
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -15,6 +16,7 @@ import ru.itis.soup2.repositories.core.UserRepository;
 import java.util.List;
 import java.util.Optional;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -27,69 +29,84 @@ public class UserServiceImpl implements UserService {
     @Transactional
     @Override
     public void register(RegisterRequestDto dto) {
-        User user = new User();
-        user.setEmail(dto.getEmail().trim());
-        user.setName(dto.getName().trim());
-        user.setPassword(passwordEncoder.encode(dto.getPassword().trim()));
-        user.setContactInfo("");
+        try {
+            User user = new User();
+            user.setEmail(dto.getEmail().trim());
+            user.setName(dto.getName().trim());
+            user.setPassword(passwordEncoder.encode(dto.getPassword().trim()));
+            user.setContactInfo("");
 
-        User savedUser = userRepository.save(user);
+            User savedUser = userRepository.save(user);
 
-        String roleName = dto.getRoleName() != null
-                ? dto.getRoleName().trim().toUpperCase()
-                : "ROLE_DEVELOPER";
+            String roleName = dto.getRoleName() != null
+                    ? dto.getRoleName().trim().toUpperCase()
+                    : "ROLE_DEVELOPER";
 
-        if (!roleName.startsWith("ROLE_")) {
-            roleName = "ROLE_" + roleName;
+            if (!roleName.startsWith("ROLE_")) {
+                roleName = "ROLE_" + roleName;
+            }
+
+            Role role = roleService.findByName(roleName)
+                    .orElseGet(() -> roleService.findByName("ROLE_DEVELOPER")
+                            .orElseThrow(() -> new EntityNotFoundException("Default role not found")));
+
+            savedUser.setRole(role);
+            userRepository.save(savedUser);
+        } catch (Exception e) {
+            log.error("Ошибка при регистрации пользователя с email: {}", dto.getEmail(), e);
+            throw e;
         }
-
-        Role role = roleService.findByName(roleName)
-                .orElseGet(() -> roleService.findByName("ROLE_DEVELOPER")
-                        .orElseThrow(() -> new EntityNotFoundException("Default role not found")));
-
-        savedUser.setRole(role);
-        userRepository.save(savedUser);
     }
 
     @Transactional
     @Override
     public void createUser(AdminUserCreateDto dto) {
-        User user = new User();
-        user.setEmail(dto.getEmail().trim());
-        user.setName(dto.getName().trim());
-        user.setPassword(passwordEncoder.encode(dto.getPassword().trim()));
-        user.setContactInfo(dto.getContactInfo() != null ? dto.getContactInfo().trim() : "");
+        try {
+            User user = new User();
+            user.setEmail(dto.getEmail().trim());
+            user.setName(dto.getName().trim());
+            user.setPassword(passwordEncoder.encode(dto.getPassword().trim()));
+            user.setContactInfo(dto.getContactInfo() != null ? dto.getContactInfo().trim() : "");
 
-        User savedUser = userRepository.save(user);
+            User savedUser = userRepository.save(user);
 
-        String roleName = normalizeRoleName(dto.getRoleName());
-        Role role = roleService.findByName(roleName)
-                .orElseGet(() -> roleService.findByName("ROLE_DEVELOPER")
-                        .orElseThrow(() -> new EntityNotFoundException("Default role ROLE_DEVELOPER not found")));
+            String roleName = normalizeRoleName(dto.getRoleName());
+            Role role = roleService.findByName(roleName)
+                    .orElseGet(() -> roleService.findByName("ROLE_DEVELOPER")
+                            .orElseThrow(() -> new EntityNotFoundException("Default role ROLE_DEVELOPER not found")));
 
-        savedUser.setRole(role);
-        userRepository.save(savedUser);
+            savedUser.setRole(role);
+            userRepository.save(savedUser);
+        } catch (Exception e) {
+            log.error("Ошибка при создании пользователя админом: {}", dto.getEmail(), e);
+            throw e;
+        }
     }
 
     @Transactional
     @Override
     public void updateUser(AdminUserUpdateDto dto) {
-        User user = userRepository.findById(dto.getId())
-                .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + dto.getId()));
+        try {
+            User user = userRepository.findById(dto.getId())
+                    .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + dto.getId()));
 
-        user.setEmail(dto.getEmail().trim());
-        user.setName(dto.getName().trim());
-        user.setContactInfo(dto.getContactInfo() != null ? dto.getContactInfo().trim() : "");
+            user.setEmail(dto.getEmail().trim());
+            user.setName(dto.getName().trim());
+            user.setContactInfo(dto.getContactInfo() != null ? dto.getContactInfo().trim() : "");
 
-        if (dto.getRoleName() != null && !dto.getRoleName().isBlank()) {
-            String roleName = normalizeRoleName(dto.getRoleName());
-            Role newRole = roleService.findByName(roleName)
-                    .orElseThrow(() -> new EntityNotFoundException("Role not found: " + roleName));
+            if (dto.getRoleName() != null && !dto.getRoleName().isBlank()) {
+                String roleName = normalizeRoleName(dto.getRoleName());
+                Role newRole = roleService.findByName(roleName)
+                        .orElseThrow(() -> new EntityNotFoundException("Role not found: " + roleName));
 
-            user.setRole(newRole);
+                user.setRole(newRole);
+            }
+
+            userRepository.save(user);
+        } catch (Exception e) {
+            log.error("Ошибка при обновлении пользователя с id: {}", dto.getId(), e);
+            throw e;
         }
-
-        userRepository.save(user);
     }
 
     private String normalizeRoleName(String roleName) {

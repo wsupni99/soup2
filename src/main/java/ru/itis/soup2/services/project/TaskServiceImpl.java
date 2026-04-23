@@ -2,6 +2,7 @@ package ru.itis.soup2.services.project;
 
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -20,6 +21,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -76,60 +78,80 @@ public class TaskServiceImpl implements TaskService {
     @Transactional
     @Override
     public void create(Task task, Integer assigneeId) {
-        if (assigneeId != null) {
-            userRepository.findById(assigneeId)
-                    .ifPresent(task::setAssignee);
+        try {
+            if (assigneeId != null) {
+                userRepository.findById(assigneeId)
+                        .ifPresent(task::setAssignee);
+            }
+            taskRepository.save(task);
+        } catch (Exception e) {
+            log.error("Ошибка при создании задачи: {}", task.getName(), e);
+            throw e;
         }
-        taskRepository.save(task);
     }
 
     @Transactional
     @Override
     public void update(Task task, Integer assigneeId) {
-        if (assigneeId != null) {
-            userRepository.findById(assigneeId)
-                    .ifPresent(task::setAssignee);
-        } else {
-            task.setAssignee(null);
+        try {
+            if (assigneeId != null) {
+                userRepository.findById(assigneeId)
+                        .ifPresent(task::setAssignee);
+            } else {
+                task.setAssignee(null);
+            }
+            taskRepository.save(task);
+        } catch (Exception e) {
+            log.error("Ошибка при обновлении задачи с id: {}", task.getId(), e);
+            throw e;
         }
-        taskRepository.save(task);
     }
 
     @Transactional
     @Override
     public void delete(Integer id) {
-        Task task = taskRepository.findWithDetailsById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Task not found"));
+        try {
+            Task task = taskRepository.findWithDetailsById(id)
+                    .orElseThrow(() -> new EntityNotFoundException("Task not found"));
 
-        if (!task.getComments().isEmpty() || !task.getAttachments().isEmpty()) {
-            throw new IllegalStateException("Нельзя удалить задачу, у которой есть комментарии или прикреплённые файлы");
+            if (!task.getComments().isEmpty() || !task.getAttachments().isEmpty()) {
+                throw new IllegalStateException("Нельзя удалить задачу, у которой есть комментарии или прикреплённые файлы");
+            }
+
+            taskRepository.delete(task);
+        } catch (Exception e) {
+            log.error("Ошибка при удалении задачи с id: {}", id, e);
+            throw e;
         }
-
-        taskRepository.delete(task);
     }
 
     @Override
     @Transactional
     public Task createSubTask(Integer parentTaskId, Task subTask, Integer assigneeId, LocalDate deadline) {
-        Task parent = taskRepository.findWithDetailsById(parentTaskId)
-                .orElseThrow(() -> new EntityNotFoundException("Parent task not found"));
+        try {
+            Task parent = taskRepository.findWithDetailsById(parentTaskId)
+                    .orElseThrow(() -> new EntityNotFoundException("Parent task not found"));
 
-        if (assigneeId != null) {
-            userRepository.findById(assigneeId).ifPresent(subTask::setAssignee);
+            if (assigneeId != null) {
+                userRepository.findById(assigneeId).ifPresent(subTask::setAssignee);
+            }
+
+            subTask.setParentTask(parent);
+            subTask.setProject(parent.getProject());
+            subTask.setSprint(parent.getSprint());
+            subTask.setStatus(TaskStatus.TODO);
+            subTask.setCreatedAt(LocalDateTime.now());
+            subTask.setUpdatedAt(LocalDateTime.now());
+
+            if (deadline != null) {
+                subTask.setDeadline(deadline);
+            }
+
+            return taskRepository.save(subTask);
+        } catch (Exception e) {
+            log.error("Ошибка при создании подзадачи для задачи с id: {}", parentTaskId, e);
+            throw e;
         }
-
-        subTask.setParentTask(parent);
-        subTask.setProject(parent.getProject());
-        subTask.setSprint(parent.getSprint());
-        subTask.setStatus(TaskStatus.TODO);
-        subTask.setCreatedAt(LocalDateTime.now());
-        subTask.setUpdatedAt(LocalDateTime.now());
-
-        if (deadline != null) {
-            subTask.setDeadline(deadline);
-        }
-
-        return taskRepository.save(subTask);
     }
 
     @Override
@@ -173,7 +195,7 @@ public class TaskServiceImpl implements TaskService {
             return task;
 
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("Ошибка при добавлении вложения к задаче с id: {}", taskId, e);
             throw new RuntimeException("Ошибка при сохранении файла: " + e.getMessage(), e);
         }
     }

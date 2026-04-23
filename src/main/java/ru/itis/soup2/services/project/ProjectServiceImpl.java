@@ -2,6 +2,7 @@ package ru.itis.soup2.services.project;
 
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.itis.soup2.models.core.User;
@@ -16,6 +17,7 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -29,7 +31,12 @@ public class ProjectServiceImpl implements ProjectService {
     @Transactional
     @Override
     public void create(Project project) {
-        projectRepository.save(project);
+        try {
+            projectRepository.save(project);
+        } catch (Exception e) {
+            log.error("Ошибка при создании проекта: {}", project.getName(), e);
+            throw e;
+        }
     }
 
     @Override
@@ -45,59 +52,74 @@ public class ProjectServiceImpl implements ProjectService {
     @Transactional
     @Override
     public void update(Project project) {
-        projectRepository.save(project);
+        try {
+            projectRepository.save(project);
+        } catch (Exception e) {
+            log.error("Ошибка при обновлении проекта с id: {}", project.getId(), e);
+            throw e;
+        }
     }
 
     @Transactional
     @Override
     public void delete(Integer id) {
-        Project project = projectRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Проект не найден"));
-        if (!project.getSprints().isEmpty()) {
-            throw new IllegalStateException("Нельзя удалить проект с привязанными спринтами");
+        try {
+            Project project = projectRepository.findById(id)
+                    .orElseThrow(() -> new EntityNotFoundException("Проект не найден"));
+            if (!project.getSprints().isEmpty()) {
+                throw new IllegalStateException("Нельзя удалить проект с привязанными спринтами");
+            }
+            if (!project.getTasks().isEmpty()) {
+                throw new IllegalStateException("Нельзя удалить проект с привязанными задачами");
+            }
+            projectRepository.delete(project);
+        } catch (Exception e) {
+            log.error("Ошибка при удалении проекта с id: {}", id, e);
+            throw e;
         }
-        if (!project.getTasks().isEmpty()) {
-            throw new IllegalStateException("Нельзя удалить проект с привязанными задачами");
-        }
-        projectRepository.delete(project);
     }
 
     @Transactional
     @Override
     public void updateMembers(Integer projectId, List<Integer> memberIds) {
-        List<Integer> finalMemberIds = (memberIds == null) ? List.of() : memberIds;
+        try {
+            List<Integer> finalMemberIds = (memberIds == null) ? List.of() : memberIds;
 
-        Project project = projectRepository.findById(projectId)
-                .orElseThrow(() -> new EntityNotFoundException("Project not found"));
+            Project project = projectRepository.findById(projectId)
+                    .orElseThrow(() -> new EntityNotFoundException("Project not found"));
 
-        List<ProjectMember> current = projectMemberRepository.findByProjectId(projectId);
-        List<Integer> currentIds = current.stream()
-                .map(m -> m.getUser().getId())
-                .toList();
+            List<ProjectMember> current = projectMemberRepository.findByProjectId(projectId);
+            List<Integer> currentIds = current.stream()
+                    .map(m -> m.getUser().getId())
+                    .toList();
 
-        List<Integer> toDelete = currentIds.stream()
-                .filter(id -> !finalMemberIds.contains(id))
-                .toList();
+            List<Integer> toDelete = currentIds.stream()
+                    .filter(id -> !finalMemberIds.contains(id))
+                    .toList();
 
-        List<Integer> toAdd = finalMemberIds.stream()
-                .filter(id -> !currentIds.contains(id))
-                .toList();
+            List<Integer> toAdd = finalMemberIds.stream()
+                    .filter(id -> !currentIds.contains(id))
+                    .toList();
 
-        if (!toDelete.isEmpty()) {
-            projectMemberRepository.deleteByProjectIdAndUserIdIn(projectId, toDelete);
-        }
-        for (Integer userId : toAdd) {
-            User user = userRepository.findById(userId)
-                    .orElseThrow(() -> new EntityNotFoundException("User not found"));
+            if (!toDelete.isEmpty()) {
+                projectMemberRepository.deleteByProjectIdAndUserIdIn(projectId, toDelete);
+            }
+            for (Integer userId : toAdd) {
+                User user = userRepository.findById(userId)
+                        .orElseThrow(() -> new EntityNotFoundException("User not found"));
 
-            ProjectMember member = ProjectMember.builder()
-                    .project(project)
-                    .user(user)
-                    .roleInProject(ProjectMemberRole.DEVELOPER)
-                    .joinedAt(LocalDate.now())
-                    .build();
+                ProjectMember member = ProjectMember.builder()
+                        .project(project)
+                        .user(user)
+                        .roleInProject(ProjectMemberRole.DEVELOPER)
+                        .joinedAt(LocalDate.now())
+                        .build();
 
-            projectMemberRepository.save(member);
+                projectMemberRepository.save(member);
+            }
+        } catch (Exception e) {
+            log.error("Ошибка при обновлении участников проекта с id: {}", projectId, e);
+            throw e;
         }
     }
 }
