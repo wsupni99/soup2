@@ -1,7 +1,6 @@
 package ru.itis.soup2.controllers;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -26,7 +25,7 @@ public class AuthController {
             model.addAttribute("error", "Неверный email или пароль");
         }
         if (logout != null) {
-            model.addAttribute("message", "Вы успешно вышли");
+            model.addAttribute("message", "Вы успешно вышли из системы");
         }
         if (registered != null) {
             model.addAttribute("message", "Регистрация прошла успешно! Теперь можно войти.");

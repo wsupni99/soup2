@@ -1,12 +1,10 @@
 package ru.itis.soup2.mappers.core;
 
-import org.springframework.stereotype.Component;
 import ru.itis.soup2.dto.core.UserDto;
 import ru.itis.soup2.models.core.User;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@Component
 public final class UserMapper {
 
     private UserMapper() {}

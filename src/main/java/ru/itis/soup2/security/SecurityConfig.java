@@ -26,16 +26,12 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/login", "/register", "/css/**", "/js/**").permitAll()
                         .requestMatchers("/tasks").authenticated()
-
                         .requestMatchers("/projects/**", "/sprints/**")
                         .hasAnyRole("MANAGER", "ADMIN")
-
                         .requestMatchers("/admin/**")
                         .hasRole("ADMIN")
-
                         .anyRequest().authenticated()
                 )
-
                 .formLogin(form -> form
                         .loginPage("/login")
                         .loginProcessingUrl("/login")
@@ -45,13 +41,13 @@ public class SecurityConfig {
                         .failureUrl("/login?error=true")
                         .permitAll()
                 )
-
                 .logout(logout -> logout
-                        .logoutUrl("/logout")
+                        .logoutRequestMatcher(request ->
+                                "GET".equals(request.getMethod()) && "/logout".equals(request.getServletPath())
+                        )
                         .logoutSuccessUrl("/login?logout")
                         .permitAll()
                 )
-
                 .authenticationProvider(authenticationProvider());
 
         return http.build();
