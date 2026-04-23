@@ -5,6 +5,7 @@ import freemarker.template.Template;
 import freemarker.template.TemplateException;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ClassRelativeResourceLoader;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -12,10 +13,10 @@ import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.ui.freemarker.SpringTemplateLoader;
-
 import java.io.IOException;
 import java.io.StringWriter;
 
+@Slf4j
 @Service
 public class MailServiceImpl implements MailService {
 
@@ -41,6 +42,11 @@ public class MailServiceImpl implements MailService {
     public void sendTaskNotification(String toEmail, String subject, String templateName, Object model) {
         MimeMessage message = javaMailSender.createMimeMessage();
         try {
+            if (toEmail == null || toEmail.isBlank()) {
+                log.warn("Попытка отправить письмо на пустой email");
+                return;
+            }
+
             MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
             helper.setFrom(mailFrom);
             helper.setTo(toEmail);
@@ -53,8 +59,10 @@ public class MailServiceImpl implements MailService {
 
             helper.setText(html, true);
             javaMailSender.send(message);
+            log.debug("Письмо успешно отправлено на {}", toEmail);
+
         } catch (MessagingException | IOException | TemplateException e) {
-            e.printStackTrace();
+            log.error("Ошибка отправки письма на {}: {}", toEmail, e.getMessage(), e);
         }
     }
 }

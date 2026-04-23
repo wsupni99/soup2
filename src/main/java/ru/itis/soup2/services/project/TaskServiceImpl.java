@@ -198,6 +198,15 @@ public class TaskServiceImpl implements TaskService {
                 Map<String, Object> model = buildNotificationModel(saved, "Создана подзадача");
                 mailService.sendTaskNotification(parentAssigneeEmail, "Новая подзадача", "mail/task_notification.ftlh", model);
             }
+            // Уведомление менеджеру
+            if (saved.getProject() != null && saved.getProject().getManager() != null) {
+                String managerEmail = saved.getProject().getManager().getEmail();
+                // не дублировать, если менеджер - родительский исполнитель
+                if (parent.getAssignee() == null || !managerEmail.equals(parent.getAssignee().getEmail())) {
+                    Map<String, Object> model = buildNotificationModel(saved, "Создана подзадача");
+                    mailService.sendTaskNotification(managerEmail, "Новая подзадача в проекте", "mail/task_notification.ftlh", model);
+                }
+            }
 
             return saved;
         } catch (Exception e) {

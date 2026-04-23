@@ -2,17 +2,18 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>Уведомление</title>
+    <title>Уведомление по задаче</title>
 </head>
 <body>
-<h3>Здравствуйте!</h3>
-<p>В задаче <strong>«${taskName}»</strong> произошло изменение: <em>${action}</em>.</p>
-<p>Текущий статус: <strong>${taskStatus}</strong></p>
-<#if taskAssignee??>
-    <p>Исполнитель: ${taskAssignee}</p>
-</#if>
-<p>Ссылка: <a href="${taskLink}">Открыть задачу</a></p>
+<h3>Уважаемый пользователь!</h3>
+<p>По задаче <strong>${taskName}</strong> произошло событие:</p>
+<p><em>${action}</em></p>
+<ul>
+    <li>Статус: ${taskStatus}</li>
+    <li>Исполнитель: ${taskAssignee}</li>
+</ul>
+<p><a href="${taskLink}">Перейти к задаче</a></p>
 <hr>
-<p>С уважением,<br/>Система управления проектами</p>
+<small>Это автоматическое сообщение, пожалуйста, не отвечайте на него.</small>
 </body>
 </html>

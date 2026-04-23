@@ -51,6 +51,21 @@ public class CommentServiceImpl implements CommentService {
                 mailService.sendTaskNotification(assigneeEmail, "Новый комментарий в задаче", "mail/task_notification.ftlh", model);
             }
 
+            if (task.getProject() != null && task.getProject().getManager() != null) {
+                String managerEmail = task.getProject().getManager().getEmail();
+                // Не отправлять дважды, если менеджер - исполнитель
+                if (task.getAssignee() == null || !managerEmail.equals(task.getAssignee().getEmail())) {
+                    Map<String, Object> model = Map.of(
+                            "taskName", task.getName(),
+                            "action", "Новый комментарий от " + comment.getUser().getName() + ": " + comment.getText(),
+                            "taskStatus", task.getStatus() != null ? task.getStatus().toString() : "—",
+                            "taskAssignee", task.getAssignee() != null ? task.getAssignee().getName() : "—",
+                            "taskLink", "http://localhost:8080/tasks/" + task.getId()
+                    );
+                    mailService.sendTaskNotification(managerEmail, "Новый комментарий в задаче проекта", "mail/task_notification.ftlh", model);
+                }
+            }
+
             return saved;
         } catch (Exception e) {
             log.error("Ошибка при создании комментария. Причина: {}", e.getMessage(), e);
