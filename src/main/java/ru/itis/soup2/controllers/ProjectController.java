@@ -11,8 +11,6 @@ import ru.itis.soup2.models.project.Project;
 import ru.itis.soup2.repositories.core.UserRepository;
 import ru.itis.soup2.services.project.ProjectService;
 
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @Controller
@@ -36,9 +34,6 @@ public class ProjectController {
     public String newProjectForm(Model model) {
         model.addAttribute("project", new ProjectDto());
         model.addAttribute("managers", userRepository.findAll());
-        model.addAttribute("startDateStr", "");
-        model.addAttribute("endDateStr", "");
-        model.addAttribute("error", null);
         model.addAttribute("allUsers", userRepository.findAll());
         return "projects/project-form";
     }
@@ -51,8 +46,7 @@ public class ProjectController {
         if (error != null) {
             model.addAttribute("project", projectDto);
             model.addAttribute("managers", userRepository.findAll());
-            model.addAttribute("startDateStr", getDateStr(projectDto.getStartDate()));
-            model.addAttribute("endDateStr", getDateStr(projectDto.getEndDate()));
+            model.addAttribute("allUsers", userRepository.findAll());
             model.addAttribute("error", error);
             return "projects/project-form";
         }
@@ -70,12 +64,8 @@ public class ProjectController {
                 .orElseThrow(() -> new RuntimeException("Project not found"));
 
         ProjectDto dto = projectMapper.toDto(project);
-
         model.addAttribute("project", dto);
         model.addAttribute("managers", userRepository.findAll());
-        model.addAttribute("startDateStr", getDateStr(project.getStartDate()));
-        model.addAttribute("endDateStr", getDateStr(project.getEndDate()));
-        model.addAttribute("error", null);
         model.addAttribute("allUsers", userRepository.findAll().stream()
                 .filter(user -> user.getRole() == null || !"ROLE_ADMIN".equals(user.getRole().getRoleName()))
                 .toList());
@@ -93,8 +83,7 @@ public class ProjectController {
         if (error != null) {
             model.addAttribute("project", projectDto);
             model.addAttribute("managers", userRepository.findAll());
-            model.addAttribute("startDateStr", getDateStr(projectDto.getStartDate()));
-            model.addAttribute("endDateStr", getDateStr(projectDto.getEndDate()));
+            model.addAttribute("allUsers", userRepository.findAll());
             model.addAttribute("error", error);
             return "projects/project-form";
         }
@@ -109,7 +98,7 @@ public class ProjectController {
     }
 
     @PreAuthorize("hasAnyRole('ROLE_MANAGER', 'ROLE_ADMIN')")
-    @GetMapping("/projects/{id}/delete")
+    @PostMapping("/projects/{id}/delete")
     public String deleteProject(@PathVariable Integer id, Model model) {
         try {
             projectService.delete(id);
@@ -139,9 +128,5 @@ public class ProjectController {
             return "Дата начала должна быть раньше даты окончания";
         }
         return null;
-    }
-
-    private String getDateStr(LocalDate date) {
-        return date != null ? date.format(DateTimeFormatter.ISO_LOCAL_DATE) : "";
     }
 }

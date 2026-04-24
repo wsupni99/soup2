@@ -38,11 +38,6 @@ public class TaskServiceImpl implements TaskService {
     private final MailService mailService;
 
     @Override
-    public List<Task> getAllTasks() {
-        return taskRepository.findAllWithDetails();
-    }
-
-    @Override
     public Optional<Task> getTaskById(Integer id) {
         return taskRepository.findWithDetailsById(id);
     }
@@ -53,30 +48,17 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
-    public List<Task> getAllTasksWithFilters(Integer projectId, Integer sprintId, String status,
-                                             String priority, Integer assigneeId, String search) {
-
-        TaskStatus statusEnum = null;
-        if (status != null && !status.trim().isEmpty()) {
-            try {
-                statusEnum = TaskStatus.valueOf(status.trim().toUpperCase());
-            } catch (IllegalArgumentException ignored) {}
-        }
-
-        TaskPriority priorityEnum = null;
-        if (priority != null && !priority.trim().isEmpty()) {
-            try {
-                priorityEnum = TaskPriority.valueOf(priority.trim().toUpperCase());
-            } catch (IllegalArgumentException ignored) {}
-        }
+    public List<Task> getAllTasksWithFilters(Integer projectId, Integer sprintId,
+                                             TaskStatus status,
+                                             TaskPriority priority,
+                                             Integer assigneeId, String search) {
 
         String cleanSearch = (search != null && !search.trim().isEmpty())
                 ? search.trim()
                 : null;
 
         return taskRepository.findTasksWithFilters(
-                projectId, sprintId, status, statusEnum,
-                priority, priorityEnum, assigneeId, cleanSearch
+                projectId, sprintId, status, priority, assigneeId, cleanSearch
         );
     }
 
@@ -265,11 +247,6 @@ public class TaskServiceImpl implements TaskService {
             log.error("Ошибка при добавлении вложения к задаче с id: {}. Причина: {}", taskId, e.getMessage(), e);
             throw new RuntimeException("Ошибка при сохранении файла: " + e.getMessage(), e);
         }
-    }
-
-    @Override
-    public List<Task> getSubTasks(Integer parentTaskId) {
-        return taskRepository.findByParentTaskId(parentTaskId);
     }
 
     @Override

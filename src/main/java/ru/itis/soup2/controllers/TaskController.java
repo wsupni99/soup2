@@ -8,16 +8,16 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-import ru.itis.soup2.dto.core.UserDto;
 import ru.itis.soup2.dto.core.UserWithRoleDto;
 import ru.itis.soup2.dto.project.AttachmentDto;
 import ru.itis.soup2.dto.project.CommentDto;
 import ru.itis.soup2.dto.project.SprintDto;
 import ru.itis.soup2.dto.project.TaskDto;
-import ru.itis.soup2.mappers.core.UserMapper;
 import ru.itis.soup2.mappers.project.SprintMapper;
 import ru.itis.soup2.mappers.project.TaskMapper;
 import ru.itis.soup2.models.core.User;
+import ru.itis.soup2.models.enums.TaskPriority;
+import ru.itis.soup2.models.enums.TaskStatus;
 import ru.itis.soup2.models.project.Task;
 import ru.itis.soup2.security.CustomUserDetails;
 import ru.itis.soup2.services.project.CommentService;
@@ -45,12 +45,13 @@ public class TaskController {
                             @AuthenticationPrincipal CustomUserDetails userDetails,
                             @RequestParam(required = false) Integer projectId,
                             @RequestParam(required = false) Integer sprintId,
-                            @RequestParam(required = false) String status,
-                            @RequestParam(required = false) String priority,
+                            @RequestParam(required = false) TaskStatus status,
+                            @RequestParam(required = false) TaskPriority priority,
                             @RequestParam(required = false) Integer assigneeId,
                             @RequestParam(required = false) String search) {
 
-        List<Task> tasksList = taskService.getAllTasksWithFilters(projectId, sprintId, status, priority, assigneeId, search);
+        List<Task> tasksList = taskService.getAllTasksWithFilters(
+                projectId, sprintId, status, priority, assigneeId, search);
 
         model.addAttribute("tasks", taskMapper.toDtoList(tasksList));
         model.addAttribute("projects", projectService.getAllProjects());
@@ -128,16 +129,22 @@ public class TaskController {
     }
 
     @PreAuthorize("hasAnyRole('ROLE_MANAGER', 'ROLE_ADMIN')")
-    @GetMapping("/tasks/{id}/delete")
-    public String deleteTask(@PathVariable("id") Integer id) {
+    @PostMapping("/tasks/{id}/delete")
+    public String deleteTask(@PathVariable("id") Integer id, RedirectAttributes redirectAttributes) {
+        Task task = taskService.getTaskById(id)
+                .orElseThrow(() -> new RuntimeException("Task not found"));
+
+        String taskName = task.getName();
         taskService.delete(id);
+
+        redirectAttributes.addFlashAttribute("successMessage",
+                "Задача №" + id + " \"" + taskName + "\" успешно удалена");
         return "redirect:/tasks";
     }
 
     @PreAuthorize("hasAnyRole('ROLE_MANAGER', 'ROLE_ADMIN')")
     @GetMapping("/sprints/byProject")
     @ResponseBody
-    // AJAX
     public List<SprintDto> getSprintsByProject(@RequestParam Integer projectId) {
         return sprintService.findSprintsByProjectId(projectId)
                 .stream()
@@ -166,35 +173,27 @@ public class TaskController {
         model.addAttribute("currentUserRole", currentUserRole);
         model.addAttribute("users", taskService.getAllUsersForAssignment());
         model.addAttribute("comments", comments);
+        model.addAttribute("commentsCount", comments.size());
+        model.addAttribute("attachmentsCount", task.getAttachments().size());
 
         return "tasks/task-detail";
     }
 
-    // AJAX создание подзадачи с полными данными
     @PreAuthorize("hasAnyRole('ROLE_MANAGER', 'ROLE_ADMIN')")
     @PostMapping("/tasks/{parentId}/subtasks")
     @ResponseBody
     public TaskDto createSubTask(@PathVariable("parentId") Integer parentId,
                                  @RequestParam String name,
                                  @RequestParam(required = false) Integer assigneeId,
-                                 @RequestParam(required = false) String deadline) {
+                                 @RequestParam(required = false) LocalDate deadline) {
 
         Task subTask = new Task();
         subTask.setName(name.trim());
 
-        // Преобразуем строку даты в LocalDate
-        LocalDate deadlineDate = null;
-        if (deadline != null && !deadline.isEmpty()) {
-            try {
-                deadlineDate = LocalDate.parse(deadline);
-            } catch (Exception ignored) {}
-        }
-
-        Task saved = taskService.createSubTask(parentId, subTask, assigneeId, deadlineDate);
+        Task saved = taskService.createSubTask(parentId, subTask, assigneeId, deadline);
         return taskMapper.toDto(saved);
     }
 
-    // AJAX загрузка файла
     @PreAuthorize("isAuthenticated()")
     @PostMapping("/tasks/{taskId}/attachments")
     @ResponseBody
@@ -206,7 +205,6 @@ public class TaskController {
                 : AttachmentDto.from(task.getAttachments().get(task.getAttachments().size() - 1));
     }
 
-    // AJAX: пользователи по проекту
     @GetMapping("/users/byProject")
     @ResponseBody
     public List<UserWithRoleDto> getUsersByProject(@RequestParam Integer projectId) {

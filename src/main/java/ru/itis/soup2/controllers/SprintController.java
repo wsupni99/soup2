@@ -11,8 +11,6 @@ import ru.itis.soup2.models.project.Sprint;
 import ru.itis.soup2.services.project.ProjectService;
 import ru.itis.soup2.services.project.SprintService;
 
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @Controller
@@ -36,43 +34,22 @@ public class SprintController {
     public String newSprintForm(Model model) {
         model.addAttribute("sprint", new SprintDto());
         model.addAttribute("projects", projectService.getAllProjects());
-        model.addAttribute("startDateStr", "");
-        model.addAttribute("endDateStr", "");
-        model.addAttribute("error", null);
         return "sprints/sprint-form";
     }
 
     @PreAuthorize("hasAnyRole('ROLE_MANAGER', 'ROLE_ADMIN')")
     @PostMapping("/sprints")
-    public String createSprint(@ModelAttribute SprintDto sprintDto,
-                               @RequestParam("startDate") String startDateStr,
-                               @RequestParam("endDate") String endDateStr,
-                               Model model) {
-
-        LocalDate startDate = parseLocalDate(startDateStr);
-        LocalDate endDate = parseLocalDate(endDateStr);
-
-        SprintDto dtoForValidation = new SprintDto(
-                null,
-                sprintDto.getName(),
-                startDate,
-                endDate,
-                sprintDto.getProjectId(),
-                null
-        );
-
-        String error = validateSprint(dtoForValidation);
+    public String createSprint(@ModelAttribute SprintDto sprintDto, Model model) {
+        String error = validateSprint(sprintDto);
 
         if (error != null) {
             model.addAttribute("sprint", sprintDto);
             model.addAttribute("projects", projectService.getAllProjects());
-            model.addAttribute("startDateStr", startDateStr);
-            model.addAttribute("endDateStr", endDateStr);
             model.addAttribute("error", error);
             return "sprints/sprint-form";
         }
 
-        Sprint sprint = sprintMapper.toEntity(dtoForValidation);
+        Sprint sprint = sprintMapper.toEntity(sprintDto);
         projectService.getProjectById(sprintDto.getProjectId())
                 .ifPresent(sprint::setProject);
 
@@ -87,12 +64,8 @@ public class SprintController {
                 .orElseThrow(() -> new RuntimeException("Sprint not found"));
 
         SprintDto dto = sprintMapper.toDto(sprint);
-
         model.addAttribute("sprint", dto);
         model.addAttribute("projects", projectService.getAllProjects());
-        model.addAttribute("startDateStr", getDateStr(sprint.getStartDate()));
-        model.addAttribute("endDateStr", getDateStr(sprint.getEndDate()));
-        model.addAttribute("error", null);
         return "sprints/sprint-form";
     }
 
@@ -100,29 +73,13 @@ public class SprintController {
     @PostMapping("/sprints/{id}/update")
     public String updateSprint(@PathVariable Integer id,
                                @ModelAttribute SprintDto sprintDto,
-                               @RequestParam("startDate") String startDateStr,
-                               @RequestParam("endDate") String endDateStr,
                                Model model) {
 
-        LocalDate startDate = parseLocalDate(startDateStr);
-        LocalDate endDate = parseLocalDate(endDateStr);
-
-        SprintDto dtoForValidation = new SprintDto(
-                null,
-                sprintDto.getName(),
-                startDate,
-                endDate,
-                sprintDto.getProjectId(),
-                null
-        );
-
-        String error = validateSprint(dtoForValidation);
+        String error = validateSprint(sprintDto);
 
         if (error != null) {
             model.addAttribute("sprint", sprintDto);
             model.addAttribute("projects", projectService.getAllProjects());
-            model.addAttribute("startDateStr", startDateStr);
-            model.addAttribute("endDateStr", endDateStr);
             model.addAttribute("error", error);
             return "sprints/sprint-form";
         }
@@ -130,16 +87,7 @@ public class SprintController {
         Sprint sprint = sprintService.getSprintById(id)
                 .orElseThrow(() -> new RuntimeException("Sprint not found"));
 
-        SprintDto correctedDto = new SprintDto(
-                null,
-                sprintDto.getName(),
-                startDate,
-                endDate,
-                sprintDto.getProjectId(),
-                null
-        );
-
-        sprintMapper.updateEntity(sprint, correctedDto);
+        sprintMapper.updateEntity(sprint, sprintDto);
 
         if (sprintDto.getProjectId() != null) {
             projectService.getProjectById(sprintDto.getProjectId())
@@ -158,15 +106,13 @@ public class SprintController {
             return "redirect:/sprints";
         } catch (IllegalStateException e) {
             model.addAttribute("error", e.getMessage());
-            List<Sprint> sprints = sprintService.getAllSprints();
-            model.addAttribute("sprints", sprintMapper.toDtoList(sprints));
-            return "sprints/sprints";
         } catch (Exception e) {
             model.addAttribute("error", "Произошла ошибка при удалении спринта");
-            List<Sprint> sprints = sprintService.getAllSprints();
-            model.addAttribute("sprints", sprintMapper.toDtoList(sprints));
-            return "sprints/sprints";
         }
+
+        List<Sprint> sprints = sprintService.getAllSprints();
+        model.addAttribute("sprints", sprintMapper.toDtoList(sprints));
+        return "sprints/sprints";
     }
 
     private String validateSprint(SprintDto dto) {
@@ -183,20 +129,5 @@ public class SprintController {
             return "Дата начала должна быть раньше даты окончания";
         }
         return null;
-    }
-
-    private String getDateStr(LocalDate date) {
-        return date != null ? date.format(DateTimeFormatter.ISO_LOCAL_DATE) : "";
-    }
-
-    private LocalDate parseLocalDate(String dateStr) {
-        if (dateStr == null || dateStr.trim().isEmpty()) {
-            return null;
-        }
-        try {
-            return LocalDate.parse(dateStr, DateTimeFormatter.ISO_LOCAL_DATE);
-        } catch (Exception e) {
-            return null;
-        }
     }
 }
