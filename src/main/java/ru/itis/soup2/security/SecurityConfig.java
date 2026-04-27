@@ -32,6 +32,9 @@ public class SecurityConfig {
                         .hasRole("ADMIN")
                         .anyRequest().authenticated()
                 )
+                .csrf(csrf -> csrf
+                        .ignoringRequestMatchers("/api/**")  // для REST API
+                )
                 .formLogin(form -> form
                         .loginPage("/login")
                         .loginProcessingUrl("/login")
