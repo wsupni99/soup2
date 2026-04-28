@@ -185,10 +185,13 @@ public class TaskController {
     public TaskDto createSubTask(@PathVariable("parentId") Integer parentId,
                                  @RequestParam String name,
                                  @RequestParam(required = false) Integer assigneeId,
-                                 @RequestParam(required = false) LocalDate deadline) {
+                                 @RequestParam(required = false) LocalDate deadline,
+                                 @RequestParam(required = false, defaultValue = "MEDIUM") TaskPriority priority) {
 
-        Task subTask = new Task();
-        subTask.setName(name.trim());
+        Task subTask = Task.builder()
+                .name(name.trim())
+                .priority(priority)
+                .build();
 
         Task saved = taskService.createSubTask(parentId, subTask, assigneeId, deadline);
         return taskMapper.toDto(saved);

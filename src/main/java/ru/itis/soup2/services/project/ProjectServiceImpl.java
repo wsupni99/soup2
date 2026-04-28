@@ -122,4 +122,17 @@ public class ProjectServiceImpl implements ProjectService {
             throw e;
         }
     }
+
+    @Override
+    public List<Project> getProjectsByUserId(Integer userId) {
+        return projectMemberRepository.findAllByUserId(userId)
+                .stream()
+                .map(ProjectMember::getProject)
+                .toList();
+    }
+
+    @Override
+    public boolean isUserInProject(Integer userId, Integer projectId) {
+        return projectMemberRepository.existsByProjectIdAndUserId(projectId, userId);
+    }
 }

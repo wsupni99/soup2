@@ -10,7 +10,6 @@ import ru.itis.soup2.models.core.User;
 import ru.itis.soup2.models.enums.TaskPriority;
 import ru.itis.soup2.models.enums.TaskStatus;
 import ru.itis.soup2.models.project.Attachment;
-import ru.itis.soup2.models.project.Project;
 import ru.itis.soup2.models.project.ProjectMember;
 import ru.itis.soup2.models.project.Task;
 import ru.itis.soup2.repositories.core.UserRepository;
@@ -70,9 +69,22 @@ public class TaskServiceImpl implements TaskService {
                 userRepository.findById(assigneeId)
                         .ifPresent(task::setAssignee);
             }
+
+            if (task.getCreatedAt() == null) {
+                task.setCreatedAt(LocalDateTime.now());
+            }
+            if (task.getUpdatedAt() == null) {
+                task.setUpdatedAt(LocalDateTime.now());
+            }
+            if (task.getStatus() == null) {
+                task.setStatus(TaskStatus.TODO);
+            }
+            if (task.getPriority() == null) {
+                task.setPriority(TaskPriority.MEDIUM);
+            }
+
             taskRepository.save(task);
 
-            // Уведомление менеджеру проекта (если есть)
             if (task.getProject() != null && task.getProject().getManager() != null) {
                 String managerEmail = task.getProject().getManager().getEmail();
                 if (managerEmail != null && !managerEmail.isBlank()) {
@@ -102,11 +114,12 @@ public class TaskServiceImpl implements TaskService {
             } else {
                 task.setAssignee(null);
             }
+
+            task.setUpdatedAt(LocalDateTime.now());
             taskRepository.save(task);
 
             Map<String, Object> model = buildNotificationModel(task, "Задача обновлена");
 
-            // Уведомление менеджеру проекта
             if (task.getProject() != null && task.getProject().getManager() != null) {
                 String managerEmail = task.getProject().getManager().getEmail();
                 if (managerEmail != null && !managerEmail.isBlank()) {
@@ -114,10 +127,8 @@ public class TaskServiceImpl implements TaskService {
                 }
             }
 
-            // Уведомление назначенному исполнителю
             if (task.getAssignee() != null) {
                 String assigneeEmail = task.getAssignee().getEmail();
-
                 boolean isNotManager = task.getProject().getManager() == null ||
                         !assigneeEmail.equals(task.getProject().getManager().getEmail());
 
@@ -157,7 +168,11 @@ public class TaskServiceImpl implements TaskService {
             Task parent = taskRepository.findWithDetailsById(parentTaskId)
                     .orElseThrow(() -> new EntityNotFoundException("Parent task not found"));
 
-            if (assigneeId != null) {
+            if (subTask.getPriority() == null) {
+                subTask.setPriority(TaskPriority.MEDIUM);
+            }
+
+            if (assigneeId != null && assigneeId > 0) {
                 userRepository.findById(assigneeId).ifPresent(subTask::setAssignee);
             }
 
@@ -174,16 +189,14 @@ public class TaskServiceImpl implements TaskService {
 
             Task saved = taskRepository.save(subTask);
 
-            // Уведомление родительскому исполнителю (если есть)
             if (parent.getAssignee() != null && parent.getAssignee().getEmail() != null) {
                 String parentAssigneeEmail = parent.getAssignee().getEmail();
                 Map<String, Object> model = buildNotificationModel(saved, "Создана подзадача");
                 mailService.sendTaskNotification(parentAssigneeEmail, "Новая подзадача", "mail/task_notification.ftlh", model);
             }
-            // Уведомление менеджеру
+
             if (saved.getProject() != null && saved.getProject().getManager() != null) {
                 String managerEmail = saved.getProject().getManager().getEmail();
-                // не дублировать, если менеджер - родительский исполнитель
                 if (parent.getAssignee() == null || !managerEmail.equals(parent.getAssignee().getEmail())) {
                     Map<String, Object> model = buildNotificationModel(saved, "Создана подзадача");
                     mailService.sendTaskNotification(managerEmail, "Новая подзадача в проекте", "mail/task_notification.ftlh", model);
@@ -235,7 +248,6 @@ public class TaskServiceImpl implements TaskService {
 
             attachmentService.create(attachment);
 
-            // Уведомление назначенному исполнителю
             if (task.getAssignee() != null && task.getAssignee().getEmail() != null) {
                 String assigneeEmail = task.getAssignee().getEmail();
                 Map<String, Object> model = buildNotificationModel(task, "Добавлен новый файл: " + originalName);
@@ -267,5 +279,16 @@ public class TaskServiceImpl implements TaskService {
         model.put("taskAssignee", task.getAssignee() != null ? task.getAssignee().getName() : "—");
         model.put("taskLink", "http://localhost:8080/tasks/" + task.getId());
         return model;
+    }
+
+    @Override
+    public List<Task> getTasksByProjectId(Integer projectId) {
+        return taskRepository.findByProjectId(projectId);
+    }
+
+    @Transactional
+    @Override
+    public void updateStatusOnly(Task task) {
+        taskRepository.save(task);
     }
 }

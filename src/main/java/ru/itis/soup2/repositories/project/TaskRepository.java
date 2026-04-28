@@ -49,4 +49,7 @@ ORDER BY t.id DESC
     })
     @Query("SELECT t FROM Task t WHERE t.parentTask.id = :parentId ORDER BY t.id")
     List<Task> findByParentTaskId(@Param("parentId") Integer parentId);
+
+    @Query("SELECT t FROM Task t WHERE t.project.id = :projectId ORDER BY t.id DESC")
+    List<Task> findByProjectId(@Param("projectId") Integer projectId);
 }

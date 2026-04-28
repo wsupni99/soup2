@@ -31,7 +31,8 @@ public class Task {
     private String description;
 
     @Enumerated(EnumType.STRING)
-    private TaskPriority priority;
+    @Builder.Default // средний приоритет - по умолчанию
+    private TaskPriority priority = TaskPriority.MEDIUM;
 
     @Enumerated(EnumType.STRING)
     private TaskStatus status;

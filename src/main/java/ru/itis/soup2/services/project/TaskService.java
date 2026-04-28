@@ -38,4 +38,9 @@ public interface TaskService {
     Task addAttachment(Integer taskId, MultipartFile file);
 
     List<User> getUsersByProjectId(Integer projectId);
+
+    List<Task> getTasksByProjectId(Integer projectId);
+
+    @Transactional
+    void updateStatusOnly(Task task);
 }

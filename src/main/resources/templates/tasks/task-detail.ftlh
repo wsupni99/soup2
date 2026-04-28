@@ -259,16 +259,23 @@
         assigneeSelect.innerHTML = '<option value="">— Не назначен —</option>';
 
         fetch('/users/byProject?projectId=' + projectId)
-            .then(response => response.ok ? response.json() : [])
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
             .then(users => {
                 users.forEach(user => {
                     const option = document.createElement('option');
-                    option.value = user.id;
-                    option.textContent = user.name + ' (' + user.email + ')';
+                    option.value = user.userId || user.id;
+                    option.textContent = (user.name || '') + ' (' + (user.email || '') + ')';
                     assigneeSelect.appendChild(option);
                 });
             })
-            .catch(() => console.error('Не удалось загрузить участников проекта'));
+            .catch(error => {
+                console.error('Не удалось загрузить участников проекта:', error);
+            });
     }
 
     function hideModal() {

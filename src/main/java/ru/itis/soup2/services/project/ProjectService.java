@@ -12,4 +12,6 @@ public interface ProjectService {
     void update(Project project);
     void delete(Integer id);
     void updateMembers(Integer projectId, List<Integer> memberIds);
+    List<Project> getProjectsByUserId(Integer userId);
+    boolean isUserInProject(Integer userId, Integer projectId);
 }
