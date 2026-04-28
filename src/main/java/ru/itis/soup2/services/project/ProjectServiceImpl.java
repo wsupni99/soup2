@@ -135,4 +135,46 @@ public class ProjectServiceImpl implements ProjectService {
     public boolean isUserInProject(Integer userId, Integer projectId) {
         return projectMemberRepository.existsByProjectIdAndUserId(projectId, userId);
     }
+
+    @Transactional
+    @Override
+    public void addUserToProject(Integer projectId, Integer userId) {
+        try {
+            Project project = projectRepository.findById(projectId)
+                    .orElseThrow(() -> new EntityNotFoundException("Проект не найден"));
+
+            if (isUserInProject(userId, projectId)) {
+                log.warn("Пользователь {} уже является участником проекта {}", userId, projectId);
+                return;
+            }
+
+            User user = userRepository.findById(userId)
+                    .orElseThrow(() -> new EntityNotFoundException("Пользователь не найден"));
+
+            ProjectMember member = ProjectMember.builder()
+                    .project(project)
+                    .user(user)
+                    .roleInProject(ProjectMemberRole.DEVELOPER)
+                    .joinedAt(LocalDate.now())
+                    .build();
+
+            projectMemberRepository.save(member);
+
+            log.info("Пользователь {} успешно добавлен в проект {} как DEVELOPER", userId, projectId);
+
+        } catch (Exception e) {
+            log.error("Ошибка при добавлении пользователя {} в проект {}: {}",
+                    userId, projectId, e.getMessage(), e);
+            throw e;
+        }
+    }
+
+    @Override
+    public List<Project> getAvailableProjectsForUser(Integer userId) {
+        List<Project> allProjects = projectRepository.findAll();
+
+        return allProjects.stream()
+                .filter(project -> !isUserInProject(userId, project.getId()))
+                .toList();
+    }
 }

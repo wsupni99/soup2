@@ -14,4 +14,6 @@ public interface ProjectService {
     void updateMembers(Integer projectId, List<Integer> memberIds);
     List<Project> getProjectsByUserId(Integer userId);
     boolean isUserInProject(Integer userId, Integer projectId);
+    void addUserToProject(Integer projectId, Integer userId);
+    List<Project> getAvailableProjectsForUser(Integer userId);
 }

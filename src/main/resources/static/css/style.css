@@ -1269,3 +1269,32 @@ body {
     padding: 0;
     background: #f8f9fa;
 }
+
+.project-grid, .request-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 20px;
+    margin: 20px 0;
+}
+
+.project-card, .request-card {
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+.request-actions {
+    margin-top: 15px;
+    display: flex;
+    gap: 10px;
+}
+
+.quick-actions {
+    margin-bottom: 30px;
+}
+
+.quick-actions .btn {
+    margin-right: 10px;
+}
