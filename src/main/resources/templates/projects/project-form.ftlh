@@ -5,83 +5,87 @@
     <title><#if project.id??>Редактирование проекта<#else>Новый проект</#if></title>
     <link rel="stylesheet" href="/css/style.css">
 </head>
-<body>
+<#include "../header.ftlh">
 
-<h1><#if project.id??>Редактирование проекта<#else>Новый проект</#if></h1>
+<div class="main-content container-form">
 
-<#if error??>
-    <div class="error">${error}</div>
-</#if>
+    <h1>
+        <#if project.id??>Редактирование проекта<#else>Новый проект</#if>
+    </h1>
 
-<form class="container-form" method="post" action="<#if project.id??>/projects/${project.id}/update<#else>/projects</#if>">
-
-    <#if project.id??>
-        <input type="hidden" name="id" value="${project.id}">
+    <#if error??>
+        <div class="error">${error}</div>
     </#if>
-    <input type="hidden" name="_csrf" value="${_csrf.token}">
-    <label>Название проекта *</label>
-    <input type="text" name="name" value="${project.name!''}" required>
 
-    <label>Описание</label>
-    <textarea name="description" rows="4">${project.description!''}</textarea>
+    <form method="post" action="<#if project.id??>/projects/${project.id}/update<#else>/projects</#if>">
 
-    <label>Дата начала *</label>
-    <input type="date" name="startDate" value="${startDateStr!''}" required>
+        <#if project.id??>
+            <input type="hidden" name="id" value="${project.id}">
+        </#if>
+        <input type="hidden" name="_csrf" value="${_csrf.token}">
 
-    <label>Дата окончания *</label>
-    <input type="date" name="endDate" value="${endDateStr!''}" required>
+        <label>Название проекта *</label>
+        <input type="text" name="name" value="${project.name!''}" required>
 
-    <label>Статус</label>
-    <select name="status">
-        <option value="PLANNED"   <#if project.status?? && project.status == 'PLANNED'>selected</#if>>Планируется</option>
-        <option value="ACTIVE"    <#if project.status?? && project.status == 'ACTIVE'>selected</#if>>Активный</option>
-        <option value="COMPLETED" <#if project.status?? && project.status == 'COMPLETED'>selected</#if>>Завершён</option>
-        <option value="CANCELLED" <#if project.status?? && project.status == 'CANCELLED'>selected</#if>>Отменён</option>
-    </select>
+        <label>Описание</label>
+        <textarea name="description" rows="4">${project.description!''}</textarea>
 
-    <label>Менеджер *</label>
-    <select name="managerId" required>
-        <option value="">Выберите менеджера</option>
-        <#list managers as manager>
-            <option value="${manager.id}"
-                    <#if project.managerId?? && project.managerId == manager.id>selected</#if>>
-                ${manager.name} (${manager.email})
-            </option>
-        </#list>
-    </select>
+        <label>Дата начала *</label>
+        <input type="date" name="startDate" value="${startDateStr!''}" required>
 
-    <label>Участники проекта</label>
-    <div class="mb-3">
-        <select name="memberIds" multiple id="memberSelect" class="form-select" size="6">
-            <#list allUsers as u>
-                <#if u.role?? && u.role.roleName != "ROLE_ADMIN">
-                    <option value="${u.id}"
-                            <#if project.memberIds?? && project.memberIds?seq_contains(u.id)>selected</#if>>
-                        ${u.name} — ${u.email}
-                    </option>
-                </#if>
+        <label>Дата окончания *</label>
+        <input type="date" name="endDate" value="${endDateStr!''}" required>
+
+        <label>Статус</label>
+        <select name="status">
+            <option value="PLANNED"   <#if project.status?? && project.status == 'PLANNED'>selected</#if>>Планируется</option>
+            <option value="ACTIVE"    <#if project.status?? && project.status == 'ACTIVE'>selected</#if>>Активный</option>
+            <option value="COMPLETED" <#if project.status?? && project.status == 'COMPLETED'>selected</#if>>Завершён</option>
+            <option value="CANCELLED" <#if project.status?? && project.status == 'CANCELLED'>selected</#if>>Отменён</option>
+        </select>
+
+        <label>Менеджер *</label>
+        <select name="managerId" required>
+            <option value="">Выберите менеджера</option>
+            <#list managers as manager>
+                <option value="${manager.id}"
+                        <#if project.managerId?? && project.managerId == manager.id>selected</#if>>
+                    ${manager.name} (${manager.email})
+                </option>
             </#list>
         </select>
-        <small class="text-muted">Удерживайте Ctrl (или Cmd) для выбора нескольких участников</small>
-    </div>
 
-    <#-- Показываем текущих участников красивыми бейджами -->
-    <#if project.memberNames?? && project.memberNames?size gt 0>
+        <label>Участники проекта</label>
         <div class="mb-3">
-            <small class="text-muted">Текущие участники:</small>
-            <div class="d-flex flex-wrap gap-2 mt-1">
-                <#list project.memberNames as name>
-                    <span class="badge bg-primary fs-6">${name}</span>
+            <select name="memberIds" multiple id="memberSelect" class="form-select" size="6">
+                <#list allUsers as u>
+                    <#if u.role?? && u.role.roleName != "ROLE_ADMIN">
+                        <option value="${u.id}"
+                                <#if project.memberIds?? && project.memberIds?seq_contains(u.id)>selected</#if>>
+                            ${u.name} — ${u.email}
+                        </option>
+                    </#if>
                 </#list>
-            </div>
+            </select>
+            <small class="text-muted">Удерживайте Ctrl (или Cmd) для выбора нескольких участников</small>
         </div>
-    </#if>
 
-    <button type="submit">Сохранить проект</button>
-</form>
+        <#if project.memberNames?? && project.memberNames?size gt 0>
+            <div class="mb-3">
+                <small class="text-muted">Текущие участники:</small>
+                <div class="d-flex flex-wrap gap-2 mt-1">
+                    <#list project.memberNames as name>
+                        <span class="badge bg-primary fs-6">${name}</span>
+                    </#list>
+                </div>
+            </div>
+        </#if>
 
-<br>
-<a href="/projects">← Назад к списку проектов</a>
+        <button type="submit">Сохранить проект</button>
+    </form>
 
-</body>
+    <br>
+    <a href="/projects">← Назад к списку проектов</a>
+
+</div>
 </html>

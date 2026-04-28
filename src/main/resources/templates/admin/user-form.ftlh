@@ -5,49 +5,50 @@
     <title>${isEdit?string('Редактирование', 'Создание')} пользователя</title>
     <link rel="stylesheet" href="/css/style.css">
 </head>
-<body>
+<#include "../header.ftlh">
 
-<h1>${isEdit?string('Редактирование', 'Создание')} пользователя</h1>
+<div class="main-content container-form">
 
-<form class="container-form"
-      method="post"
-      action="${isEdit?string('/admin/users/' + userDto.id + '/update', '/admin/users')}">
+    <h1>${isEdit?string('Редактирование', 'Создание')} пользователя</h1>
 
-    <#if isEdit>
-        <input type="hidden" name="id" value="${userDto.id!''}">
-    </#if>
-    <input type="hidden" name="_csrf" value="${_csrf.token}">
+    <form method="post"
+          action="${isEdit?string('/admin/users/' + userDto.id + '/update', '/admin/users')}">
 
-    <label>Email <span class="required">*</span></label>
-    <input type="email" name="email" value="${userDto.email!''}" required>
+        <#if isEdit>
+            <input type="hidden" name="id" value="${userDto.id!''}">
+        </#if>
+        <input type="hidden" name="_csrf" value="${_csrf.token}">
 
-    <#if !isEdit>
-        <label>Пароль <span class="required">*</span></label>
-        <input type="password" name="password" required>
-    </#if>
+        <label>Email <span class="required">*</span></label>
+        <input type="email" name="email" value="${userDto.email!''}" required>
 
-    <label>Имя <span class="required">*</span></label>
-    <input type="text" name="name" value="${userDto.name!''}" required>
+        <#if !isEdit>
+            <label>Пароль <span class="required">*</span></label>
+            <input type="password" name="password" required>
+        </#if>
 
-    <label>Контактная информация</label>
-    <input type="text" name="contactInfo" value="${userDto.contactInfo!''}">
+        <label>Имя <span class="required">*</span></label>
+        <input type="text" name="name" value="${userDto.name!''}" required>
 
-    <label>Роль <span class="required">*</span></label>
-    <select name="roleName" required>
-        <option value="">-- Выберите роль --</option>
-        <#list roles as role>
-            <option value="${role.roleName!''}"
-                    <#if userDto.roleName?? && userDto.roleName == role.roleName>selected</#if>>
-                ${role.roleName!''}
-            </option>
-        </#list>
-    </select>
+        <label>Контактная информация</label>
+        <input type="text" name="contactInfo" value="${userDto.contactInfo!''}">
 
-    <button type="submit">${isEdit?string('Сохранить', 'Создать')}</button>
-</form>
+        <label>Роль <span class="required">*</span></label>
+        <select name="roleName" required>
+            <option value="">-- Выберите роль --</option>
+            <#list roles as role>
+                <option value="${role.roleName!''}"
+                        <#if userDto.roleName?? && userDto.roleName == role.roleName>selected</#if>>
+                    ${role.roleName!''}
+                </option>
+            </#list>
+        </select>
 
-<br>
-<a href="/admin/users">← Назад к списку</a>
+        <button type="submit">${isEdit?string('Сохранить', 'Создать')}</button>
+    </form>
 
-</body>
+    <br>
+    <a href="/admin/users">← Назад к списку</a>
+
+</div>
 </html>

@@ -55,7 +55,6 @@ public class DashboardController {
 
         Integer userId = userDetails.getUser().getId();
 
-        // Проверяем, что пользователь состоит в проекте
         if (!projectService.isUserInProject(userId, projectId)) {
             return "redirect:/dashboard";
         }
@@ -81,7 +80,7 @@ public class DashboardController {
                 .orElseThrow(() -> new RuntimeException("Task not found"));
 
         task.setStatus(status);
-        taskService.updateStatusOnly(task); // новый метод, только меняет статус
+        taskService.updateStatusOnly(task);
 
         return taskMapper.toDto(task);
     }
