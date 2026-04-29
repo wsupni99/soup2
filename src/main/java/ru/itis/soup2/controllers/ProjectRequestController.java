@@ -19,9 +19,11 @@ public class ProjectRequestController {
                                            @AuthenticationPrincipal CustomUserDetails userDetails) {
         try {
             projectRequestService.createRequest(projectId, userDetails.getUser().getId());
-            return ResponseEntity.ok().build();
+            return ResponseEntity.ok("Заявка успешно создана");
         } catch (IllegalStateException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body("Произошла внутренняя ошибка");
         }
     }
 

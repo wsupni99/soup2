@@ -5,6 +5,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import ru.itis.soup2.mappers.project.ProjectMapper;
 import ru.itis.soup2.security.CustomUserDetails;
 import ru.itis.soup2.services.project.ProjectService;
 import ru.itis.soup2.services.project.ProjectRequestService;
@@ -15,8 +16,9 @@ public class HomeController {
 
     private final ProjectService projectService;
     private final ProjectRequestService projectRequestService;
+    private final ProjectMapper projectMapper;
 
-    @GetMapping("/")  // ← изменили с /home на /
+    @GetMapping("/")
     public String home(@AuthenticationPrincipal CustomUserDetails userDetails, Model model) {
 
         if (userDetails == null) {
@@ -41,10 +43,11 @@ public class HomeController {
             return "home/manager-home";
         }
 
-        // Для разработчика / тестера
-        model.addAttribute("myProjects", projectService.getProjectsByUserId(userId));
+        model.addAttribute("myProjects",
+                projectMapper.toDtoList(projectService.getProjectsByUserId(userId)));
+        model.addAttribute("availableProjects",
+                projectMapper.toDtoList(projectService.getAvailableProjectsForUser(userId)));
         model.addAttribute("myRequests", projectRequestService.getMyPendingRequests(userId));
-        model.addAttribute("availableProjects", projectService.getAvailableProjectsForUser(userId));
 
         return "home/user-home";
     }

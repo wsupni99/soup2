@@ -1,3 +1,7 @@
+<head>
+    <meta name="_csrf" content="${_csrf.token}"/>
+    <meta name="_csrf_header" content="${_csrf.headerName}"/>
+</head>
 <header class="main-header">
     <div class="header-inner">
         <div class="header-left">
@@ -5,6 +9,7 @@
         </div>
 
         <nav class="main-nav">
+            <a href="/" class="nav-link">Главная</a>
             <a href="/tasks" class="nav-link">Задачи</a>
             <a href="/projects" class="nav-link">Проекты</a>
             <a href="/sprints" class="nav-link">Спринты</a>
@@ -19,10 +24,10 @@
 
             <div class="user-info">
                 <span class="username">
-                    <#if userDetails?? && userDetails.user?? && userDetails.user.email??>
-                        ${userDetails.user.email}
-                    <#else>
-                        Пользователь
+                <#if currentUser??>
+                    ${currentUser.user.name}
+                <#else>
+                    Пользователь
                     </#if>
                 </span>
                 <a href="/logout" class="btn btn-logout">Выйти</a>

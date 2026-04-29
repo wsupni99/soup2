@@ -1236,6 +1236,7 @@ button:hover {
     max-width: 220px;
     overflow: hidden;
     text-overflow: ellipsis;
+    padding: 20px;
 }
 
 .btn-logout {

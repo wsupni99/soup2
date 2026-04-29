@@ -42,7 +42,7 @@
                 <div class="request-card">
                     <h3>${req.project.name}</h3>
                     <p><strong>От:</strong> ${req.user.name} (${req.user.email})</p>
-                    <p>Дата подачи: ${req.createdAt?datetime}</p>
+                    <p>Дата подачи: ${req.createdAt}</p>
 
                     <div class="request-actions">
                         <button onclick="approveRequest(${req.id})" class="btn btn-primary">Одобрить</button>
