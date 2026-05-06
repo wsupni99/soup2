@@ -11,6 +11,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 
 @Configuration
 @EnableWebSecurity
@@ -21,11 +22,14 @@ public class SecurityConfig {
     private final UserDetailsService userDetailsService;
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain securityFilterChain(HttpSecurity http, OAuth2SuccessHandler oAuth2SuccessHandler) throws Exception {
         http
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/login", "/register", "/css/**", "/js/**").permitAll()
+                        .requestMatchers("/login", "/register", "/css/**", "/js/**", "/images/**",
+                                "/oauth2/**", "/login/oauth2/**").permitAll()
+                        .requestMatchers("/", "/home").authenticated()
                         .requestMatchers("/tasks").authenticated()
+                        .requestMatchers("/project-requests/**").authenticated()
                         .requestMatchers("/projects/**", "/sprints/**")
                         .hasAnyRole("MANAGER", "ADMIN")
                         .requestMatchers("/admin/**")
@@ -33,7 +37,8 @@ public class SecurityConfig {
                         .anyRequest().authenticated()
                 )
                 .csrf(csrf -> csrf
-                        .ignoringRequestMatchers("/api/**")  // для REST API
+                        .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
+                        .ignoringRequestMatchers("/api/**")
                 )
                 .formLogin(form -> form
                         .loginPage("/login")
@@ -44,6 +49,12 @@ public class SecurityConfig {
                         .failureUrl("/login?error=true")
                         .permitAll()
                 )
+                .oauth2Login(oauth2 -> oauth2
+                        .loginPage("/login")
+                        .successHandler(oAuth2SuccessHandler)
+                        .failureUrl("/login?oauth_error=true")
+                        .permitAll()
+                )
                 .logout(logout -> logout
                         .logoutRequestMatcher(request ->
                                 "GET".equals(request.getMethod()) && "/logout".equals(request.getServletPath())
@@ -51,7 +62,8 @@ public class SecurityConfig {
                         .logoutSuccessUrl("/login?logout")
                         .permitAll()
                 )
-                .authenticationProvider(authenticationProvider());
+                .authenticationProvider(authenticationProvider())
+                ;
 
         return http.build();
     }

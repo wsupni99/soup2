@@ -11,6 +11,7 @@ import ru.itis.soup2.dto.core.AdminUserUpdateDto;
 import ru.itis.soup2.dto.core.RegisterRequestDto;
 import ru.itis.soup2.models.core.Role;
 import ru.itis.soup2.models.core.User;
+import ru.itis.soup2.repositories.core.RoleRepository;
 import ru.itis.soup2.repositories.core.UserRepository;
 
 import java.util.List;
@@ -25,6 +26,7 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final RoleService roleService;
+    private final RoleRepository roleRepository;
 
     @Transactional
     @Override
@@ -107,6 +109,27 @@ public class UserServiceImpl implements UserService {
             log.error("Ошибка при обновлении пользователя с id: {}. Причина: {}", dto.getId(), e.getMessage(), e);
             throw e;
         }
+    }
+
+    @Override
+    public User findOrCreateOAuthUser(String email, String fullName) {
+        return userRepository.findByEmail(email)
+                .orElseGet(() -> {
+                    Role defaultRole = roleRepository.findByRoleName("ROLE_DEVELOPER")
+                            .orElseGet(() -> roleRepository.findByRoleName("ROLE_USER")
+                                    .orElseThrow(() -> new RuntimeException("Default role not found")));
+
+                    User newUser = User.builder()
+                            .email(email)
+                            .name(fullName != null ? fullName : "OAuth User")
+                            .password("")  // пустой - OAuth
+                            .oauthProvider("google")
+                            .role(defaultRole)
+                            .contactInfo("")
+                            .build();
+
+                    return userRepository.save(newUser);
+                });
     }
 
     private String normalizeRoleName(String roleName) {

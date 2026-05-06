@@ -5,8 +5,6 @@
     <title><#if sprint.id??>Редактирование спринта<#else>Новый спринт</#if></title>
     <link rel="stylesheet" href="/css/style.css">
 </head>
-<#include "../header.ftlh">
-
 <div class="main-content container-form">
 
     <h1>

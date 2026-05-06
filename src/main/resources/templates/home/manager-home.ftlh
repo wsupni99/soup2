@@ -60,10 +60,13 @@
     function approveRequest(requestId) {
         if (!confirm('Одобрить заявку?')) return;
 
+        const csrfMeta = document.querySelector('meta[name="_csrf"]');
+        const csrfToken = csrfMeta ? csrfMeta.content : '';
+
         fetch('/project-requests/' + requestId + '/approve', {
             method: 'POST',
             headers: {
-                'X-CSRF-TOKEN': document.querySelector('meta[name="_csrf"]').content
+                'X-XSRF-TOKEN': csrfToken
             }
         }).then(response => {
             if (response.ok) {
@@ -71,16 +74,22 @@
             } else {
                 alert('Ошибка при одобрении заявки');
             }
+        }).catch(error => {
+            console.error(error);
+            alert('Произошла ошибка');
         });
     }
 
     function rejectRequest(requestId) {
         if (!confirm('Отклонить заявку?')) return;
 
+        const csrfMeta = document.querySelector('meta[name="_csrf"]');
+        const csrfToken = csrfMeta ? csrfMeta.content : '';
+
         fetch('/project-requests/' + requestId + '/reject', {
             method: 'POST',
             headers: {
-                'X-CSRF-TOKEN': document.querySelector('meta[name="_csrf"]').content
+                'X-XSRF-TOKEN': csrfToken
             }
         }).then(response => {
             if (response.ok) {
@@ -88,6 +97,9 @@
             } else {
                 alert('Ошибка при отклонении заявки');
             }
+        }).catch(error => {
+            console.error(error);
+            alert('Произошла ошибка');
         });
     }
 </script>

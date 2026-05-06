@@ -18,8 +18,8 @@
         <#if userProjects?has_content>
             <div class="project-switch">
                 <#list userProjects as p>
-                    <a href="/dashboard/${p.id}"
-                       class="btn ${(p.id == project.id)?string('btn-primary', '')}">
+                    <a href="/dashboard/${p.id?c}"
+                       class="btn ${(p.id?long == project.id?long)?string('btn-primary', 'btn-outline')}">
                         ${p.name}
                     </a>
                 </#list>
@@ -128,7 +128,7 @@
 
                 if (!taskId || !newStatus) return;
 
-                fetch(`/dashboard/tasks/${taskId}/status?status=${newStatus}`, {
+                fetch('/dashboard/tasks/' + taskId + '/status?status=' + newStatus, {
                     method: 'POST',
                     headers: {
                         'X-CSRF-TOKEN': getCsrfToken()

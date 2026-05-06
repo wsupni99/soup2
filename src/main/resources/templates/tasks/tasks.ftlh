@@ -10,13 +10,7 @@
 <div class="main-content">
     <h1>Управление задачами</h1>
 
-    <a href="/tasks/new" class="btn btn-primary">Новая задача</a>
-    <a href="/sprints" class="btn">К спринтам</a>
-    <a href="/projects" class="btn">К проектам</a>
-    <#if currentUserRole == "ROLE_ADMIN">
-        <a href="/admin/users" class="btn">Админ: users</a>
-        <a href="/admin/tasklogs" class="btn">Админ: tasklogs</a>
-    </#if>
+    <a href="/tasks/new" class="btn-outline">Новая задача</a>
 
     <div class="filter-form">
         <form method="get" action="/tasks" id="filterForm">

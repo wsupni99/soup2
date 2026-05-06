@@ -1,8 +1,6 @@
-<head>
-    <meta name="_csrf" content="${_csrf.token}"/>
-    <meta name="_csrf_header" content="${_csrf.headerName}"/>
-</head>
 <header class="main-header">
+    <meta name="_csrf" content="${_csrf.token!''}" />
+    <meta name="_csrf_header" content="${_csrf.headerName!''}" />
     <div class="header-inner">
         <div class="header-left">
             <a href="/dashboard" class="logo">SOUP</a>

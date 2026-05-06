@@ -5,7 +5,6 @@
     <title><#if project.id??>Редактирование проекта<#else>Новый проект</#if></title>
     <link rel="stylesheet" href="/css/style.css">
 </head>
-<#include "../header.ftlh">
 
 <div class="main-content container-form">
 

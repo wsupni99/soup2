@@ -5,7 +5,6 @@
     <title><#if task.id??>Редактирование задачи<#else>Новая задача</#if></title>
     <link rel="stylesheet" href="/css/style.css">
 </head>
-<#include "../header.ftlh">
 
 <div class="main-content container-form">
 

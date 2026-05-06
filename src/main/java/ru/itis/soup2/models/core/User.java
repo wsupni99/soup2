@@ -38,6 +38,9 @@ public class User {
     @JoinColumn(name = "role_id")
     private Role role;
 
+    @Column(name = "oauth_provider")
+    private String oauthProvider;
+
     @OneToMany(mappedBy = "assignee", fetch = FetchType.LAZY)
     private List<Task> assignedTasks = new ArrayList<>();
 

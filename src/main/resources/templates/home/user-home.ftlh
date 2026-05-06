@@ -28,7 +28,11 @@
                 <div class="project-card">
                     <h3>Заявка на проект: ${request.project.name}</h3>
                     <p>Статус: <strong>Ожидает подтверждения</strong></p>
-                    <p>Дата подачи: ${request.createdAt!''}</p>
+                    <p>Дата подачи:
+                        <#if request.createdAt??>
+                            ${request.createdAt}
+                        </#if>
+                    </p>
                 </div>
             </#list>
         <#else>
@@ -54,7 +58,6 @@
         const csrfToken = csrfMeta ? csrfMeta.content : '';
 
         if (!csrfToken) {
-            console.error("CSRF token not found!");
             alert("Ошибка: CSRF токен не найден. Обновите страницу.");
             return;
         }
@@ -62,7 +65,7 @@
         fetch('/project-requests/request?projectId=' + projectId, {
             method: 'POST',
             headers: {
-                'X-CSRF-TOKEN': csrfToken,
+                'X-XSRF-TOKEN': csrfToken,
                 'Content-Type': 'application/json'
             }
         })
@@ -70,6 +73,8 @@
                 if (response.ok) {
                     alert("Заявка успешно отправлена!");
                     location.reload();
+                } else if (response.status === 403) {
+                    alert("Ошибка доступа (403). Возможно, проблема с CSRF.");
                 } else {
                     return response.text().then(text => {
                         alert("Ошибка: " + text);

@@ -9,7 +9,6 @@
     <meta name="_csrf" content="${_csrf.token}">
     <meta name="_csrf_header" content="${_csrf.headerName}">
 </head>
-<#include "../header.ftlh">
 <div class="main-content">
     <body class="container-form">
 

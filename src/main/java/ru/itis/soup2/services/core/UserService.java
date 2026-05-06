@@ -15,4 +15,5 @@ public interface UserService {
     Optional<User> getUserById(Integer id);
     void createUser(AdminUserCreateDto dto);
     void updateUser(AdminUserUpdateDto dto);
+    User findOrCreateOAuthUser(String email, String name);
 }

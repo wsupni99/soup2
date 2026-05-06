@@ -5,7 +5,6 @@
     <title>${isEdit?string('Редактирование', 'Создание')} пользователя</title>
     <link rel="stylesheet" href="/css/style.css">
 </head>
-<#include "../header.ftlh">
 
 <div class="main-content container-form">
 
