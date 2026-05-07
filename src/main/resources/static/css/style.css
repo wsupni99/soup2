@@ -1005,6 +1005,18 @@ button:hover {
     color: #2c3e50;
 }
 
+.kanban-column[data-status="IN_PROGRESS"] {
+    min-width: 340px;
+    max-width: 420px;
+    flex: 1.25;
+}
+
+.kanban-column[data-status="BLOCKED"] {
+    min-width: 300px;
+    max-width: 420px;
+    flex: 1.25;
+}
+
 .task-count {
     background: #e0e0e0;
     color: #555;

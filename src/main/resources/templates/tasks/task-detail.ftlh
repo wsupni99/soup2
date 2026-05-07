@@ -205,26 +205,42 @@
     </#if>
 
     <script>
+        // === CSRF helpers ===
         function getCsrfToken() {
-            return document.querySelector('meta[name="_csrf"]').getAttribute('content');
+            const meta = document.querySelector('meta[name="_csrf"]');
+            return meta ? meta.content : '';
         }
 
+        function getCsrfHeader() {
+            const meta = document.querySelector('meta[name="_csrf_header"]');
+            return meta ? meta.content : 'X-XSRF-TOKEN';
+        }
+
+        // Создание подзадачи через prompt
         function createSubTask() {
             const name = prompt("Введите название подзадачи:");
-            if (!name || name.trim() === '') return;
+            if (!name || !name.trim()) return;
+
+            const formData = new URLSearchParams();
+            formData.append('name', name.trim());
 
             fetch('/tasks/${task.id?c}/subtasks', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded',
-                    'X-CSRF-TOKEN': getCsrfToken()
+                    [getCsrfHeader()]: getCsrfToken()
                 },
-                body: 'name=' + encodeURIComponent(name.trim())
+                body: formData
             })
-                .then(response => response.ok ? location.reload() : alert('Ошибка при создании подзадачи'))
+                .then(response => {
+                    if (response.ok) location.reload();
+                    else if (response.status === 403) alert('Ошибка CSRF. Обновите страницу (F5).');
+                    else alert('Ошибка при создании подзадачи');
+                })
                 .catch(() => alert('Ошибка соединения'));
         }
 
+        // Загрузка файла
         function uploadFile() {
             const fileInput = document.getElementById('fileInput');
             if (!fileInput.files.length) {
@@ -237,22 +253,25 @@
 
             fetch('/tasks/${task.id?c}/attachments', {
                 method: 'POST',
-                headers: { 'X-CSRF-TOKEN': getCsrfToken() },
+                headers: { [getCsrfHeader()]: getCsrfToken() },
                 body: formData
             })
-                .then(response => response.ok ? location.reload() : alert('Ошибка загрузки файла'))
+                .then(response => {
+                    if (response.ok) location.reload();
+                    else if (response.status === 403) alert('Ошибка CSRF. Обновите страницу (F5).');
+                    else alert('Ошибка загрузки файла');
+                })
                 .catch(() => alert('Ошибка соединения'));
         }
 
+        // Модальное окно
         function showCreateSubtaskModal() {
             const modal = document.getElementById('subtaskModal');
             modal.classList.add('show');
             document.getElementById('subtaskName').focus();
 
             const projectId = "${task.projectId!''}";
-            if (projectId) {
-                loadProjectUsersForSubtask(projectId);
-            }
+            if (projectId) loadProjectUsersForSubtask(projectId);
         }
 
         function loadProjectUsersForSubtask(projectId) {
@@ -260,23 +279,19 @@
             assigneeSelect.innerHTML = '<option value="">— Не назначен —</option>';
 
             fetch('/users/byProject?projectId=' + projectId)
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error('Network response was not ok');
-                    }
-                    return response.json();
-                })
+                .then(r => r.ok ? r.json() : [])
                 .then(users => {
                     users.forEach(user => {
                         const option = document.createElement('option');
-                        option.value = user.userId || user.id;
-                        option.textContent = (user.name || '') + ' (' + (user.email || '') + ')';
+                        option.value = user.userId || user.id || '';
+                        const name = user.name || '';
+                        const email = user.email || '';
+                        option.textContent = name + (email ? ' (' + email + ')' : '');
+
                         assigneeSelect.appendChild(option);
                     });
                 })
-                .catch(error => {
-                    console.error('Не удалось загрузить участников проекта:', error);
-                });
+                .catch(err => console.error('Не удалось загрузить пользователей:', err));
         }
 
         function hideModal() {
@@ -304,7 +319,7 @@
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded',
-                    'X-CSRF-TOKEN': getCsrfToken()
+                    [getCsrfHeader()]: getCsrfToken()
                 },
                 body: formData
             })
@@ -312,16 +327,13 @@
                     if (response.ok) {
                         hideModal();
                         location.reload();
+                    } else if (response.status === 403) {
+                        alert('Ошибка CSRF. Обновите страницу (F5).');
                     } else {
                         alert('Ошибка при создании подзадачи');
                     }
                 })
                 .catch(() => alert('Ошибка соединения'));
-        }
-
-        window.onclick = function(event) {
-            const modal = document.getElementById('subtaskModal');
-            if (event.target === modal) hideModal();
         }
 
         function addComment() {
@@ -338,19 +350,22 @@
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded',
-                    'X-CSRF-TOKEN': getCsrfToken()
+                    [getCsrfHeader()]: getCsrfToken()
                 },
                 body: formData
             })
                 .then(response => {
-                    if (response.ok) {
-                        location.reload();
-                    } else {
-                        alert('Ошибка при добавлении комментария');
-                    }
+                    if (response.ok) location.reload();
+                    else if (response.status === 403) alert('Ошибка CSRF. Обновите страницу (F5).');
+                    else alert('Ошибка при добавлении комментария');
                 })
                 .catch(() => alert('Ошибка соединения'));
         }
+
+        window.onclick = function(event) {
+            const modal = document.getElementById('subtaskModal');
+            if (event.target === modal) hideModal();
+        };
     </script>
 
     </body>

@@ -10,8 +10,9 @@
 <div class="main-content">
     <h1>Управление задачами</h1>
 
-    <a href="/tasks/new" class="btn-outline">Новая задача</a>
-
+    <#if currentUserRole?? && currentUserRole == "ROLE_ADMIN" || currentUserRole == "ROLE_MANAGER">
+        <a href="/tasks/new" class="btn-outline">Новая задача</a>
+    </#if>
     <div class="filter-form">
         <form method="get" action="/tasks" id="filterForm">
             <div class="filter-row">

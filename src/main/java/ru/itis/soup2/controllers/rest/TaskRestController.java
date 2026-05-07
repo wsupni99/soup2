@@ -41,7 +41,7 @@ public class TaskRestController {
     }
 
     @PostMapping
-    @PreAuthorize("hasAnyRole('ROLE_MANAGER', 'ROLE_ADMIN')")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<TaskDto> createTask(@RequestBody TaskDto taskDto) {
         Task task = taskMapper.toEntity(taskDto);
         taskService.create(task, taskDto.getAssigneeId());
