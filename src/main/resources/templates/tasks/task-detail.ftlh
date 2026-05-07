@@ -27,6 +27,9 @@
         <!-- Основная информация -->
         <div class="info-section">
             <h3>Информация о задаче</h3>
+            <button onclick="addToGoogleTasks()" class="btn btn-primary" id="google-btn">
+                Добавить в Google Tasks
+            </button>
             <div class="info-grid">
                 <div class="info-row">
                     <span class="info-label">Проект:</span>
@@ -366,6 +369,29 @@
             const modal = document.getElementById('subtaskModal');
             if (event.target === modal) hideModal();
         };
+
+        function addToGoogleTasks() {
+            const taskId = ${task.id?c};
+
+            fetch(`/tasks/` + taskId + `/google-tasks`, {
+                method: 'POST',
+                headers: {
+                    [getCsrfHeader()]: getCsrfToken()
+                }
+            })
+                .then(response => {
+                    if (response.ok) {
+                        alert('Задача успешно добавлена в Google Tasks');
+                    } else if (response.status === 403) {
+                        alert('Нет прав для добавления задачи в Google Tasks');
+                    } else if (response.status === 401) {
+                        alert('Необходимо войти через Google (OAuth)');
+                    } else {
+                        alert('Ошибка при добавлении в Google Tasks');
+                    }
+                })
+                .catch(() => alert('Ошибка соединения'));
+        }
     </script>
 
     </body>

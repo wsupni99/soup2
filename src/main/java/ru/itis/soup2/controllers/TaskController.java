@@ -1,8 +1,11 @@
 package ru.itis.soup2.controllers;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -20,6 +23,8 @@ import ru.itis.soup2.models.enums.TaskPriority;
 import ru.itis.soup2.models.enums.TaskStatus;
 import ru.itis.soup2.models.project.Task;
 import ru.itis.soup2.security.CustomUserDetails;
+import ru.itis.soup2.security.OAuth2TokenService;
+import ru.itis.soup2.services.integration.GoogleTasksService;
 import ru.itis.soup2.services.project.CommentService;
 import ru.itis.soup2.services.project.ProjectService;
 import ru.itis.soup2.services.project.SprintService;
@@ -27,7 +32,7 @@ import ru.itis.soup2.services.project.TaskService;
 
 import java.time.LocalDate;
 import java.util.List;
-
+@Slf4j
 @Controller
 @RequiredArgsConstructor
 public class TaskController {
@@ -38,6 +43,9 @@ public class TaskController {
     private final TaskMapper taskMapper;
     private final SprintMapper sprintMapper;
     private final CommentService commentService;
+    private final GoogleTasksService googleTasksService;
+    private final OAuth2TokenService oAuth2TokenService;
+
 
     @PreAuthorize("isAuthenticated()")
     @GetMapping("/tasks")
@@ -65,10 +73,7 @@ public class TaskController {
         model.addAttribute("selectedAssigneeId", assigneeId);
         model.addAttribute("selectedSearch", search);
 
-        String currentUserRole = (userDetails != null && userDetails.getUser().getRole() != null)
-                ? userDetails.getUser().getRole().getRoleName()
-                : "ROLE_USER";
-        model.addAttribute("currentUserRole", currentUserRole);
+        model.addAttribute("currentUserRole", getCurrentUserRole(userDetails));
 
         return "tasks/tasks";
     }
@@ -93,15 +98,8 @@ public class TaskController {
 
         model.addAttribute("task", dto);
         model.addAttribute("projects", projectService.getAllProjects());
-
-        model.addAttribute("sprints", task.getProject() != null
-                ? sprintService.findSprintsByProjectId(task.getProject().getId())
-                : List.of());
-
-        List<User> projectUsers = task.getProject() != null
-                ? taskService.getUsersByProjectId(task.getProject().getId())
-                : taskService.getAllUsersForAssignment();
-        model.addAttribute("projectUsers", projectUsers);
+        model.addAttribute("sprints", getSprintsByProject(task));
+        model.addAttribute("projectUsers", getProjectUsers(task));
 
         return "tasks/task-form";
     }
@@ -160,17 +158,13 @@ public class TaskController {
         Task task = taskService.getTaskById(id)
                 .orElseThrow(() -> new RuntimeException("Task not found"));
 
-        String currentUserRole = (userDetails != null && userDetails.getUser().getRole() != null)
-                ? userDetails.getUser().getRole().getRoleName()
-                : "ROLE_USER";
-
         List<CommentDto> comments = commentService.findByTaskId(id)
                 .stream()
                 .map(CommentDto::from)
                 .toList();
 
         model.addAttribute("task", taskMapper.toDto(task));
-        model.addAttribute("currentUserRole", currentUserRole);
+        model.addAttribute("currentUserRole", getCurrentUserRole(userDetails));
         model.addAttribute("users", taskService.getAllUsersForAssignment());
         model.addAttribute("comments", comments);
         model.addAttribute("commentsCount", comments.size());
@@ -219,5 +213,75 @@ public class TaskController {
                         .roleName(user.getRole() != null ? user.getRole().getRoleName() : null)
                         .build())
                 .toList();
+    }
+
+    // ====================== Google Tasks ======================
+
+    @PostMapping("/tasks/{id}/google-tasks")
+    @ResponseBody
+    public boolean addToGoogleTasks(@PathVariable Integer id,
+                                    @AuthenticationPrincipal CustomUserDetails userDetails) {
+
+        Task task = taskService.getTaskById(id)
+                .orElseThrow(() -> new RuntimeException("Task not found"));
+
+        if (!canAddToGoogleTasks(task, userDetails)) {
+            throw new AccessDeniedException("Нет прав для добавления задачи в Google Tasks");
+        }
+
+        String accessToken = oAuth2TokenService.getGoogleAccessToken(userDetails.getUsername());
+
+        if (accessToken == null) {
+            log.warn("Пользователь {} попытался добавить задачу без Google токена", userDetails.getUsername());
+            return false;
+        }
+
+        boolean success = googleTasksService.addTaskToGoogleTasks(task, accessToken);
+        return success;
+    }
+
+    // ====================== Вспомогательные методы ======================
+
+    private String getCurrentUserRole(CustomUserDetails userDetails) {
+        if (userDetails == null || userDetails.getUser().getRole() == null) {
+            return "ROLE_USER";
+        }
+        return userDetails.getUser().getRole().getRoleName();
+    }
+
+    private boolean canAddToGoogleTasks(Task task, CustomUserDetails userDetails) {
+        if (userDetails == null) {
+            return false;
+        }
+
+        String role = getCurrentUserRole(userDetails);
+
+        // Менеджер и Админ могут добавлять любую задачу
+        if ("ROLE_MANAGER".equals(role) || "ROLE_ADMIN".equals(role)) {
+            return true;
+        }
+
+        // Разработчик может добавлять только назначенные на него задачи
+        if ("ROLE_DEVELOPER".equals(role)) {
+            return task.getAssignee() != null &&
+                    task.getAssignee().getId().equals(userDetails.getUser().getId());
+        }
+
+        return false;
+    }
+
+    private List<SprintDto> getSprintsByProject(Task task) {
+        if (task.getProject() == null) return List.of();
+        return sprintService.findSprintsByProjectId(task.getProject().getId())
+                .stream()
+                .map(sprintMapper::toDto)
+                .toList();
+    }
+
+    private List<User> getProjectUsers(Task task) {
+        if (task.getProject() == null) {
+            return taskService.getAllUsersForAssignment();
+        }
+        return taskService.getUsersByProjectId(task.getProject().getId());
     }
 }
