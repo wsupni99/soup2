@@ -187,20 +187,22 @@ public class TaskServiceImpl implements TaskService {
             Task task = taskRepository.findWithDetailsById(id)
                     .orElseThrow(() -> new EntityNotFoundException("Task not found"));
 
-            if (!task.getComments().isEmpty() || !task.getAttachments().isEmpty()) {
-                log.warn("Невозможно удалить задачу ID: {} — есть комментарии или файлы", id);
-                throw new IllegalStateException("Нельзя удалить задачу, у которой есть комментарии или прикреплённые файлы");
-            }
+            // Подсчёт того, что будет удалено
+            int commentsCount = task.getComments().size();
+            int attachmentsCount = task.getAttachments().size();
+            int subTasksCount = task.getSubTasks().size();
 
-            if (!task.getSubTasks().isEmpty()) {
-                log.warn("Невозможно удалить задачу ID: {} — есть подзадачи", id);
-                throw new IllegalStateException("Нельзя удалить задачу, у которой есть подзадачи");
-            }
-
-            String taskName = task.getName();
+            String warning = String.format(
+                    "Задача будет удалена вместе с:\n" +
+                            "- %d комментариями\n" +
+                            "- %d вложениями\n" +
+                            "- %d подзадачами",
+                    commentsCount, attachmentsCount, subTasksCount
+            );
+            log.warn(warning);
             taskRepository.deleteById(id);
+            log.info("Задача ID: {} и все связанные данные успешно удалены", id);
 
-            log.info("Задача ID: {} («{}») успешно удалена", id, taskName);
         } catch (Exception e) {
             log.error("Ошибка при удалении задачи с id: {}", id, e);
             throw e;

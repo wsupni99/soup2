@@ -45,8 +45,9 @@ public class TaskRestController {
     public ResponseEntity<TaskDto> createTask(@RequestBody TaskDto taskDto) {
         Task task = taskMapper.toEntity(taskDto);
         taskService.create(task, taskDto.getAssigneeId());
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .body(taskMapper.toDto(task));
+        Task savedTask = taskService.getTaskById(task.getId())
+                .orElse(task);
+        return ResponseEntity.status(HttpStatus.CREATED).body(taskMapper.toDto(savedTask));
     }
 
     @PutMapping("/{id}")

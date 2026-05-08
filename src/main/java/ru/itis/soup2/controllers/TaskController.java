@@ -137,16 +137,12 @@ public class TaskController {
             taskService.delete(id);
 
             redirectAttributes.addFlashAttribute("successMessage",
-                    "Задача №" + id + " \"" + taskName + "\" успешно удалена");
+                    "Задача №" + id + " \"" + taskName + "\" и все связанные данные успешно удалены");
 
             return "redirect:/tasks";
-        } catch (IllegalStateException e) {
-            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
-            return "redirect:/tasks";
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             log.error("Ошибка при удалении задачи {}", id, e);
-            redirectAttributes.addFlashAttribute("errorMessage", "Не удалось удалить задачу");
+            redirectAttributes.addFlashAttribute("errorMessage", "Не удалось удалить задачу: " + e.getMessage());
             return "redirect:/tasks";
         }
     }

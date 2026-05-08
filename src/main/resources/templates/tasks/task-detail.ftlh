@@ -180,7 +180,7 @@
                             <strong>${comment.userName!''}</strong>
                             <span class="comment-date">
                                 ${comment.formattedCreatedAt!''}
-    </span>
+                            </span>
                         </div>
                         <div class="comment-text">${comment.text?no_esc}</div>
                     </div>
@@ -200,18 +200,17 @@
     <#if currentUserRole == "ROLE_ADMIN" || currentUserRole == "ROLE_MANAGER">
         <div class="task-actions" style="margin-bottom: 25px;">
             <a href="/tasks/${task.id?c}/edit" class="btn btn-edit">Редактировать задачу</a>
-            <form method="post" action="/tasks/${task.id?c}/delete" style="display:inline;">
+            <form method="post" action="/tasks/${task.id?c}/delete" style="display:inline;" id="deleteForm">
                 <input type="hidden" name="_csrf" value="${_csrf.token}">
-                <button type="submit" class="btn btn-danger"
-                        onclick="return confirm('Удалить задачу №${task.id}?')">
-                    Удалить
+                <button type="button" class="btn btn-danger"
+                        onclick="confirmDelete(${task.id?c}, '${(task.name!('Задача №' + task.id))?js_string}')">
+                    Удалить задачу
                 </button>
             </form>
         </div>
     </#if>
 
     <script>
-        // === CSRF helpers ===
         function getCsrfToken() {
             const meta = document.querySelector('meta[name="_csrf"]');
             return meta ? meta.content : '';
@@ -222,7 +221,14 @@
             return meta ? meta.content : 'X-XSRF-TOKEN';
         }
 
-        // Создание подзадачи через prompt
+        function confirmDelete(taskId, taskName) {
+            const safeName = taskName || 'эту задачу';
+            if (confirm('Вы уверены, что хотите удалить задачу "' + safeName + '"?\n\n' +
+                'Вместе с задачей будут удалены ВСЕ комментарии, вложения и подзадачи.')) {
+                document.getElementById('deleteForm').submit();
+            }
+        }
+
         function createSubTask() {
             const name = prompt("Введите название подзадачи:");
             if (!name || !name.trim()) return;
@@ -246,7 +252,6 @@
                 .catch(() => alert('Ошибка соединения'));
         }
 
-        // Загрузка файла
         function uploadFile() {
             const fileInput = document.getElementById('fileInput');
             if (!fileInput.files.length) {
@@ -270,7 +275,6 @@
                 .catch(() => alert('Ошибка соединения'));
         }
 
-        // Модальное окно
         function showCreateSubtaskModal() {
             const modal = document.getElementById('subtaskModal');
             modal.classList.add('show');
@@ -396,7 +400,6 @@
                 .catch(() => alert('Ошибка соединения'));
         }
     </script>
-
     </body>
 </div>
 </html>

@@ -101,8 +101,24 @@
             <h3>Новая задача</h3>
 
             <form id="quickTaskForm">
-                <label>Название задачи <span class="required">*</span></label>
-                <input type="text" id="quickTaskName" required placeholder="Введите название">
+                <label>Название <span class="required">*</span></label>
+                <input type="text" id="quickTaskName" required>
+
+                <label>Описание</label>
+                <textarea id="quickTaskDescription" rows="3" placeholder="Краткое описание задачи"></textarea>
+
+                <label>Исполнитель</label>
+                <select id="quickTaskAssignee">
+                    <option value="">— Не назначен —</option>
+                </select>
+
+                <label>Дедлайн</label>
+                <input type="date" id="quickTaskDeadline">
+
+                <label>Спринт</label>
+                <select id="quickTaskSprint">
+                    <option value="">— Без спринта —</option>
+                </select>
 
                 <label>Приоритет</label>
                 <select id="quickTaskPriority">
@@ -121,8 +137,6 @@
     </div>
 
     <script>
-        let currentColumnStatus = 'TODO';
-
         function getCsrfToken() {
             return document.querySelector('meta[name="_csrf"]').content;
         }
@@ -131,31 +145,71 @@
             return document.querySelector('meta[name="_csrf_header"]').content;
         }
 
-        function showCreateTaskModal(status) {
-            currentColumnStatus = status;
-            document.getElementById('quickTaskName').value = '';
-            document.getElementById('createTaskModal').classList.add('show');
-            document.getElementById('quickTaskName').focus();
-        }
-
         function hideCreateTaskModal() {
             document.getElementById('createTaskModal').classList.remove('show');
+        }
+
+        let currentColumnStatus = 'TODO';
+
+        function showCreateTaskModal(status) {
+            currentColumnStatus = status;
+            document.getElementById('quickTaskForm').reset();
+            document.getElementById('createTaskModal').classList.add('show');
+            document.getElementById('quickTaskName').focus();
+
+            const projectId = ${project.id?c};
+            loadProjectUsers(projectId);
+            loadProjectSprints(projectId);
+        }
+
+        function loadProjectUsers(projectId) {
+            fetch('/users/byProject?projectId=' + projectId)
+                .then(r => r.ok ? r.json() : [])
+                .then(users => {
+                    const select = document.getElementById('quickTaskAssignee');
+                    select.innerHTML = '<option value="">— Не назначен —</option>';
+                    users.forEach(u => {
+                        const opt = document.createElement('option');
+                        opt.value = u.userId || u.id;
+                        opt.textContent = u.name + (u.email ? ' (' + u.email + ')' : '');
+                        select.appendChild(opt);
+                    });
+                });
+        }
+
+        function loadProjectSprints(projectId) {
+            fetch('/sprints/byProject?projectId=' + projectId)
+                .then(r => r.ok ? r.json() : [])
+                .then(sprints => {
+                    const select = document.getElementById('quickTaskSprint');
+                    select.innerHTML = '<option value="">— Без спринта —</option>';
+                    sprints.forEach(s => {
+                        const opt = document.createElement('option');
+                        opt.value = s.id;
+                        opt.textContent = s.name;
+                        select.appendChild(opt);
+                    });
+                });
         }
 
         function createQuickTask() {
             const name = document.getElementById('quickTaskName').value.trim();
             if (!name) {
-                alert("Название задачи обязательно");
+                alert("Название обязательно");
                 return;
             }
 
-            const priority = document.getElementById('quickTaskPriority').value;
-
             const taskDto = {
                 name: name,
+                description: document.getElementById('quickTaskDescription').value.trim(),
                 status: currentColumnStatus,
-                priority: priority,
-                projectId: ${project.id?c}
+                priority: document.getElementById('quickTaskPriority').value,
+                projectId: ${project.id?c},
+                assigneeId: document.getElementById('quickTaskAssignee').value ?
+                    parseInt(document.getElementById('quickTaskAssignee').value) : null,
+                sprintId: document.getElementById('quickTaskSprint').value ?
+                    parseInt(document.getElementById('quickTaskSprint').value) : null,
+                deadline: document.getElementById('quickTaskDeadline').value || null
             };
 
             fetch('/api/tasks', {
@@ -170,13 +224,18 @@
                     if (response.ok) {
                         hideCreateTaskModal();
                         location.reload();
-                    } else if (response.status === 403) {
-                        alert('Ошибка доступа. Только менеджеры и администраторы могут создавать задачи.');
                     } else {
-                        alert('Не удалось создать задачу');
+                        return response.text().then(text => {
+                            console.error('Server error:', text);
+                            alert('Ошибка создания задачи: ' + (text || response.status));
+                        });
                     }
                 })
-                .catch(() => alert('Ошибка соединения'));
+                .catch(err => {
+                    console.error('Fetch error:', err);
+                    alert('Ошибка соединения. Задача могла быть создана (проверьте список).');
+                    location.reload();
+                });
         }
 
         // Drag & Drop
