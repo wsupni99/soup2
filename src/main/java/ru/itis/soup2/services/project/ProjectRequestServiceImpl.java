@@ -1,6 +1,7 @@
 package ru.itis.soup2.services.project;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.itis.soup2.models.core.User;
@@ -10,12 +11,10 @@ import ru.itis.soup2.models.project.ProjectRequest;
 import ru.itis.soup2.repositories.core.UserRepository;
 import ru.itis.soup2.repositories.project.ProjectRepository;
 import ru.itis.soup2.repositories.project.ProjectRequestRepository;
-import ru.itis.soup2.services.core.UserService;
-import ru.itis.soup2.services.project.ProjectRequestService;
-import ru.itis.soup2.services.project.ProjectService;
 
 import java.util.List;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class ProjectRequestServiceImpl implements ProjectRequestService {
@@ -28,60 +27,92 @@ public class ProjectRequestServiceImpl implements ProjectRequestService {
     @Transactional
     @Override
     public ProjectRequest createRequest(Integer projectId, Integer userId) {
-        if (projectService.isUserInProject(userId, projectId)) {
-            throw new IllegalStateException("Вы уже являетесь участником этого проекта");
+        try {
+            log.info("Создание заявки на проект. ProjectId={}, UserId={}", projectId, userId);
+
+            if (projectService.isUserInProject(userId, projectId)) {
+                log.warn("Пользователь {} уже состоит в проекте {}", userId, projectId);
+                throw new IllegalStateException("Вы уже являетесь участником этого проекта");
+            }
+
+            if (hasActiveRequest(userId, projectId)) {
+                log.warn("У пользователя {} уже есть активная заявка на проект {}", userId, projectId);
+                throw new IllegalStateException("Заявка на вступление уже подана");
+            }
+
+            Project project = projectRepository.findById(projectId)
+                    .orElseThrow(() -> new IllegalArgumentException("Проект не найден"));
+
+            User user = userRepository.findById(userId)
+                    .orElseThrow(() -> new IllegalArgumentException("Пользователь не найден"));
+
+            ProjectRequest request = ProjectRequest.builder()
+                    .project(project)
+                    .user(user)
+                    .status(RequestStatus.PENDING)
+                    .build();
+
+            ProjectRequest saved = requestRepository.save(request);
+            log.info("Заявка успешно создана. RequestId={}, ProjectId={}, UserId={}",
+                    saved.getId(), projectId, userId);
+
+            return saved;
+        } catch (Exception e) {
+            log.error("Ошибка при создании заявки на проект (projectId={}, userId={})", projectId, userId, e);
+            throw e;
         }
-
-        if (hasActiveRequest(userId, projectId)) {
-            throw new IllegalStateException("Заявка на вступление уже подана");
-        }
-
-        Project project = projectRepository.findById(projectId)
-                .orElseThrow(() -> new IllegalArgumentException("Проект не найден"));
-
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("Пользователь не найден"));
-
-        ProjectRequest request = ProjectRequest.builder()
-                .project(project)
-                .user(user)
-                .status(RequestStatus.PENDING)
-                .build();
-
-        return requestRepository.save(request);
     }
 
     @Transactional
     @Override
     public ProjectRequest approveRequest(Long requestId, Integer managerId) {
-        ProjectRequest request = requestRepository.findById(requestId)
-                .orElseThrow(() -> new IllegalArgumentException("Заявка не найдена"));
+        try {
+            log.info("Одобрение заявки ID: {} менеджером {}", requestId, managerId);
 
-        if (!request.getProject().getManager().getId().equals(managerId)) {
-            throw new IllegalStateException("У вас нет прав на одобрение этой заявки");
+            ProjectRequest request = requestRepository.findById(requestId)
+                    .orElseThrow(() -> new IllegalArgumentException("Заявка не найдена"));
+
+            if (!request.getProject().getManager().getId().equals(managerId)) {
+                log.warn("Менеджер {} не имеет прав на одобрение заявки {}", managerId, requestId);
+                throw new IllegalStateException("У вас нет прав на одобрение этой заявки");
+            }
+
+            request.setStatus(RequestStatus.APPROVED);
+            ProjectRequest saved = requestRepository.save(request);
+
+            projectService.addUserToProject(request.getProject().getId(), request.getUser().getId());
+
+            log.info("Заявка ID: {} успешно одобрена", requestId);
+            return saved;
+        } catch (Exception e) {
+            log.error("Ошибка при одобрении заявки ID: {}", requestId, e);
+            throw e;
         }
-        request.setStatus(RequestStatus.APPROVED);
-        requestRepository.save(request);
-
-        projectService.addUserToProject(
-                request.getProject().getId(),
-                request.getUser().getId()
-        );
-        return request;
     }
 
     @Transactional
     @Override
     public ProjectRequest rejectRequest(Long requestId, Integer managerId) {
-        ProjectRequest request = requestRepository.findById(requestId)
-                .orElseThrow(() -> new IllegalArgumentException("Заявка не найдена"));
+        try {
+            log.info("Отклонение заявки ID: {} менеджером {}", requestId, managerId);
 
-        if (!request.getProject().getManager().getId().equals(managerId)) {
-            throw new IllegalStateException("У вас нет прав на отклонение этой заявки");
+            ProjectRequest request = requestRepository.findById(requestId)
+                    .orElseThrow(() -> new IllegalArgumentException("Заявка не найдена"));
+
+            if (!request.getProject().getManager().getId().equals(managerId)) {
+                log.warn("Менеджер {} не имеет прав на отклонение заявки {}", managerId, requestId);
+                throw new IllegalStateException("У вас нет прав на отклонение этой заявки");
+            }
+
+            request.setStatus(RequestStatus.REJECTED);
+            ProjectRequest saved = requestRepository.save(request);
+
+            log.info("Заявка ID: {} успешно отклонена", requestId);
+            return saved;
+        } catch (Exception e) {
+            log.error("Ошибка при отклонении заявки ID: {}", requestId, e);
+            throw e;
         }
-
-        request.setStatus(RequestStatus.REJECTED);
-        return requestRepository.save(request);
     }
 
     @Override

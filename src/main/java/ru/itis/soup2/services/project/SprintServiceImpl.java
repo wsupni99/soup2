@@ -23,9 +23,48 @@ public class SprintServiceImpl implements SprintService {
     @Override
     public void create(Sprint sprint) {
         try {
+            log.info("Создание спринта: {}", sprint.getName());
+
             sprintRepository.save(sprint);
+            log.info("Спринт успешно создан. ID: {}", sprint.getId());
         } catch (Exception e) {
-            log.error("Ошибка при создании спринта: {}. Причина: {}", sprint.getName(), e.getMessage(), e);
+            log.error("Ошибка при создании спринта: {}", sprint.getName(), e);
+            throw e;
+        }
+    }
+
+    @Transactional
+    @Override
+    public void update(Sprint sprint) {
+        try {
+            log.info("Обновление спринта ID: {}", sprint.getId());
+
+            sprintRepository.save(sprint);
+            log.info("Спринт ID: {} успешно обновлён", sprint.getId());
+        } catch (Exception e) {
+            log.error("Ошибка при обновлении спринта с id: {}", sprint.getId(), e);
+            throw e;
+        }
+    }
+
+    @Transactional
+    @Override
+    public void delete(Integer id) {
+        try {
+            log.info("Попытка удаления спринта ID: {}", id);
+
+            Sprint sprint = sprintRepository.findById(id)
+                    .orElseThrow(() -> new EntityNotFoundException("Спринт не найден"));
+
+            if (!sprint.getTasks().isEmpty()) {
+                log.warn("Невозможно удалить спринт ID: {} — есть привязанные задачи", id);
+                throw new IllegalStateException("Нельзя удалить спринт, в котором есть задачи");
+            }
+
+            sprintRepository.delete(sprint);
+            log.info("Спринт ID: {} успешно удалён", id);
+        } catch (Exception e) {
+            log.error("Ошибка при удалении спринта с id: {}", id, e);
             throw e;
         }
     }
@@ -46,34 +85,5 @@ public class SprintServiceImpl implements SprintService {
     @Override
     public Optional<Sprint> getSprintById(Integer id) {
         return sprintRepository.findById(id);
-    }
-
-    @Transactional
-    @Override
-    public void update(Sprint sprint) {
-        try {
-            sprintRepository.save(sprint);
-        } catch (Exception e) {
-            log.error("Ошибка при обновлении спринта с id: {}. Причина: {}", sprint.getId(), e.getMessage(), e);
-            throw e;
-        }
-    }
-
-    @Transactional
-    @Override
-    public void delete(Integer id) {
-        try {
-            Sprint sprint = sprintRepository.findById(id)
-                    .orElseThrow(() -> new EntityNotFoundException("Спринт не найден"));
-
-            if (!sprint.getTasks().isEmpty()) {
-                throw new IllegalStateException("Нельзя удалить спринт, в котором есть задачи");
-            }
-
-            sprintRepository.delete(sprint);
-        } catch (Exception e) {
-            log.error("Ошибка при удалении спринта с id: {}. Причина: {}", id, e.getMessage(), e);
-            throw e;
-        }
     }
 }

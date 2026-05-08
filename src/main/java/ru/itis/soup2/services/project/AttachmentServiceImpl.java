@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.itis.soup2.models.project.Attachment;
 import ru.itis.soup2.repositories.project.AttachmentRepository;
+
 import java.util.List;
 import java.util.Optional;
 
@@ -14,15 +15,22 @@ import java.util.Optional;
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class AttachmentServiceImpl implements AttachmentService {
+
     private final AttachmentRepository attachmentRepository;
 
     @Transactional
     @Override
     public Attachment create(Attachment attachment) {
         try {
-            return attachmentRepository.save(attachment);
+            log.info("Сохранение вложения: {} к задаче ID: {}",
+                    attachment.getFileName(), attachment.getTask().getId());
+
+            Attachment saved = attachmentRepository.save(attachment);
+            log.info("Вложение успешно сохранено. AttachmentId: {}", saved.getId());
+
+            return saved;
         } catch (Exception e) {
-            log.error("Ошибка при сохранении вложения. Причина: {}", e.getMessage(), e);
+            log.error("Ошибка при сохранении вложения {}", attachment.getFileName(), e);
             throw e;
         }
     }
@@ -32,7 +40,7 @@ public class AttachmentServiceImpl implements AttachmentService {
         try {
             return attachmentRepository.findById(id);
         } catch (Exception e) {
-            log.error("Ошибка при поиске вложения с id: {}. Причина: {}", id, e.getMessage(), e);
+            log.error("Ошибка при поиске вложения с id: {}", id, e);
             throw e;
         }
     }
@@ -42,7 +50,7 @@ public class AttachmentServiceImpl implements AttachmentService {
         try {
             return attachmentRepository.findByTaskId(taskId);
         } catch (Exception e) {
-            log.error("Ошибка при поиске вложений по задаче с id: {}. Причина: {}", taskId, e.getMessage(), e);
+            log.error("Ошибка при поиске вложений по задаче с id: {}", taskId, e);
             throw e;
         }
     }

@@ -1,4 +1,3 @@
-// ru.itis.soup2.services.project.CommentServiceImpl
 package ru.itis.soup2.services.project;
 
 import jakarta.persistence.EntityNotFoundException;
@@ -33,12 +32,16 @@ public class CommentServiceImpl implements CommentService {
     @Override
     public Comment createComment(Comment comment) {
         try {
+            log.info("Добавление комментария к задаче ID: {}", comment.getTask().getId());
+
             comment.setCreatedAt(LocalDateTime.now());
             Comment saved = commentRepository.save(comment);
 
-            // Уведомление исполнителю задачи
+            log.info("Комментарий успешно добавлен. CommentId: {}, TaskId: {}", saved.getId(), comment.getTask().getId());
+
             Task task = taskRepository.findWithDetailsById(comment.getTask().getId())
                     .orElseThrow(() -> new RuntimeException("Task not found"));
+
             if (task.getAssignee() != null && task.getAssignee().getEmail() != null) {
                 String assigneeEmail = task.getAssignee().getEmail();
                 Map<String, Object> model = Map.of(
@@ -53,7 +56,6 @@ public class CommentServiceImpl implements CommentService {
 
             if (task.getProject() != null && task.getProject().getManager() != null) {
                 String managerEmail = task.getProject().getManager().getEmail();
-                // Не отправлять дважды, если менеджер - исполнитель
                 if (task.getAssignee() == null || !managerEmail.equals(task.getAssignee().getEmail())) {
                     Map<String, Object> model = Map.of(
                             "taskName", task.getName(),
@@ -68,7 +70,7 @@ public class CommentServiceImpl implements CommentService {
 
             return saved;
         } catch (Exception e) {
-            log.error("Ошибка при создании комментария. Причина: {}", e.getMessage(), e);
+            log.error("Ошибка при создании комментария к задаче", e);
             throw e;
         }
     }
@@ -76,17 +78,24 @@ public class CommentServiceImpl implements CommentService {
     @Override
     @Transactional
     public Comment createComment(Integer taskId, Integer userId, String text) {
-        Task task = taskRepository.findById(taskId)
-                .orElseThrow(() -> new EntityNotFoundException("Task not found with id: " + taskId));
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + userId));
+        try {
+            log.info("Создание комментария. TaskId={}, UserId={}", taskId, userId);
 
-        Comment comment = new Comment();
-        comment.setTask(task);
-        comment.setUser(user);
-        comment.setText(text);
+            Task task = taskRepository.findById(taskId)
+                    .orElseThrow(() -> new EntityNotFoundException("Task not found with id: " + taskId));
+            User user = userRepository.findById(userId)
+                    .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + userId));
 
-        return createComment(comment);
+            Comment comment = new Comment();
+            comment.setTask(task);
+            comment.setUser(user);
+            comment.setText(text);
+
+            return createComment(comment);
+        } catch (Exception e) {
+            log.error("Ошибка при создании комментария к задаче {} от пользователя {}", taskId, userId, e);
+            throw e;
+        }
     }
 
     @Override
@@ -94,7 +103,7 @@ public class CommentServiceImpl implements CommentService {
         try {
             return commentRepository.findByTaskId(taskId);
         } catch (Exception e) {
-            log.error("Ошибка при поиске комментариев по задаче с id: {}. Причина: {}", taskId, e.getMessage(), e);
+            log.error("Ошибка при поиске комментариев по задаче с id: {}", taskId, e);
             throw e;
         }
     }

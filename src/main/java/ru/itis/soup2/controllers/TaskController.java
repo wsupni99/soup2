@@ -129,15 +129,26 @@ public class TaskController {
     @PreAuthorize("hasAnyRole('ROLE_MANAGER', 'ROLE_ADMIN')")
     @PostMapping("/tasks/{id}/delete")
     public String deleteTask(@PathVariable("id") Integer id, RedirectAttributes redirectAttributes) {
-        Task task = taskService.getTaskById(id)
-                .orElseThrow(() -> new RuntimeException("Task not found"));
+        try {
+            Task task = taskService.getTaskById(id)
+                    .orElseThrow(() -> new RuntimeException("Task not found"));
 
-        String taskName = task.getName();
-        taskService.delete(id);
+            String taskName = task.getName();
+            taskService.delete(id);
 
-        redirectAttributes.addFlashAttribute("successMessage",
-                "Задача №" + id + " \"" + taskName + "\" успешно удалена");
-        return "redirect:/tasks";
+            redirectAttributes.addFlashAttribute("successMessage",
+                    "Задача №" + id + " \"" + taskName + "\" успешно удалена");
+
+            return "redirect:/tasks";
+        } catch (IllegalStateException e) {
+            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
+            return "redirect:/tasks";
+        }
+        catch (Exception e) {
+            log.error("Ошибка при удалении задачи {}", id, e);
+            redirectAttributes.addFlashAttribute("errorMessage", "Не удалось удалить задачу");
+            return "redirect:/tasks";
+        }
     }
 
     @PreAuthorize("hasAnyRole('ROLE_MANAGER', 'ROLE_ADMIN')")

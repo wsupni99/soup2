@@ -27,12 +27,11 @@ public class TaskMapper {
         task.setName(dto.getName());
         task.setDescription(dto.getDescription());
         task.setPriority(dto.getPriority());
+        task.setDeadline(dto.getDeadline());
 
         if (dto.getStatus() != null && !dto.getStatus().trim().isEmpty()) {
             task.setStatus(TaskStatus.valueOf(dto.getStatus().trim().toUpperCase()));
         }
-
-        task.setDeadline(dto.getDeadline());
 
         if (dto.getProjectId() != null) {
             Project project = new Project();
@@ -55,12 +54,13 @@ public class TaskMapper {
         task.setName(dto.getName());
         task.setDescription(dto.getDescription());
         task.setPriority(dto.getPriority());
+        task.setDeadline(dto.getDeadline());
 
         if (dto.getStatus() != null && !dto.getStatus().trim().isEmpty()) {
             task.setStatus(TaskStatus.valueOf(dto.getStatus().trim().toUpperCase()));
+        } else {
+            task.setStatus(null);
         }
-
-        task.setDeadline(dto.getDeadline());
 
         if (dto.getProjectId() != null) {
             Project project = new Project();

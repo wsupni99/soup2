@@ -32,6 +32,8 @@ public class UserServiceImpl implements UserService {
     @Override
     public void register(RegisterRequestDto dto) {
         try {
+            log.info("Регистрация пользователя: {}", dto.getEmail());
+
             User user = new User();
             user.setEmail(dto.getEmail().trim());
             user.setName(dto.getName().trim());
@@ -54,8 +56,10 @@ public class UserServiceImpl implements UserService {
 
             savedUser.setRole(role);
             userRepository.save(savedUser);
+
+            log.info("Пользователь успешно зарегистрирован. Email: {}, Role: {}", dto.getEmail(), roleName);
         } catch (Exception e) {
-            log.error("Ошибка при регистрации пользователя с email: {}. Причина: {}", dto.getEmail(), e.getMessage(), e);
+            log.error("Ошибка при регистрации пользователя с email: {}", dto.getEmail(), e);
             throw e;
         }
     }
@@ -64,6 +68,8 @@ public class UserServiceImpl implements UserService {
     @Override
     public void createUser(AdminUserCreateDto dto) {
         try {
+            log.info("Создание пользователя администратором. Email: {}", dto.getEmail());
+
             User user = new User();
             user.setEmail(dto.getEmail().trim());
             user.setName(dto.getName().trim());
@@ -79,8 +85,10 @@ public class UserServiceImpl implements UserService {
 
             savedUser.setRole(role);
             userRepository.save(savedUser);
+
+            log.info("Пользователь успешно создан администратором. Email: {}, Role: {}", dto.getEmail(), roleName);
         } catch (Exception e) {
-            log.error("Ошибка при создании пользователя админом: {}. Причина: {}", dto.getEmail(), e.getMessage(), e);
+            log.error("Ошибка при создании пользователя админом: {}", dto.getEmail(), e);
             throw e;
         }
     }
@@ -89,6 +97,8 @@ public class UserServiceImpl implements UserService {
     @Override
     public void updateUser(AdminUserUpdateDto dto) {
         try {
+            log.info("Обновление пользователя ID: {}", dto.getId());
+
             User user = userRepository.findById(dto.getId())
                     .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + dto.getId()));
 
@@ -102,34 +112,45 @@ public class UserServiceImpl implements UserService {
                         .orElseThrow(() -> new EntityNotFoundException("Role not found: " + roleName));
 
                 user.setRole(newRole);
+                log.info("У пользователя ID: {} изменена роль на {}", dto.getId(), roleName);
             }
 
             userRepository.save(user);
+            log.info("Пользователь ID: {} успешно обновлён", dto.getId());
         } catch (Exception e) {
-            log.error("Ошибка при обновлении пользователя с id: {}. Причина: {}", dto.getId(), e.getMessage(), e);
+            log.error("Ошибка при обновлении пользователя с id: {}", dto.getId(), e);
             throw e;
         }
     }
 
     @Override
     public User findOrCreateOAuthUser(String email, String fullName) {
-        return userRepository.findByEmail(email)
-                .orElseGet(() -> {
-                    Role defaultRole = roleRepository.findByRoleName("ROLE_DEVELOPER")
-                            .orElseGet(() -> roleRepository.findByRoleName("ROLE_USER")
-                                    .orElseThrow(() -> new RuntimeException("Default role not found")));
+        try {
+            log.info("Поиск/создание OAuth пользователя: {}", email);
 
-                    User newUser = User.builder()
-                            .email(email)
-                            .name(fullName != null ? fullName : "OAuth User")
-                            .password("")  // пустой - OAuth
-                            .oauthProvider("google")
-                            .role(defaultRole)
-                            .contactInfo("")
-                            .build();
+            return userRepository.findByEmail(email)
+                    .orElseGet(() -> {
+                        Role defaultRole = roleRepository.findByRoleName("ROLE_DEVELOPER")
+                                .orElseGet(() -> roleRepository.findByRoleName("ROLE_USER")
+                                        .orElseThrow(() -> new RuntimeException("Default role not found")));
 
-                    return userRepository.save(newUser);
-                });
+                        User newUser = User.builder()
+                                .email(email)
+                                .name(fullName != null ? fullName : "OAuth User")
+                                .password("")
+                                .oauthProvider("google")
+                                .role(defaultRole)
+                                .contactInfo("")
+                                .build();
+
+                        User saved = userRepository.save(newUser);
+                        log.info("Создан новый OAuth пользователь: {}", email);
+                        return saved;
+                    });
+        } catch (Exception e) {
+            log.error("Ошибка при findOrCreateOAuthUser для email: {}", email, e);
+            throw e;
+        }
     }
 
     private String normalizeRoleName(String roleName) {

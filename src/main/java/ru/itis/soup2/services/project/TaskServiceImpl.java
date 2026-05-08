@@ -9,11 +9,11 @@ import org.springframework.web.multipart.MultipartFile;
 import ru.itis.soup2.models.core.User;
 import ru.itis.soup2.models.enums.TaskPriority;
 import ru.itis.soup2.models.enums.TaskStatus;
-import ru.itis.soup2.models.project.Attachment;
-import ru.itis.soup2.models.project.ProjectMember;
-import ru.itis.soup2.models.project.Task;
+import ru.itis.soup2.models.project.*;
 import ru.itis.soup2.repositories.core.UserRepository;
 import ru.itis.soup2.repositories.project.ProjectMemberRepository;
+import ru.itis.soup2.repositories.project.ProjectRepository;
+import ru.itis.soup2.repositories.project.SprintRepository;
 import ru.itis.soup2.repositories.project.TaskRepository;
 import ru.itis.soup2.services.mail.MailService;
 
@@ -35,6 +35,8 @@ public class TaskServiceImpl implements TaskService {
     private final AttachmentService attachmentService;
     private final ProjectMemberRepository projectMemberRepository;
     private final MailService mailService;
+    private final ProjectRepository projectRepository;
+    private final SprintRepository sprintRepository;
 
     @Override
     public Optional<Task> getTaskById(Integer id) {
@@ -65,6 +67,18 @@ public class TaskServiceImpl implements TaskService {
     @Override
     public void create(Task task, Integer assigneeId) {
         try {
+            if (task.getProject() != null && task.getProject().getId() != null) {
+                Project project = projectRepository.findById(task.getProject().getId())
+                        .orElseThrow(() -> new EntityNotFoundException("Project not found"));
+                task.setProject(project);
+            }
+
+            if (task.getSprint() != null && task.getSprint().getId() != null) {
+                Sprint sprint = sprintRepository.findById(task.getSprint().getId())
+                        .orElseThrow(() -> new EntityNotFoundException("Sprint not found"));
+                task.setSprint(sprint);
+            }
+
             if (assigneeId != null) {
                 userRepository.findById(assigneeId)
                         .ifPresent(task::setAssignee);
@@ -84,6 +98,9 @@ public class TaskServiceImpl implements TaskService {
             }
 
             taskRepository.save(task);
+
+            log.info("Создана задача: {} (id={}, projectId={})",
+                    task.getName(), task.getId(), task.getProject() != null ? task.getProject().getId() : null);
 
             if (task.getProject() != null && task.getProject().getManager() != null) {
                 String managerEmail = task.getProject().getManager().getEmail();
@@ -108,6 +125,22 @@ public class TaskServiceImpl implements TaskService {
     @Override
     public void update(Task task, Integer assigneeId) {
         try {
+            if (task.getProject() != null && task.getProject().getId() != null) {
+                Project project = projectRepository.findById(task.getProject().getId())
+                        .orElseThrow(() -> new EntityNotFoundException("Project not found"));
+                task.setProject(project);
+            } else {
+                task.setProject(null);
+            }
+
+            if (task.getSprint() != null && task.getSprint().getId() != null) {
+                Sprint sprint = sprintRepository.findById(task.getSprint().getId())
+                        .orElseThrow(() -> new EntityNotFoundException("Sprint not found"));
+                task.setSprint(sprint);
+            } else {
+                task.setSprint(null);
+            }
+
             if (assigneeId != null) {
                 userRepository.findById(assigneeId)
                         .ifPresent(task::setAssignee);
@@ -117,6 +150,8 @@ public class TaskServiceImpl implements TaskService {
 
             task.setUpdatedAt(LocalDateTime.now());
             taskRepository.save(task);
+
+            log.info("Обновлена задача: {} (id={})", task.getName(), task.getId());
 
             Map<String, Object> model = buildNotificationModel(task, "Задача обновлена");
 
@@ -129,7 +164,7 @@ public class TaskServiceImpl implements TaskService {
 
             if (task.getAssignee() != null) {
                 String assigneeEmail = task.getAssignee().getEmail();
-                boolean isNotManager = task.getProject().getManager() == null ||
+                boolean isNotManager = task.getProject() == null || task.getProject().getManager() == null ||
                         !assigneeEmail.equals(task.getProject().getManager().getEmail());
 
                 if (assigneeEmail != null && !assigneeEmail.isBlank() && isNotManager) {
@@ -147,16 +182,27 @@ public class TaskServiceImpl implements TaskService {
     @Override
     public void delete(Integer id) {
         try {
+            log.info("Попытка удаления задачи ID: {}", id);
+
             Task task = taskRepository.findWithDetailsById(id)
                     .orElseThrow(() -> new EntityNotFoundException("Task not found"));
 
             if (!task.getComments().isEmpty() || !task.getAttachments().isEmpty()) {
+                log.warn("Невозможно удалить задачу ID: {} — есть комментарии или файлы", id);
                 throw new IllegalStateException("Нельзя удалить задачу, у которой есть комментарии или прикреплённые файлы");
             }
 
-            taskRepository.delete(task);
+            if (!task.getSubTasks().isEmpty()) {
+                log.warn("Невозможно удалить задачу ID: {} — есть подзадачи", id);
+                throw new IllegalStateException("Нельзя удалить задачу, у которой есть подзадачи");
+            }
+
+            String taskName = task.getName();
+            taskRepository.deleteById(id);
+
+            log.info("Задача ID: {} («{}») успешно удалена", id, taskName);
         } catch (Exception e) {
-            log.error("Ошибка при удалении задачи с id: {}. Причина: {}", id, e.getMessage(), e);
+            log.error("Ошибка при удалении задачи с id: {}", id, e);
             throw e;
         }
     }
@@ -188,7 +234,7 @@ public class TaskServiceImpl implements TaskService {
             }
 
             Task saved = taskRepository.save(subTask);
-
+            log.info("Подзадача id:{} для задачи {} - успешно создана", subTask.getId(), parent.getName());
             if (parent.getAssignee() != null && parent.getAssignee().getEmail() != null) {
                 String parentAssigneeEmail = parent.getAssignee().getEmail();
                 Map<String, Object> model = buildNotificationModel(saved, "Создана подзадача");
@@ -247,6 +293,7 @@ public class TaskServiceImpl implements TaskService {
                     .build();
 
             attachmentService.create(attachment);
+            log.info("Файл {} для задачи {} по пути {} - успешно прикреплен", attachment.getFileName() , task.getId(), attachment.getFileUrl());
 
             if (task.getAssignee() != null && task.getAssignee().getEmail() != null) {
                 String assigneeEmail = task.getAssignee().getEmail();

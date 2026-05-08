@@ -15,6 +15,7 @@
     <h1>Задача №${task.id?c}: ${task.name}</h1>
 
     <a href="/tasks" class="btn btn-primary">← Назад к списку задач</a>
+    <a href="/dashboard" class="btn btn-primary">← Назад к дашборду</a>
 
     <div class="task-detail-card">
         <#if successMessage??>
@@ -199,11 +200,13 @@
     <#if currentUserRole == "ROLE_ADMIN" || currentUserRole == "ROLE_MANAGER">
         <div class="task-actions" style="margin-bottom: 25px;">
             <a href="/tasks/${task.id?c}/edit" class="btn btn-edit">Редактировать задачу</a>
-            <a href="/tasks/${task.id?c}/delete"
-               class="btn btn-delete"
-               onclick="return confirm('Вы уверены, что хотите удалить задачу №${task.id?c}? Это действие нельзя отменить.')">
-                Удалить задачу
-            </a>
+            <form method="post" action="/tasks/${task.id?c}/delete" style="display:inline;">
+                <input type="hidden" name="_csrf" value="${_csrf.token}">
+                <button type="submit" class="btn btn-danger"
+                        onclick="return confirm('Удалить задачу №${task.id}?')">
+                    Удалить
+                </button>
+            </form>
         </div>
     </#if>
 

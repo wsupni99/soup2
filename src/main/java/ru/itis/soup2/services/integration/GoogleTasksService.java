@@ -22,11 +22,13 @@ public class GoogleTasksService {
 
     public boolean addTaskToGoogleTasks(Task task, String accessToken) {
         if (accessToken == null) {
-            log.warn("Access token is missing for Google Tasks integration");
+            log.warn("Попытка синхронизации задачи в Google Tasks без access token. Task: {}", task.getName());
             return false;
         }
 
         try {
+            log.info("Отправка задачи '{}' в Google Tasks", task.getName());
+
             HttpHeaders headers = new HttpHeaders();
             headers.setBearerAuth(accessToken);
             headers.setContentType(MediaType.APPLICATION_JSON);
@@ -46,13 +48,16 @@ public class GoogleTasksService {
             ResponseEntity<String> response = restTemplate.exchange(GOOGLE_TASKS_API_URL, HttpMethod.POST, request, String.class);
 
             if (response.getStatusCode().is2xxSuccessful()) {
-                log.info("Task '{}' successfully synced to Google Tasks", task.getName());
+                log.info("Задача '{}' успешно синхронизирована в Google Tasks", task.getName());
                 return true;
+            } else {
+                log.warn("Google Tasks вернул статус {} при синхронизации задачи '{}'",
+                        response.getStatusCode(), task.getName());
+                return false;
             }
-            return false;
 
         } catch (Exception e) {
-            log.error("Error syncing task to Google Tasks: {}", e.getMessage());
+            log.error("Ошибка синхронизации задачи '{}' в Google Tasks", task.getName(), e);
             return false;
         }
     }

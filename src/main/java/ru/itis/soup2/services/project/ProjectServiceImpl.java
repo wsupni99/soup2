@@ -32,9 +32,11 @@ public class ProjectServiceImpl implements ProjectService {
     @Override
     public void create(Project project) {
         try {
+            log.info("Создание проекта: {}", project.getName());
             projectRepository.save(project);
+            log.info("Проект успешно создан. ID: {}", project.getId());
         } catch (Exception e) {
-            log.error("Ошибка при создании проекта: {}. Причина: {}", project.getName(), e.getMessage(), e);
+            log.error("Ошибка при создании проекта: {}", project.getName(), e);
             throw e;
         }
     }
@@ -53,9 +55,11 @@ public class ProjectServiceImpl implements ProjectService {
     @Override
     public void update(Project project) {
         try {
+            log.info("Обновление проекта ID: {}", project.getId());
             projectRepository.save(project);
+            log.info("Проект ID: {} успешно обновлён", project.getId());
         } catch (Exception e) {
-            log.error("Ошибка при обновлении проекта с id: {}. Причина: {}", project.getId(), e.getMessage(), e);
+            log.error("Ошибка при обновлении проекта с id: {}", project.getId(), e);
             throw e;
         }
     }
@@ -64,17 +68,26 @@ public class ProjectServiceImpl implements ProjectService {
     @Override
     public void delete(Integer id) {
         try {
+            log.info("Попытка удаления проекта ID: {}", id);
+
             Project project = projectRepository.findById(id)
                     .orElseThrow(() -> new EntityNotFoundException("Проект не найден"));
+
             if (!project.getSprints().isEmpty()) {
+                log.warn("Невозможно удалить проект ID: {} — есть привязанные спринты", id);
                 throw new IllegalStateException("Нельзя удалить проект с привязанными спринтами");
             }
+
             if (!project.getTasks().isEmpty()) {
+                log.warn("Невозможно удалить проект ID: {} — есть привязанные задачи", id);
                 throw new IllegalStateException("Нельзя удалить проект с привязанными задачами");
             }
+
             projectRepository.delete(project);
+            log.info("Проект ID: {} успешно удалён", id);
+
         } catch (Exception e) {
-            log.error("Ошибка при удалении проекта с id: {}. Причина: {}", id, e.getMessage(), e);
+            log.error("Ошибка при удалении проекта с id: {}", id, e);
             throw e;
         }
     }

@@ -21,9 +21,19 @@ public class RoleServiceImpl implements RoleService {
     @Override
     public Optional<Role> findByName(String roleName) {
         try {
-            return roleRepository.findByRoleName(roleName);
+            log.debug("Поиск роли по имени: {}", roleName);
+
+            Optional<Role> role = roleRepository.findByRoleName(roleName);
+
+            if (role.isPresent()) {
+                log.debug("Роль найдена: {}", roleName);
+            } else {
+                log.warn("Роль не найдена: {}", roleName);
+            }
+
+            return role;
         } catch (Exception e) {
-            log.error("Ошибка при поиске роли по имени: {}. Причина: {}", roleName, e.getMessage(), e);
+            log.error("Ошибка при поиске роли по имени: {}", roleName, e);
             throw e;
         }
     }
@@ -31,9 +41,14 @@ public class RoleServiceImpl implements RoleService {
     @Override
     public List<Role> findAll() {
         try {
-            return roleRepository.findAll();
+            log.info("Получение списка всех ролей");
+
+            List<Role> roles = roleRepository.findAll();
+            log.info("Получено {} ролей", roles.size());
+
+            return roles;
         } catch (Exception e) {
-            log.error("Ошибка при получении списка ролей. Причина: {}", e.getMessage(), e);
+            log.error("Ошибка при получении списка ролей", e);
             throw e;
         }
     }
