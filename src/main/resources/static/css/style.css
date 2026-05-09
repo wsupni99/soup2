@@ -1,5 +1,3 @@
-/* style.css */
-
 body {
     font-family: Arial, sans-serif;
     margin: 20px;
@@ -27,7 +25,6 @@ th {
     background: #f0f0f0;
 }
 
-/* Общие формы (создание/редактирование) */
 form {
     display: flex;
     flex-direction: column;
@@ -36,9 +33,8 @@ form {
     margin: 0 auto;
 }
 
-/* Специально для фильтров — делаем компактнее */
 .filter-form form {
-    display: block;           /* отключаем column flex для фильтров */
+    display: block;
     max-width: 100%;
 }
 
@@ -159,7 +155,7 @@ button:hover {
     display: flex;
     flex-direction: column;
     min-width: 180px;
-    flex: 1 1 200px;           /* позволяет элементам равномерно распределяться */
+    flex: 1 1 200px;
 }
 
 .filter-group label {
@@ -201,14 +197,12 @@ button:hover {
     margin-bottom: 20px;
 }
 
-/* Для форм создания/редактирования */
 .container-form {
     max-width: 800px;
     margin: 40px auto;
     padding: 20px;
 }
 
-/* Стили для страницы логина */
 .login-page {
     min-height: 100vh;
     display: flex;
@@ -274,8 +268,6 @@ button:hover {
     padding: 6px 12px;
     font-weight: 500;
 }
-
-/* ====================== ATTACHMENTS BLOCK ====================== */
 
 .attachments-section {
     margin-top: 40px;
@@ -399,8 +391,6 @@ button:hover {
     border-radius: 8px;
     border: 2px dashed #ddd;
 }
-
-/* ====================== TASK DETAIL ====================== */
 
 .task-detail-card {
     background: white;
@@ -559,7 +549,6 @@ button:hover {
     flex-wrap: wrap;
 }
 
-/* Ссылки на задачи в таблице */
 .task-link {
     color: #4e73df;
     font-weight: 600;
@@ -572,7 +561,6 @@ button:hover {
     text-decoration: underline;
 }
 
-/* Улучшенные бейджи для статуса и приоритета в таблице */
 .priority-badge, .status-badge {
     padding: 5px 12px;
     border-radius: 20px;
@@ -611,8 +599,6 @@ button:hover {
 .status-in_progress { background: #fff3e0; color: #f57c00; }
 .status-done        { background: #e8f5e9; color: #388e3c; }
 .status-blocked     { background: #ffebee; color: #d32f2f; }
-
-/* ====================== SUBTASKS ====================== */
 
 .subtasks-section {
     margin-top: 40px;
@@ -675,8 +661,6 @@ button:hover {
 .subtask-body strong {
     color: #2c3e50;
 }
-
-/* ====================== MODAL WINDOW ====================== */
 
 .modal {
     display: none;
@@ -776,7 +760,6 @@ button:hover {
     }
 }
 
-/* ---------- ERROR PAGES ---------- */
 .error-page {
     display: flex;
     align-items: center;
@@ -828,7 +811,6 @@ button:hover {
     font-family: monospace;
 }
 
-/* ====================== COMMENTS ====================== */
 .comments-section {
     margin-top: 40px;
     padding: 20px;
@@ -912,8 +894,6 @@ button:hover {
     align-self: flex-end;
     padding: 10px 20px;
 }
-
-/* ====================== KANBAN DASHBOARD ====================== */
 
 .dashboard-container {
     max-width: 1400px;
@@ -1123,7 +1103,6 @@ button:hover {
     margin-top: 8px;
 }
 
-/* Стили для разных статусов колонок */
 .kanban-column[data-status="TODO"] .kanban-column-header h3 {
     color: #1976d2;
 }
@@ -1160,7 +1139,6 @@ button:hover {
     color: #d32f2f;
 }
 
-/* Стили для пустых колонок */
 .kanban-column-empty {
     text-align: center;
     padding: 30px 20px;
@@ -1169,7 +1147,6 @@ button:hover {
     font-size: 0.95em;
 }
 
-/* Адаптивность для дашборда */
 @media (max-width: 1200px) {
     .kanban-column {
         min-width: 260px;
@@ -1200,7 +1177,6 @@ button:hover {
     }
 }
 
-/* Скроллбар для канбан доски */
 .kanban-board::-webkit-scrollbar {
     height: 8px;
 }
@@ -1218,7 +1194,7 @@ button:hover {
 .kanban-board::-webkit-scrollbar-thumb:hover {
     background: #a8a8a8;
 }
-/* ====================== HEADER - ИСПРАВЛЕННАЯ ВЕРСИЯ ====================== */
+
 .main-header {
     background: #4e73df;
     color: white;
@@ -1301,14 +1277,12 @@ button:hover {
     font-weight: 600;
 }
 
-/* Основной контент страниц */
 .main-content {
     max-width: 1480px;
     margin: 30px auto;
     padding: 0 30px;
 }
 
-/* Убираем старые отступы у body */
 body {
     margin: 0;
     padding: 0;
@@ -1348,7 +1322,6 @@ body {
     padding: 8px 16px;
 }
 
-/* ====================== GOOGLE BUTTON ====================== */
 .btn-google {
     background-color: #ffffff;
     color: #3c4043;

@@ -19,6 +19,7 @@ import java.util.List;
 @Entity
 @Table(name = "projects", schema = "project")
 public class Project {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "project_id")

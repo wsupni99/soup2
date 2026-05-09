@@ -186,8 +186,6 @@ public class TaskServiceImpl implements TaskService {
 
             Task task = taskRepository.findWithDetailsById(id)
                     .orElseThrow(() -> new EntityNotFoundException("Task not found"));
-
-            // Подсчёт того, что будет удалено
             int commentsCount = task.getComments().size();
             int attachmentsCount = task.getAttachments().size();
             int subTasksCount = task.getSubTasks().size();
@@ -332,7 +330,7 @@ public class TaskServiceImpl implements TaskService {
 
     @Override
     public List<Task> getTasksByProjectId(Integer projectId) {
-        return taskRepository.findByProjectId(projectId);
+        return taskRepository.findByProjectIdOrderByIdDesc(projectId);
     }
 
     @Transactional

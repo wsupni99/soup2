@@ -8,5 +8,5 @@ import ru.itis.soup2.models.project.Comment;
 import java.util.List;
 
 public interface CommentRepository extends JpaRepository<Comment, Integer> {
-    List<Comment> findByTaskId(@Param("taskId") Integer taskId);
+    List<Comment> findByTaskId(Integer taskId);
 }

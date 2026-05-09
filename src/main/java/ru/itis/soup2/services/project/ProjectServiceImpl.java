@@ -138,10 +138,7 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Override
     public List<Project> getProjectsByUserId(Integer userId) {
-        return projectMemberRepository.findAllByUserId(userId)
-                .stream()
-                .map(ProjectMember::getProject)
-                .toList();
+        return projectRepository.findProjectsByUserId(userId);
     }
 
     @Override
@@ -184,10 +181,6 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Override
     public List<Project> getAvailableProjectsForUser(Integer userId) {
-        List<Project> allProjects = projectRepository.findAll();
-
-        return allProjects.stream()
-                .filter(project -> !isUserInProject(userId, project.getId()))
-                .toList();
+        return projectRepository.findAvailableProjectsForUser(userId);
     }
 }

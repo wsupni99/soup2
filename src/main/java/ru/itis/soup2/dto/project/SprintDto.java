@@ -23,13 +23,6 @@ public class SprintDto {
     private List<TaskDto> tasks;
     private Integer taskCount;
 
-    // Конструктор без задач
-    public SprintDto(Integer id, String name, LocalDate startDate, LocalDate endDate,
-                     Integer projectId, String projectName) {
-        this(id, name, startDate, endDate, projectId, projectName, List.of(), 0);
-    }
-
-    // Конструктор с задачами
     public SprintDto(Integer id, String name, LocalDate startDate, LocalDate endDate,
                      Integer projectId, String projectName, List<TaskDto> tasks) {
         this(id, name, startDate, endDate, projectId, projectName,

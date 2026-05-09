@@ -116,8 +116,8 @@ public class ProjectRequestServiceImpl implements ProjectRequestService {
     }
 
     @Override
-    public List<ProjectRequest> getMyPendingRequests(Integer userId) {
-        return requestRepository.findByUserIdAndStatus(userId, RequestStatus.PENDING);
+    public boolean hasActiveRequest(Integer userId, Integer projectId) {
+        return requestRepository.existsByProjectIdAndUserIdAndStatus(projectId, userId, RequestStatus.PENDING);
     }
 
     @Override
@@ -126,7 +126,7 @@ public class ProjectRequestServiceImpl implements ProjectRequestService {
     }
 
     @Override
-    public boolean hasActiveRequest(Integer userId, Integer projectId) {
-        return requestRepository.existsByProjectIdAndUserIdAndStatus(projectId, userId, RequestStatus.PENDING);
+    public List<ProjectRequest> getMyPendingRequests(Integer userId) {
+        return requestRepository.findByUserIdAndStatus(userId, RequestStatus.PENDING);
     }
 }

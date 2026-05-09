@@ -14,8 +14,7 @@ import java.util.List;
 @Repository
 public interface TaskLogRepository extends JpaRepository<TaskLog, Integer> {
 
-    @Query("SELECT tl FROM TaskLog tl ORDER BY tl.changedAt DESC")
-    Page<TaskLog> findAllOrdered(Pageable pageable);
+    Page<TaskLog> findAllByOrderByChangedAtDesc(Pageable pageable);
 
     @Query("SELECT tl FROM TaskLog tl WHERE (:userId IS NULL OR tl.user.id = :userId) ORDER BY tl.changedAt DESC")
     Page<TaskLog> findByUserIdOptional(@Param("userId") Integer userId, Pageable pageable);

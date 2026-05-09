@@ -19,7 +19,7 @@ public class TaskLogService {
 
     public Page<TaskLogDto> findAllOrdered(Pageable pageable) {
         try {
-            return taskLogRepository.findAllOrdered(pageable).map(taskLogMapper::toDto);
+            return taskLogRepository.findAllByOrderByChangedAtDesc(pageable).map(taskLogMapper::toDto);
         } catch (Exception e) {
             log.error("Ошибка при получении логов задач. Причина: {}", e.getMessage(), e);
             throw e;

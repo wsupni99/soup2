@@ -4,8 +4,6 @@
     <meta charset="UTF-8">
     <title>Задача #${task.id?c} — ${task.name}</title>
     <link rel="stylesheet" href="/css/style.css">
-
-    <!-- CSRF защита -->
     <meta name="_csrf" content="${_csrf.token}">
     <meta name="_csrf_header" content="${_csrf.headerName}">
 </head>
@@ -25,7 +23,6 @@
             <div class="error">${errorMessage}</div>
         </#if>
 
-        <!-- Основная информация -->
         <div class="info-section">
             <h3>Информация о задаче</h3>
             <button onclick="addToGoogleTasks()" class="btn btn-primary" id="google-btn">
@@ -63,7 +60,6 @@
             </div>
         </div>
 
-        <!-- Описание -->
         <div class="description-section">
             <h3>Описание задачи</h3>
             <div class="description-content">
@@ -75,7 +71,6 @@
             </div>
         </div>
 
-        <!-- Подзадачи -->
         <div class="subtasks-section">
             <div class="section-header">
                 <h3>Подзадачи (${task.subTasks?size!0})</h3>
@@ -108,7 +103,6 @@
             </div>
         </div>
 
-        <!-- Модальное окно -->
         <div id="subtaskModal" class="modal">
             <div class="modal-content">
                 <span class="modal-close" onclick="hideModal()">&times;</span>
@@ -134,7 +128,6 @@
             </div>
         </div>
 
-        <!-- Прикреплённые файлы -->
         <div class="attachments-section">
             <h3>Прикреплённые файлы</h3>
 
@@ -169,7 +162,6 @@
             </div>
         </div>
 
-        <!-- Блок комментариев -->
         <div class="comments-section">
             <h3>Комментарии (${comments?size})</h3>
 

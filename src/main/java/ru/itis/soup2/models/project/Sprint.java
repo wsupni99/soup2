@@ -14,6 +14,7 @@ import java.util.List;
 @Entity
 @Table(name = "sprints", schema = "project")
 public class Sprint {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "sprint_id")

@@ -1,11 +1,10 @@
-package ru.itis.soup2.controllers;
+package ru.itis.soup2.controllers.web;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -222,8 +221,6 @@ public class TaskController {
                 .toList();
     }
 
-    // ====================== Google Tasks ======================
-
     @PostMapping("/tasks/{id}/google-tasks")
     @ResponseBody
     public boolean addToGoogleTasks(@PathVariable Integer id,
@@ -247,8 +244,6 @@ public class TaskController {
         return success;
     }
 
-    // ====================== Вспомогательные методы ======================
-
     private String getCurrentUserRole(CustomUserDetails userDetails) {
         if (userDetails == null || userDetails.getUser().getRole() == null) {
             return "ROLE_USER";
@@ -263,12 +258,10 @@ public class TaskController {
 
         String role = getCurrentUserRole(userDetails);
 
-        // Менеджер и Админ могут добавлять любую задачу
         if ("ROLE_MANAGER".equals(role) || "ROLE_ADMIN".equals(role)) {
             return true;
         }
 
-        // Разработчик может добавлять только назначенные на него задачи
         if ("ROLE_DEVELOPER".equals(role)) {
             return task.getAssignee() != null &&
                     task.getAssignee().getId().equals(userDetails.getUser().getId());

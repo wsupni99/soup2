@@ -48,7 +48,6 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
 
         SecurityContextHolder.getContext().setAuthentication(newAuth);
 
-        // Обновление CSRF токена
         CsrfToken csrfToken = csrfTokenRepository.loadToken(request);
         if (csrfToken == null) {
             csrfToken = csrfTokenRepository.generateToken(request);

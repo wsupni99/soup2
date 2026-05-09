@@ -10,14 +10,12 @@
 <div class="main-content">
     <h1>Главная страница — Менеджер</h1>
 
-    <!-- Быстрые действия -->
     <div class="quick-actions">
         <h2>Быстрые действия</h2>
         <a href="/projects/new" class="btn btn-primary">+ Создать проект</a>
         <a href="/projects" class="btn">Управление проектами</a>
     </div>
 
-    <!-- Мои проекты -->
     <h2>Мои проекты</h2>
     <#if myProjects?? && myProjects?size gt 0>
         <div class="project-grid">
@@ -34,7 +32,6 @@
         <p class="empty">У вас пока нет проектов</p>
     </#if>
 
-    <!-- Заявки на вступление -->
     <h2>Заявки на вступление</h2>
     <#if pendingRequests?? && pendingRequests?size gt 0>
         <div class="request-grid">

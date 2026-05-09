@@ -1,4 +1,4 @@
-package ru.itis.soup2.controllers;
+package ru.itis.soup2.controllers.web;
 
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.ControllerAdvice;

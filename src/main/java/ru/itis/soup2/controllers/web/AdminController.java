@@ -1,4 +1,4 @@
-package ru.itis.soup2.controllers;
+package ru.itis.soup2.controllers.web;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;

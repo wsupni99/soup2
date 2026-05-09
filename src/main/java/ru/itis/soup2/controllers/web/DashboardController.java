@@ -1,4 +1,4 @@
-package ru.itis.soup2.controllers;
+package ru.itis.soup2.controllers.web;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -39,8 +39,6 @@ public class DashboardController {
 
         model.addAttribute("userProjects", userProjects);
         model.addAttribute("currentUserId", userId);
-
-        // Если есть проекты — показываем первый по умолчанию
         if (!userProjects.isEmpty()) {
             return "redirect:/dashboard/" + userProjects.get(0).getId();
         }
